@@ -127,7 +127,7 @@ body {
   color: white;
   border-radius: 30px;
   text-decoration: none;
-  font-size: large;
+  font-size: medium;
   cursor: pointer;
   border: none;
 }
@@ -147,6 +147,13 @@ body {
   border-radius:10px;width:300px;height:40px
 }
 
+.metamask-icon{
+  margin-left: 5px;
+}
+
+.none-decoration{
+  text-decoration: none !important;
+}
 
 @media only screen and (max-width: 768px) {
   .logo{
@@ -171,9 +178,6 @@ body {
     width: 20px;
     height: 20px;
     margin-right: 5px;
-  }
-  .btn-grad {
-    font-size: medium;
   }
   .address-box {
     border-radius:10px;width:300px;height:40px;
