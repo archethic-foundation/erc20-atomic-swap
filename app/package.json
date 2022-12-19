@@ -1,0 +1,27 @@
+{
+  "name": "archethic-bridge",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "type": "module",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "start": "npm run build && node server.js",
+    "build": "node build.cjs"
+  },
+  "author": "",
+  "license": "AGPL-3.0-or-later",
+  "dependencies": {
+    "archethic": "1.13.0",
+    "ethers": "^5.7.2",
+    "express": "^4.18.2",
+    "express-validation": "^4.1.0",
+    "joi": "^17.7.0",
+    "web3": "^1.8.1"
+  },
+  "devDependencies": {
+    "esbuild": "^0.15.15"
+  }
+}
