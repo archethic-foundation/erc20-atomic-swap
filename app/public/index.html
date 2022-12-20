@@ -1,84 +1,3 @@
-<!-- <!DOCTYPE html>
-<html>
-  <head>
-    <title>Archethic Bridge</title>
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css"
-    />
-    <style>
-      html {
-        background: black;
-      }
-    </style>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  </head>
-  <body>
-    <div class="container mt-6 pr-6 pl-6">
-      <div class="columns">
-        <div class="column is-8-desktop is-offset-2-desktop box">
-          <div class="columns">
-            <div class="column">
-              <img src="./logo.svg" class="image p-3"/>
-            </div>
-          </div>
-          <div class="columns">
-            <div class="column">
-              <h1 class="is-size-5">Bridge ETH -> ARCHETHIC</h1>
-            </div>
-          </div>
-          <div class="columns" >
-            <div class="column">
-              <button type="button" class="button is-info" id="connectMetamask">
-                Connect Metamask
-              </button>
-              <p id="ethAddress" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></p>
-              <p class="mt-3" id="ucoBalance"></p>
-
-              <form style="display: none" id="swapForm" class="mt-5">
-                <div class="field">
-                  <label class="label" for="nbTokens">Number of tokens to swap</label>
-                  <div class="control">
-                  <input type="number" class="input" min="1" max="100" id="nbTokens" placeholder="Enter the number of tokens to swap" value="1" required/>
-                  </div>
-                </div>
-                <div class="message is-warning">
-                  <div class="message-body">
-                    The swap is currently limited to 100 UCO
-                  </div>
-                </div>
-                <div class="field">
-                  <label class="label" for="recipientAddress">Recipent's address of the swap</label>
-                  <div class="control">
-                    <input type="text" class="input" placeholder="Enter your Archethic's address" id="recipientAddress" pattern="^([0-9A-Fa-f]){68}$" title="The address should be a valid Archethic's address" required/>
-                  </div>
-                </div>
-                <div class="message is-warning">
-                  <div class="message-body">
-                    This address must exist on Archethic's network. Please make sure the address entered is correct, to avoid any loss.
-                  </div>
-                </div>
-                <div class="control mt-5">
-                  <button class="button is-primary">Swap</button>
-                  <br />
-                  <p id="errorMsg" class="has-text-danger" style="display: none"></p>
-                  <progress class="progress is-success mt-5" value="0" max="100" id="progressBar" style="display: none"></progress>
-                  <p id="progressStatus" class="word-wrap: break-word;"></p>
-                  <p id="archethicAddress"></p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <script src="https://cdn.ethers.io/lib/ethers-5.0.umd.min.js" type="text/javascript"></script>
-    <script src="./app.js"></script>
-  </body>
-</html> -->
-
 <!doctype html>
 <html lang="en">
 
@@ -128,34 +47,42 @@
         </main>
 
         <form role="main" class="inner cover" id="swapForm" style="display: none">
-            <div class="col d-xl-block">
+            <div class="col">
                 <p>Recipient's address of the swap</p>
-                <input type="text" style="border-radius:10px;width:600px;height:40px;" id="recipientAddress">
+                <input type="text" class="address-box" id="recipientAddress">
 
                 <div class="row">
 
-                    <div class="box" style="--color-shadow1: #00a4db;box-shadow: 5px 5px var(--color-shadow1);">
+                    <div class="box col" style="--color-shadow1: #00a4db;box-shadow: 5px 5px var(--color-shadow1);">
+                      <div class="row d-flex flex-wrap align-items-center">
                         <div class="col">
-                            <p>Balance</p>
-                            <p id="ucoEthBalance">0</p>
-                            <h4>ETH</h4>
+                              <p>Balance</p>
+                              <p id="ucoEthBalance">0</p>
                         </div>
+                        <div class="col">
+                              <h4>ETH</h4>
+                        </div>
+                      </div>
                     </div>
 
-                    <img class="arrow" src="./img/Arrows.png" width="300px" height="100px" style="margin-top: 10%;" />
+                    <img class="arrow margin-top-10 col" src="./img/Arrows.png" width="300px" height="100px" />
 
-                    <div class="box" style="--color-shadow1: #cc00ff;box-shadow: 5px 5px var(--color-shadow1);">
-                        <div class="col">
-                            <p>Balance</p>
-                            <p id="ucoArchethicBalance">0</p>
-                            <h4>UCO</h4>
-                        </div>
+                    <div class="box col" style="--color-shadow1: #cc00ff;box-shadow: 5px 5px var(--color-shadow1);">                            
+                            <div class="row d-flex flex-wrap align-items-center">
+                              <div class="col">
+                                    <p>Balance</p>
+                                    <p id="ucoArchethicBalance">0</p>
+                              </div>
+                              <div class="col">
+                                    <h4>UCO</h4>
+                              </div>
+                            </div>
                     </div>
 
                 </div>
 
                 <p>Nb of tokens to swap</p>
-                <input type="number" min="1" max="100" style="border-radius:10px;width:300px;height:40px"
+                <input type="number" min="1" max="100" class="token-box"
                     id="nbTokensToSwap" value="1">
 
                 <br>
@@ -163,7 +90,7 @@
 
                 <button class="btn-grad">Swap</button>
 
-                <div class="info-box">
+                <div class="info-box mx-auto">
                   <div class="row">
                     <div class="col-2 d-flex flex-wrap align-items-center">
                       <img style="margin-left: 12px;" class="info-picture" src="./img/icons8-info.svg" />
