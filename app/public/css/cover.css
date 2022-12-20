@@ -169,6 +169,7 @@ body {
   }
   .arrow{
     width: 300px;
+    margin-top: 0px !important;
     /* height: 50px;   */
   }
   .ae{
@@ -189,9 +190,14 @@ body {
     font-size:x-small !important;
     width: 300px;
   }
+  .info-picture{
+    width: 32px;
+    height: 32px;
+    margin-left: 6px !important;
+  }
   .box{
     border-radius: 20px !important;
-    width: 240px !important;
+    width: 250px !important;
     height: 80px !important;
     background-color: #252525 !important;
     padding: 0px !important;
@@ -200,6 +206,10 @@ body {
 }
 
 
+.margin-top-10{
+  margin-top: 10%;
+}
+
 .box {
   width: 200px;
   height: 200px;
@@ -207,6 +217,7 @@ body {
   border-radius: 50px;
   padding: 50px;
   margin: 20px;
+ 
 }
 
 .info-box {
