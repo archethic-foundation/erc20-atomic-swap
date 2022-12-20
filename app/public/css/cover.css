@@ -335,3 +335,7 @@ ul.progress-bar {
   justify-content: center;
   border-radius: 50%;
  }
+ 
+ .steps .label {
+     color: grey;
+ }

@@ -49,7 +49,8 @@
         <form role="main" class="inner cover" id="swapForm" style="display: none">
             <div class="col">
                 <p>Recipient's address of the swap</p>
-                <input type="text" class="address-box" id="recipientAddress">
+                <input type="text" class="address-box" id="recipientAddress" required pattern="^([0-9A-Fa-f]){68}$"
+                    placeholder="Enter your Archethic's address">
 
                 <div class="row">
 
@@ -82,12 +83,12 @@
                 </div>
 
                 <p>Nb of tokens to swap</p>
-                <input type="number" min="1" max="100" class="token-box" id="nbTokensToSwap" value="1">
+                <input type="number" min="1" max="100" class="token-box" id="nbTokensToSwap" value="1" required>
 
                 <br>
                 <br>
 
-                <button class="btn-grad">Swap</button>
+                <button class="btn-grad" id="btnSwap">Swap</button>
 
                 <div class="info-box mx-auto">
                     <div class="row">
@@ -105,33 +106,34 @@
                         </div>
                     </div>
                 </div>
-                <div class="progresses timeline">
+                <div class="progresses timeline" id="progressBar" style="display: none">
 
                     <div class="steps">
-                        <div class="label">Deployment ETH</div>
-                    </div>
-                    
-                    <span class="line"></span>
-
-                    <div class="steps">
-                        <div class="label">Deployment Archethic</div>
+                        <div class="label" id="deployEthProgress">Deployment ETH
+                        </div>
                     </div>
 
                     <span class="line"></span>
 
                     <div class="steps">
-                        <div class="label">Swap in progress</div>
+                        <div class="label" id="deployArchethicProgress">Deployment Archethic</div>
                     </div>
 
                     <span class="line"></span>
 
                     <div class="steps">
-                        <div class="label" style="color: greenyellow;">&#10004;Swap Validated</div>
+                        <div class="label" id="swapProgress">Swap in progress</div>
+                    </div>
+
+                    <span class="line"></span>
+
+                    <div class="steps">
+                        <div class="label" id="swapValidated">Swap Validated</div>
                     </div>
 
                 </div>
 
-
+                <p id="error" style="margin-top: 100px" class="text-danger"></p>
             </div>
 
         </form>
@@ -189,7 +191,7 @@
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous">
-    </script>
+        </script>
 
     <script src="./app.js"></script>
 </body>

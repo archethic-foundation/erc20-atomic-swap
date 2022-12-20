@@ -15,7 +15,13 @@ $("#connectMetamaskBtn").on('click', async () => {
 async function startApp(provider) {
   $("#swapForm").show();
 
-  const { _archethicEndpoint, unirisTokenAddress, recipientEthereum } = await getConfig();
+  const { _archethicEndpoint, unirisTokenAddress, recipientEthereum, sufficientFunds } = await getConfig();
+
+  if (!sufficientFunds) {
+    $("#error").text("An error occured: Bridge has insuffficient funds. Please retry later")
+    $("#btnSwap").hide()
+    return
+  }
 
   // console.log("Archethic endpoint: ", archethicEndpoint);
   // const archethic = new Archethic(archethicEndpoint)
@@ -36,14 +42,14 @@ async function startApp(provider) {
   // })
 
 
-  $("#swapForm").on('submit', (e) => {
+  $("#swapForm").on('submit', async (e) => {
     e.preventDefault();
-    if (!swapForm.checkValidity()) {
+    if (!e.target.checkValidity()) {
       return;
     }
 
     const recipientAddress = $("#recipientAddress").val();
-    handleFormSubmit(signer, unirisContract, recipientEthereum, recipientAddress);
+    await handleFormSubmit(signer, unirisContract, recipientEthereum, recipientAddress);
   })
 }
 
@@ -53,6 +59,8 @@ async function getERC20Contract(unirisTokenAddress, provider) {
 }
 
 async function handleFormSubmit(signer, unirisContract, recipientEthereum, recipientArchethic) {
+  $("#progressBar").show()
+
   const secret = new Uint8Array(32);
   crypto.getRandomValues(secret);
 
@@ -67,6 +75,8 @@ async function handleFormSubmit(signer, unirisContract, recipientEthereum, recip
 
   try {
 
+    $("#deployEthProgress").css({ color: "white" })
+
     const HTLC_Contract = await deployHTLC(
       recipientEthereum,
       unirisContract.address,
@@ -80,6 +90,9 @@ async function handleFormSubmit(signer, unirisContract, recipientEthereum, recip
 
     await transferTokensToHTLC(amount, HTLCAddress, unirisContract, signer)
 
+    $("#deployEthProgress").css({ color: "greenyellow" })
+    $("#deployArchethicProgress").css({ color: "white" })
+
     const contractAddress = await sendDeployRequest(
       secretDigestHex,
       recipientArchethic,
@@ -88,10 +101,16 @@ async function handleFormSubmit(signer, unirisContract, recipientEthereum, recip
     );
     console.log("Contract address on Archethic", contractAddress);
 
+    $("#deployArchethicProgress").css({ color: "greenyellow" })
     await sendWithdrawRequest(contractAddress, HTLCAddress, secretHex);
     console.log("Token swap finish");
+
+    $("#swapProgress").css({ color: "greenyellow" })
+    $("#swapValidated").css({ color: "greenyellow" })
+
   } catch (e) {
-    console.error(e);
+    console.error(e.message || e);
+    $("#error").text(`An error occured: ${e.message || e}`).show()
   }
 }
 
@@ -114,7 +133,7 @@ async function sendDeployRequest(secretDigestHex, recipientAddress, amount, ethe
       ethereumContractAddress: ethereumContractAddress
     }),
   })
-    .then((r) => r.json())
+    .then(handleResponse)
     .then((r) => r.contractAddress);
 }
 
@@ -130,7 +149,8 @@ async function sendWithdrawRequest(archethicContractAddress, ethereumContractAdd
       ethereumContractAddress: ethereumContractAddress,
       secret: secret,
     }),
-  }).then((r) => r.json());
+  })
+    .then(handleResponse)
 }
 
 async function deployHTLC(
@@ -198,12 +218,13 @@ function uint8ArrayToHex(bytes) {
 
 async function getConfig() {
   return fetch("/status")
-    .then((r) => r.json())
+    .then(handleResponse)
     .then((r) => {
       return {
         archethicEndpoint: r.archethicEndpoint,
         unirisTokenAddress: r.unirisTokenAddress,
-        recipientEthereum: r.recipientEthereum
+        recipientEthereum: r.recipientEthereum,
+        sufficientFunds: r.sufficientFunds
       };
     });
 }
@@ -249,3 +270,16 @@ async function getHTLC() {
 //     return 0;
 //   })
 // }
+
+
+async function handleResponse(response) {
+  return new Promise(function(resolve, reject) {
+    if (response.status >= 200 && response.status <= 299) {
+      response.json().then(resolve);
+    } else {
+      response.json()
+        .then(reject)
+        .catch(() => reject(response.statusText))
+    }
+  });
+}

@@ -23,14 +23,13 @@ app.get("/", function(_req, res) {
 
 app.use("/", routes);
 
-app.use((err, _req, res) => {
+app.use((err, req, res, _next) => {
   if (err instanceof expressValidation.ValidationError) {
-    console.log(err)
     res.status(err.statusCode).json(err);
   } else {
     res.status(500).json({
       status: 500,
-      message: err,
+      message: err
     });
   }
 });
