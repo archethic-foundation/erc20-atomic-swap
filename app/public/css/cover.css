@@ -203,6 +203,9 @@ body {
     padding: 0px !important;
     
   }
+  .timeline{
+    width: 300px;
+  }
 }
 
 
