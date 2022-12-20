@@ -213,11 +213,21 @@ body {
 
   font-size: smaller;
   text-align: left;
-  display: flex;
   border-radius: 10px;
+  display: flex;
   padding: 10px;
   margin: 30px;
   box-shadow: inset 0 0 0 1px white;
+}
+
+.info-picture{
+  margin-left: 2%;
+  margin-right: 2%;
+}
+
+.info-text{
+  margin-top: 2%;
+  margin-bottom: 2%;
 }
 
 .step-progress-bar {
