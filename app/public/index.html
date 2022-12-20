@@ -54,36 +54,35 @@
                 <div class="row">
 
                     <div class="box col" style="--color-shadow1: #00a4db;box-shadow: 5px 5px var(--color-shadow1);">
-                      <div class="row d-flex flex-wrap align-items-center">
-                        <div class="col">
-                              <p>Balance</p>
-                              <p id="ucoEthBalance">0</p>
+                        <div class="row d-flex flex-wrap align-items-center">
+                            <div class="col">
+                                <p>Balance</p>
+                                <p id="ucoEthBalance">0</p>
+                            </div>
+                            <div class="col">
+                                <h4>ETH</h4>
+                            </div>
                         </div>
-                        <div class="col">
-                              <h4>ETH</h4>
-                        </div>
-                      </div>
                     </div>
 
                     <img class="arrow margin-top-10 col" src="./img/Arrows.png" width="300px" height="100px" />
 
-                    <div class="box col" style="--color-shadow1: #cc00ff;box-shadow: 5px 5px var(--color-shadow1);">                            
-                            <div class="row d-flex flex-wrap align-items-center">
-                              <div class="col">
-                                    <p>Balance</p>
-                                    <p id="ucoArchethicBalance">0</p>
-                              </div>
-                              <div class="col">
-                                    <h4>UCO</h4>
-                              </div>
+                    <div class="box col" style="--color-shadow1: #cc00ff;box-shadow: 5px 5px var(--color-shadow1);">
+                        <div class="row d-flex flex-wrap align-items-center">
+                            <div class="col">
+                                <p>Balance</p>
+                                <p id="ucoArchethicBalance">0</p>
                             </div>
+                            <div class="col">
+                                <h4>UCO</h4>
+                            </div>
+                        </div>
                     </div>
 
                 </div>
 
                 <p>Nb of tokens to swap</p>
-                <input type="number" min="1" max="100" class="token-box"
-                    id="nbTokensToSwap" value="1">
+                <input type="number" min="1" max="100" class="token-box" id="nbTokensToSwap" value="1">
 
                 <br>
                 <br>
@@ -91,64 +90,91 @@
                 <button class="btn-grad">Swap</button>
 
                 <div class="info-box mx-auto">
-                  <div class="row">
-                    <div class="col-2 d-flex flex-wrap align-items-center">
-                      <img style="margin-left: 12px;" class="info-picture" src="./img/icons8-info.svg" />
+                    <div class="row">
+                        <div class="col-2 d-flex flex-wrap align-items-center">
+                            <img style="margin-left: 12px;" class="info-picture" src="./img/icons8-info.svg" />
+                        </div>
+                        <div class="col-10">
+                            <p class="info-text">
+                                The swap is currently limited to 100 UCO.
+                                <br>
+                                The destination address must exits on Archethic Network.
+                                <br>
+                                Please make sure the address entered is correct, to avoid any loss.
+                            </p>
+                        </div>
                     </div>
-                    <div class="col-10">
-                      <p class="info-text">
-                        The swap is currently limited to 100 UCO.
-                        <br>
-                        The destination address must exits on Archethic Network.
-                        <br>
-                        Please make sure the address entered is correct, to avoid any loss.
-                      </p>
-                    </div>
-                  </div>
                 </div>
+                <div class="progresses timeline">
+
+                    <div class="steps">
+                        <div class="label">Deployment ETH</div>
+                    </div>
+                    
+                    <span class="line"></span>
+
+                    <div class="steps">
+                        <div class="label">Deployment Archethic</div>
+                    </div>
+
+                    <span class="line"></span>
+
+                    <div class="steps">
+                        <div class="label">Swap in progress</div>
+                    </div>
+
+                    <span class="line"></span>
+
+                    <div class="steps">
+                        <div class="label" style="color: greenyellow;">&#10004;Swap Validated</div>
+                    </div>
+
+                </div>
+
+
             </div>
 
-          </form>
+        </form>
 
-            <footer class="mastfoot mt-auto">
-                <div class="inner">
-                    <a class="none-decoration" target="_blank" href="https://twitter.com/archethic">
-                        <img class="social" src="./img/white_logos/twitter.svg" />
-                    </a>
-                    <a class="none-decoration" target="_blank" href="https://www.instagram.com/the_official_archethic/">
-                        <img class="social" src="./img/white_logos/instagram.svg" />
-                    </a>
-                    <a class="none-decoration" target="_blank" href="https://t.me/ArchEthic_ENG">
-                        <img class="social" src="./img/white_logos/telegram.svg" />
-                    </a>
-                    <a class="none-decoration" target="_blank" href="https://discord.com/invite/CJZJvVReBx">
-                        <img class="social" src="./img/white_logos/discord.svg" />
-                    </a>
-                    <a class="none-decoration" target="_blank" href="https://www.reddit.com/r/ArchEthic/">
-                        <img class="social" src="./img/white_logos/reddit.svg" />
-                    </a>
-                    <a class="none-decoration" target="_blank"
-                        href="https://www.youtube.com/channel/UCmP7Sg_TdBfbO1_u4EyIKzg">
-                        <img class="social" src="./img/white_logos/youtube.svg" />
-                    </a>
-                    <a class="none-decoration" target="_blank" href="https://github.com/archethic-foundation">
-                        <img class="social" src="./img/white_logos/github.svg" />
-                    </a>
-                    <a class="none-decoration" target="_blank"
-                        href="https://www.linkedin.com/company/archethic-technologies/">
-                        <img class="social" src="./img/white_logos/linkedin.svg" />
-                    </a>
-                    <a class="none-decoration" target="_blank" href="https://medium.com/archethic">
-                        <img class="social" src="./img//white_logos/medium.png" />
-                    </a>
-                    <a class="none-decoration" target="_blank" href="https://coinmarketcap.com/currencies/uniris/">
-                        <img class="social" src="./img/white_logos/cmc.png" />
-                    </a>
-                    <a class="none-decoration" target="_blank" href="https://www.coingecko.com/en/coins/archethic">
-                        <img class="social" src="./img/white_logos/cg.png" />
-                    </a>
-                </div>
-            </footer>
+        <footer class="mastfoot mt-auto">
+            <div class="inner">
+                <a class="none-decoration" target="_blank" href="https://twitter.com/archethic">
+                    <img class="social" src="./img/white_logos/twitter.svg" />
+                </a>
+                <a class="none-decoration" target="_blank" href="https://www.instagram.com/the_official_archethic/">
+                    <img class="social" src="./img/white_logos/instagram.svg" />
+                </a>
+                <a class="none-decoration" target="_blank" href="https://t.me/ArchEthic_ENG">
+                    <img class="social" src="./img/white_logos/telegram.svg" />
+                </a>
+                <a class="none-decoration" target="_blank" href="https://discord.com/invite/CJZJvVReBx">
+                    <img class="social" src="./img/white_logos/discord.svg" />
+                </a>
+                <a class="none-decoration" target="_blank" href="https://www.reddit.com/r/ArchEthic/">
+                    <img class="social" src="./img/white_logos/reddit.svg" />
+                </a>
+                <a class="none-decoration" target="_blank"
+                    href="https://www.youtube.com/channel/UCmP7Sg_TdBfbO1_u4EyIKzg">
+                    <img class="social" src="./img/white_logos/youtube.svg" />
+                </a>
+                <a class="none-decoration" target="_blank" href="https://github.com/archethic-foundation">
+                    <img class="social" src="./img/white_logos/github.svg" />
+                </a>
+                <a class="none-decoration" target="_blank"
+                    href="https://www.linkedin.com/company/archethic-technologies/">
+                    <img class="social" src="./img/white_logos/linkedin.svg" />
+                </a>
+                <a class="none-decoration" target="_blank" href="https://medium.com/archethic">
+                    <img class="social" src="./img//white_logos/medium.png" />
+                </a>
+                <a class="none-decoration" target="_blank" href="https://coinmarketcap.com/currencies/uniris/">
+                    <img class="social" src="./img/white_logos/cmc.png" />
+                </a>
+                <a class="none-decoration" target="_blank" href="https://www.coingecko.com/en/coins/archethic">
+                    <img class="social" src="./img/white_logos/cg.png" />
+                </a>
+            </div>
+        </footer>
     </div>
 
     <!-- Bootstrap core JavaScript
@@ -162,8 +188,8 @@
         integrity="sha512-6UofPqm0QupIL0kzS/UIzekR73/luZdC6i/kXDbWnLOJoqwklBK6519iUnShaYceJ0y4FaiPtX/hRnV/X/xlUQ=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
-        crossorigin="anonymous"></script>
+        integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous">
+    </script>
 
     <script src="./app.js"></script>
 </body>

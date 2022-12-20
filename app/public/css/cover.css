@@ -203,8 +203,19 @@ body {
     padding: 0px !important;
     
   }
+  .timeline{
+    width: 300px;
+    margin-bottom: 100px !important;
+  }
 }
 
+.timeline{
+  margin-bottom: 50px;
+}
+
+.label{
+  margin-top: 100px;
+}
 
 .margin-top-10{
   margin-top: 10%;
@@ -298,3 +309,29 @@ ul.progress-bar {
 .step-progress-bar li.active:after{
   /* background-color: #e75153; */
 }
+
+
+.progresses{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+ }
+
+ .line{
+  width: 120px;
+  height: 6px;
+  background: linear-gradient(160deg, #00A4DB 0, #CC00FF 100%);
+ }
+
+ 
+ .steps{
+  display: flex;
+  background: linear-gradient(160deg, #00A4DB 0, #CC00FF 100%);
+  color: #fff;
+  font-size: 14px;
+  width: 40px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+ }
