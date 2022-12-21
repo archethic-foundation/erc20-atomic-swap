@@ -13,7 +13,7 @@ switch (process.env["ETHEREUM_ENDPOINT"]) {
     WEB3_PRIVATE_KEY = "91478b9ed07e05d331f3eb12be41541d61ffaefee8ccaec3249897c597814bf8" // account #9
     break;
   case "TESTNET":
-    WEB3_PROVIDER = "https://ropsten.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161"
+    WEB3_PROVIDER = "https://goerli.infura.io/v3/3a7a2dbdbec046a4961550ddf8c7d78a"
     WEB3_PRIVATE_KEY = ""
     break;
   default:

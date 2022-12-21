@@ -17,7 +17,7 @@ router.get("/status", async (_req, res) => {
     bridgeAddress: bridgeAddress,
     recipientEthereum: recipientEthereum,
     unirisTokenAddress: unirisTokenAddress,
-    sufficientFunds: balance > 1
+    sufficientFunds: balance > 1e8 // Should have at least 1 UCO
   })
 });
 
@@ -54,8 +54,6 @@ async function getLastTransactionBalance(archethic) {
     });
     const res = await r.json();
 
-    console.log(res)
-
     if (res.errors && res.errors.find(x => x.message == "transaction_not_exists")) {
       return await getBridgeInputs(archethic)
     }
@@ -63,7 +61,6 @@ async function getLastTransactionBalance(archethic) {
     if (res.data.lastTransaction && res.data.lastTransaction.balance) {
       return res.data.lastTransaction.balance.uco;
     }
-
 
     return 0;
   })

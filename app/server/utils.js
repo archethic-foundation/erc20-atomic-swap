@@ -1,5 +1,4 @@
 import { Crypto, Utils } from "archethic";
-
 const archethicEndpoint =
   process.env["ARCHETHIC_ENDPOINT"] || "https://mainnet.archethic.net";
 
@@ -20,7 +19,7 @@ switch (process.env["ETHEREUM_ENDPOINT"]) {
     recipientEthereum = "";
     unirisTokenAddress = "";
   default:
-    recipientEthereum = ""; // TODO: provide the mainnet bridge address
+    recipientEthereum = process.env["ETHEREUM_BRIDGE_ADDRESS"];
     unirisTokenAddress = "0x8a3d77e9d6968b780564936d15B09805827C21fa";
 }
 
