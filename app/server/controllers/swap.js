@@ -5,36 +5,11 @@ const contractJSON = fs.readFileSync("../truffle/build/contracts/HTLC.json", "ut
 
 const contractABI = JSON.parse(contractJSON).abi
 
-let WEB3_PROVIDER, WEB3_PRIVATE_KEY;
-
-switch (process.env["ETHEREUM_ENDPOINT"]) {
-  case "LOCAL":
-    WEB3_PROVIDER = "http://localhost:7545";
-    WEB3_PRIVATE_KEY = "91478b9ed07e05d331f3eb12be41541d61ffaefee8ccaec3249897c597814bf8" // account #9
-    break;
-  case "TESTNET":
-    WEB3_PROVIDER = "https://goerli.infura.io/v3/3a7a2dbdbec046a4961550ddf8c7d78a"
-    WEB3_PRIVATE_KEY = ""
-    break;
-  default:
-    WEB3_PROVIDER = "https://mainnet.infura.io/v3/3a7a2dbdbec046a4961550ddf8c7d78a"
-    WEB3_PRIVATE_KEY = ""
-}
-
-const provider = new ethers.providers.JsonRpcProvider(WEB3_PROVIDER)
-const ethWallet = new ethers.Wallet(WEB3_PRIVATE_KEY, provider)
-const balance = ethers.utils.formatUnits(await ethWallet.getBalance(), 18)
-if (balance <= 0) {
-  throw "Ethereum's account has not found"
-}
-
-console.log(`Connected to Ethereum on ${WEB3_PROVIDER}`)
-
 import Archethic, { Crypto, Utils } from "archethic";
 import { createHmac } from "crypto";
 const { originPrivateKey } = Utils;
 
-import { archethicEndpoint, baseSeedContract, bridgeAddress, bridgeSeed, recipientEthereum, unirisTokenAddress } from "../utils.js";
+import { hasSufficientFunds, archethicEndpoint, ethConfig, baseSeedContract, bridgeAddress, bridgeSeed } from "../utils.js";
 
 const archethic = new Archethic(archethicEndpoint)
 
@@ -51,17 +26,24 @@ archethic.connect()
 export default { deployContract, withdraw }
 
 async function deployContract(req, res, next) {
-
-  await checkEthereumContract(req.body.ethereumContractAddress, req.body.amount, req.body.secretHash)
-
-  const contractSeed = createHmac("sha512", baseSeedContract)
-    .update(req.body.ethereumContractAddress)
-    .digest();
-
-  const contractAddress = Crypto.deriveAddress(contractSeed, 0);
-  const contractAddressHex = Utils.uint8ArrayToHex(contractAddress);
-
   try {
+
+    if (!await hasSufficientFunds(req.body.ethereumChainId)) {
+      return res.status(500).json({ message: "Unsufficient funds" })
+    }
+
+    const { providerEndpoint, unirisTokenAddress, recipientEthereum } = ethConfig[req.body.ethereumChainId]
+    const provider = new ethers.providers.JsonRpcProvider(providerEndpoint)
+
+    await checkEthereumContract(req.body.ethereumContractAddress, req.body.amount, req.body.secretHash, recipientEthereum, unirisTokenAddress, provider)
+
+    const contractSeed = createHmac("sha512", baseSeedContract)
+      .update(req.body.ethereumContractAddress)
+      .digest();
+
+    const contractAddress = Crypto.deriveAddress(contractSeed, 0);
+    const contractAddressHex = Utils.uint8ArrayToHex(contractAddress);
+
     await fundContract(contractSeed, req.body.amount);
     console.log(`Contract ${contractAddressHex} funded`);
     const tx = await createContract(contractSeed, req.body.recipientAddress, req.body.amount, req.body.endTime, req.body.secretHash);
@@ -71,36 +53,42 @@ async function deployContract(req, res, next) {
     res.json({ status: "ok", contractAddress: contractAddressHex });
   }
   catch (error) {
-    next(error)
+    next(error.message || error)
   }
 }
 
 async function withdraw(req, res, next) {
-  const archethicContractAddress = req.body.archethicContractAddress
-  const ethereumContractAddress = req.body.ethereumContractAddress
-  const secret = req.body.secret
-
-  const ethContractInstance = getEthereumContract(ethereumContractAddress)
-  if (ethContractInstance === undefined) {
-    throw "Invalid ethereum contract's address"
-  }
-
   try {
-    const tx = await createRevealSecretTransaction(archethicContractAddress, secret)
+
+    if (!await hasSufficientFunds(req.body.ethereumChainId)) {
+      return res.status(500).json({ message: "Unsufficient funds" })
+    }
+
+    const { providerEndpoint, privateKey } = ethConfig[req.body.ethereumChainId]
+    const provider = new ethers.providers.JsonRpcProvider(providerEndpoint)
+
+    const ethContractInstance = getEthereumContract(req.body.ethereumContractAddress, provider)
+    if (ethContractInstance === undefined) {
+      throw "Invalid ethereum contract's address"
+    }
+
+    const ethWallet = new ethers.Wallet(privateKey, provider)
+
+    const tx = await createRevealSecretTransaction(req.body.archethicContractAddress, req.body.secret)
     await sendTransaction(tx)
-    await withdrawEthereumContract(ethContractInstance, secret)
+    await withdrawEthereumContract(ethWallet, ethContractInstance, req.body.secret)
 
     res.json({ status: "ok" })
   }
   catch (error) {
-    next(error)
+    next(error.message || error)
   }
 }
 
-function checkEthereumContract(ethereumContractAddress, amount, hash) {
+function checkEthereumContract(ethereumContractAddress, amount, hash, recipientEthereum, unirisTokenAddress, provider) {
   return new Promise(async (resolve, reject) => {
 
-    const contractInstance = getEthereumContract(ethereumContractAddress)
+    const contractInstance = getEthereumContract(ethereumContractAddress, provider)
     if (contractInstance === undefined) {
       return reject("Invalid ethereum contract's address")
     }
@@ -110,6 +98,7 @@ function checkEthereumContract(ethereumContractAddress, amount, hash) {
     const contractHash = await contractInstance.hash()
     const contractRecipient = await contractInstance.recipient()
 
+    // We check with the amount * 1e10, because the amount on Archethic will be 1e8, we need to reach Ethereum decimals
     if (contractToken == unirisTokenAddress && contractHash == `0x${hash}` && contractAmount == (amount * 1e10) && contractRecipient == recipientEthereum) {
       return resolve()
     }
@@ -117,13 +106,13 @@ function checkEthereumContract(ethereumContractAddress, amount, hash) {
   })
 }
 
-function getEthereumContract(ethereumContractAddress) {
-  return new ethers.Contract(ethereumContractAddress, contractABI, ethWallet)
+function getEthereumContract(ethereumContractAddress, provider) {
+  return new ethers.Contract(ethereumContractAddress, contractABI, provider)
 }
 
-async function withdrawEthereumContract(contractInstance, secret) {
-  const contractSigner = contractInstance.connect(ethWallet)
+async function withdrawEthereumContract(ethWallet, ethContractInstance, secret) {
   const nonce = await ethWallet.getTransactionCount()
+  const contractSigner = ethContractInstance.connect(ethWallet)
   await contractSigner.withdraw(`0x${secret}`, { gasLimit: 100000, nonce: nonce || undefined })
 }
 

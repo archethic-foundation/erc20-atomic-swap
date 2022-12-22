@@ -8,6 +8,10 @@ window.onload = async function() {
 
 $("#connectMetamaskBtn").on('click', async () => {
   provider = new ethers.providers.Web3Provider(window.ethereum);
+
+  // MetaMask requires requesting permission to connect users accounts
+  await provider.send("eth_requestAccounts", []);
+
   $("#main").hide()
   await startApp(provider);
 })
@@ -15,7 +19,8 @@ $("#connectMetamaskBtn").on('click', async () => {
 async function startApp(provider) {
   $("#swapForm").show();
 
-  const { _archethicEndpoint, unirisTokenAddress, recipientEthereum, sufficientFunds } = await getConfig();
+  const { chainId: ethChainId } = await provider.getNetwork()
+  const { archethicEndpoint, unirisTokenAddress, recipientEthereum, sufficientFunds } = await getConfig(ethChainId);
 
   if (!sufficientFunds) {
     $("#error").text("An error occured: Bridge has insuffficient funds. Please retry later")
@@ -23,11 +28,10 @@ async function startApp(provider) {
     return
   }
 
-  // console.log("Archethic endpoint: ", archethicEndpoint);
-  // const archethic = new Archethic(archethicEndpoint)
-  // await archethic.connect()
+  const archethic = new Archethic(archethicEndpoint)
+  await archethic.connect()
+  console.log("Archethic endpoint: ", archethicEndpoint);
 
-  await provider.send("eth_requestAccounts", []);
   const signer = provider.getSigner();
 
   const account = await signer.getAddress();
@@ -36,11 +40,10 @@ async function startApp(provider) {
   const balance = await unirisContract.balanceOf(account);
   $("#ucoEthBalance").text(ethers.utils.formatUnits(balance, 18))
 
-  // $("#recipientAddress").on("change", async () => {
-  //   const archethicBalance = await getArchethicBalance(archethic, $(this).val())
-  //   console.log(archethicBalance)
-  // })
-
+  $("#recipientAddress").on("change", async (e) => {
+    const archethicBalance = await getLastTransactionBalance(archethic, $(e.target).val())
+    $("#ucoArchethicBalance").text(archethicBalance / 1e8)
+  })
 
   $("#swapForm").on('submit', async (e) => {
     e.preventDefault();
@@ -49,7 +52,7 @@ async function startApp(provider) {
     }
 
     const recipientAddress = $("#recipientAddress").val();
-    await handleFormSubmit(signer, unirisContract, recipientEthereum, recipientAddress);
+    await handleFormSubmit(signer, unirisContract, recipientEthereum, recipientAddress, ethChainId, archethic);
   })
 }
 
@@ -58,7 +61,7 @@ async function getERC20Contract(unirisTokenAddress, provider) {
   return new ethers.Contract(unirisTokenAddress, unirisTokenABI, provider);
 }
 
-async function handleFormSubmit(signer, unirisContract, recipientEthereum, recipientArchethic) {
+async function handleFormSubmit(signer, unirisContract, recipientEthereum, recipientArchethic, ethChainId, archethic) {
   $("#progressBar").show()
 
   const secret = new Uint8Array(32);
@@ -97,16 +100,20 @@ async function handleFormSubmit(signer, unirisContract, recipientEthereum, recip
       secretDigestHex,
       recipientArchethic,
       amount,
-      HTLCAddress
+      HTLCAddress,
+      ethChainId
     );
     console.log("Contract address on Archethic", contractAddress);
 
     $("#deployArchethicProgress").css({ color: "greenyellow" })
-    await sendWithdrawRequest(contractAddress, HTLCAddress, secretHex);
+    await sendWithdrawRequest(contractAddress, HTLCAddress, secretHex, ethChainId);
     console.log("Token swap finish");
 
     $("#swapProgress").css({ color: "greenyellow" })
     $("#swapValidated").css({ color: "greenyellow" })
+
+    const archethicBalance = await getLastTransactionBalance(archethic, recipientArchethic)
+    $("#ucoArchethicBalance").text(archethicBalance / 1e8)
 
   } catch (e) {
     console.error(e.message || e);
@@ -114,7 +121,7 @@ async function handleFormSubmit(signer, unirisContract, recipientEthereum, recip
   }
 }
 
-async function sendDeployRequest(secretDigestHex, recipientAddress, amount, ethereumContractAddress) {
+async function sendDeployRequest(secretDigestHex, recipientAddress, amount, ethereumContractAddress, ethChainId) {
   const endTime = new Date();
   endTime.setSeconds(endTime.getSeconds() + 10000);
   const endTimeUNIX = Math.floor(endTime / 1000);
@@ -130,14 +137,15 @@ async function sendDeployRequest(secretDigestHex, recipientAddress, amount, ethe
       recipientAddress: recipientAddress,
       amount: amount * 1e8,
       endTime: endTimeUNIX,
-      ethereumContractAddress: ethereumContractAddress
+      ethereumContractAddress: ethereumContractAddress,
+      ethereumChainId: ethChainId
     }),
   })
     .then(handleResponse)
     .then((r) => r.contractAddress);
 }
 
-async function sendWithdrawRequest(archethicContractAddress, ethereumContractAddress, secret) {
+async function sendWithdrawRequest(archethicContractAddress, ethereumContractAddress, secret, ethChainId) {
   return fetch("/swap/withdraw", {
     method: "POST",
     headers: {
@@ -148,6 +156,7 @@ async function sendWithdrawRequest(archethicContractAddress, ethereumContractAdd
       archethicContractAddress: archethicContractAddress,
       ethereumContractAddress: ethereumContractAddress,
       secret: secret,
+      ethereumChainId: ethChainId
     }),
   })
     .then(handleResponse)
@@ -216,8 +225,17 @@ function uint8ArrayToHex(bytes) {
   return hexOctets.join("");
 }
 
-async function getConfig() {
-  return fetch("/status")
+async function getConfig(ethChainId) {
+  return fetch("/status", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify({
+      ethereumChainId: ethChainId
+    })
+  })
     .then(handleResponse)
     .then((r) => {
       return {
@@ -243,34 +261,99 @@ async function getHTLC() {
   };
 }
 
-// async function getArchethicBalance(archethic, address) {
+async function getArchethicBalance(archethic, address) {
 
-//   archethic.requestNode(async (endpoint) => {
-//     const url = new URL("/api", endpoint);
-//     const r = await fetch(url, {
-//       method: "POST",
-//       headers: {
-//         "Content-Type": "application/json",
-//         Accept: "application/json",
-//       },
-//       body: JSON.stringify({
-//         query: `
-//           query {
-//             balance(address: "${address}") {
-//               uco
-//             }
-//           }
-//         `
-//       })
-//     });
-//     const res = await r.json();
-//     if (res.data.balance && res.data.balance.uco) {
-//       return res.data.balance.uco;
-//     }
-//     return 0;
-//   })
-// }
+  archethic.requestNode(async (endpoint) => {
+    const url = new URL("/api", endpoint);
+    const r = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        query: `
+          query {
+            balance(address: "${address}") {
+              uco
+            }
+          }
+        `
+      })
+    });
+    const res = await r.json();
+    if (res.data.balance && res.data.balance.uco) {
+      return res.data.balance.uco;
+    }
+    return 0;
+  })
+}
 
+
+async function getLastTransactionBalance(archethic, address) {
+  return archethic.requestNode(async (endpoint) => {
+    const url = new URL("/api", endpoint);
+    const r = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        query: `
+            query {
+              lastTransaction(address: "${address}") {
+                 balance {
+                   uco
+                 }
+              }
+            }
+          `
+      })
+    });
+    const res = await r.json();
+
+    if (res.errors && res.errors.find(x => x.message == "transaction_not_exists")) {
+      return await getInputs(archethic, address)
+    }
+
+    if (res.data.lastTransaction && res.data.lastTransaction.balance) {
+      return res.data.lastTransaction.balance.uco;
+    }
+
+    return 0;
+  })
+}
+
+async function getInputs(archethic, address) {
+  return archethic.requestNode(async (endpoint) => {
+    const url = new URL("/api", endpoint);
+    const r = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        query: `
+            query {
+              transactionInputs(address: "${address}") {
+                 type,
+                 amount
+              }
+            }
+          `
+      })
+    });
+    const res = await r.json();
+    if (res.data.transactionInputs && res.data.transactionInputs.length > 0) {
+      return res.data.transactionInputs
+        .filter(r => r.type == "UCO")
+        .reduce((acc, { amount: amount }) => acc + amount, 0)
+    }
+    return 0;
+  })
+}
 
 async function handleResponse(response) {
   return new Promise(function(resolve, reject) {
