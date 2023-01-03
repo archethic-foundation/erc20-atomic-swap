@@ -3,8 +3,8 @@
 
 <head>
 	<meta charset="UTF-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
-	<title>Archethic Bridge</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Archethic</title>
 	<!-- Library -->
 	<link rel="stylesheet" href="assets/css/bootstrap.min.css" />
 	<!-- font-family -->
@@ -13,7 +13,6 @@
 	<link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet">
 	<!-- Main css -->
 	<link rel="stylesheet" href="assets/scss/main.css" />
-	<link rel="icon" href="assets/images/Archethic Logo alone - Gradient.svg">
 </head>
 
 <body>
@@ -39,8 +38,15 @@
 						<div class="col-lg-7 col-md-7">
 							<div class="icon-block">
 								<div class="box">
-									<div>
-										<br /><br /><br />
+									<h2>2) Enter the recipient’s address</h2>
+									<div class="row">
+										<div class="col-12">
+											<div class="in-box">
+												<input type="text" class="form-control" id="recipientAddress" required
+													pattern="^([0-9A-Fa-f]){68}$"
+													placeholder="Enter your Archethic's address">
+											</div>
+										</div>
 									</div>
 									<div class="icon-bar">
 										<div class="row mb-4">
@@ -53,24 +59,44 @@
 										</div>
 										<div class="row">
 											<div class="col-12">
-												<h3>1) Please, connect your ERC20 Wallet</h3>
+												<h3>3) Enter the nb of tokens to transfer</h3>
 											</div>
 										</div>
 									</div>
 									<div class="three-block">
+										<div class="row mb-3">
+											<div class="col-12">
+												<ul>
+													<li>
+														<div class="i-box">
+															<input type="text" class="form-control" id="ucoEthBalance"
+																type="number" min="1" max="100" id="nbTokensToSwap"
+																required placeholder="ETH">
+														</div>
+													</li>
+													<li></li>
+													<li>
+														<div class="i-box">
+															<input type="text" id="ucoArchethicBalance"
+																class="form-control" placeholder="UCO">
+														</div>
+													</li>
+												</ul>
+											</div>
+										</div>
 										<div class="row">
 											<div class="col-12">
 												<h4>1 ETH = 13738,56 UCO</h4>
 											</div>
 										</div>
 									</div>
+									<div class="para-text">
+										<p>The swap is currently limited to 100 UCO.</p>
+										<p>The destination address must exists on Archethic Network.</p>
+										<p>Please make sure the address entered is correct, to avoid any loss.</p>
+									</div>
 									<div class="btn-area">
-										<button id="connectMetamaskBtn" class="btn sp-btn"
-											style="margin-top: 5%;  width: 400px;">
-											Connect to Metamask
-											<img class="metamask-icon" src="assets/images/icons8-metamask-logo-48.png"
-												width="25px" />
-										</button>
+										<button class="btn sp-btn">Swap</button>
 									</div>
 								</div>
 							</div>
@@ -78,8 +104,7 @@
 								<div class="col-12">
 									<footer id="footer">
 										<p>Archethic Bridge powered by <a href="#"><img
-													src="assets/images/small-logo.svg" alt=""></a>
-										</p>
+													src="assets/images/small-logo.svg" alt=""></a></p>
 									</footer>
 								</div>
 							</div>
@@ -87,7 +112,6 @@
 					</div>
 				</div>
 			</main>
-
 			<footer class="mastfoot mt-auto">
 				<div class="inner">
 					<a class="none-decoration" target="_blank" href="https://twitter.com/archethic">
@@ -136,8 +160,5 @@
 <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.js"></script>
 <script src="assets/js/app.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/archethic/dist/archethic.min.js"></script>
-<script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="application/javascript"></script>
-<script src="app.js"></script>
 
 </html>

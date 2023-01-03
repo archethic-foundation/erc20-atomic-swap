@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="./img/Archethic Logo alone - Gradient.svg">
+
+    <title>Archethic Bridge</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <!-- Custom styles for this template -->
+    <link href="./css/cover.css" rel="stylesheet">
+</head>
+
+<body class="text-center">
+
+    <div class="cover-container d-flex h-100 p-3 mx-auto flex-column">
+        <header class="masthead mb-auto">
+            <div class="inner">
+                <a href="index.html">
+                    <img class="logo" src="./img/ArchethicPublicBlockchain-Gradient.svg" width="350">
+                </a>
+            </div>
+        </header>
+
+        <main role="main" class="inner cover" id="main">
+            <h3 class="cover-heading heading-size">Welcome to the Archethic's Bridge.<br> Please, connect to our
+                <br>Ethereum Wallet with metamask.
+            </h3>
+            <div class="row">
+                <div class="col">
+                    <img class="arrow" src="./img/Arrows.png" width="600px" />
+                </div>
+            </div>
+            <button id="connectMetamaskBtn" class="btn-grad" style="margin-top: 5%;">
+                Connect to Metamask
+                <img class="metamask-icon" src="./img/icons8-metamask-logo-48.png" width="25px" />
+            </button>
+        </main>
+
+        <form role="main" class="inner cover" id="swapForm" style="display: none">
+            <div class="col">
+                <p>Recipient's address of the swap</p>
+                <input type="text" class="address-box" id="recipientAddress" required pattern="^([0-9A-Fa-f]){68}$"
+                    placeholder="Enter your Archethic's address">
+
+                <div class="row">
+
+                    <div class="box col" style="--color-shadow1: #00a4db;box-shadow: 5px 5px var(--color-shadow1);">
+                        <div class="row d-flex flex-wrap align-items-center">
+                            <div class="col">
+                                <p>Balance</p>
+                                <p id="ucoEthBalance">0</p>
+                            </div>
+                            <div class="col">
+                                <h4>ETH</h4>
+                            </div>
+                        </div>
+                    </div>
+
+                    <img class="arrow margin-top-10 col" src="./img/Arrows.png" width="300px" height="100px" />
+
+                    <div class="box col" style="--color-shadow1: #cc00ff;box-shadow: 5px 5px var(--color-shadow1);">
+                        <div class="row d-flex flex-wrap align-items-center">
+                            <div class="col">
+                                <p>Balance</p>
+                                <p id="ucoArchethicBalance">0</p>
+                            </div>
+                            <div class="col">
+                                <h4>UCO</h4>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <p>Nb of tokens to swap</p>
+                <input type="number" min="1" max="100" class="token-box" id="nbTokensToSwap" value="1" required>
+
+                <br>
+                <br>
+
+                <button class="btn-grad" id="btnSwap">Swap</button>
+
+                <div class="info-box mx-auto">
+                    <div class="row">
+                        <div class="col-2 d-flex flex-wrap align-items-center">
+                            <img style="margin-left: 12px;" class="info-picture" src="./img/icons8-info.svg" />
+                        </div>
+                        <div class="col-10">
+                            <p class="info-text">
+                                The swap is currently limited to 100 UCO.
+                                <br>
+                                The destination address must exits on Archethic Network.
+                                <br>
+                                Please make sure the address entered is correct, to avoid any loss.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="progresses timeline" id="progressBar" style="display: none">
+
+                    <div class="steps">
+                        <div class="label" id="deployEthProgress">Deployment ETH
+                        </div>
+                    </div>
+
+                    <span class="line"></span>
+
+                    <div class="steps">
+                        <div class="label" id="deployArchethicProgress">Deployment Archethic</div>
+                    </div>
+
+                    <span class="line"></span>
+
+                    <div class="steps">
+                        <div class="label" id="swapProgress">Swap in progress</div>
+                    </div>
+
+                    <span class="line"></span>
+
+                    <div class="steps">
+                        <div class="label" id="swapValidated">Swap Validated</div>
+                    </div>
+
+                </div>
+
+                <p id="error" style="margin-top: 100px" class="text-danger"></p>
+            </div>
+
+        </form>
+
+        <footer class="mastfoot mt-auto">
+            <div class="inner">
+                <a class="none-decoration" target="_blank" href="https://twitter.com/archethic">
+                    <img class="social" src="./img/white_logos/twitter.svg" />
+                </a>
+                <a class="none-decoration" target="_blank" href="https://www.instagram.com/the_official_archethic/">
+                    <img class="social" src="./img/white_logos/instagram.svg" />
+                </a>
+                <a class="none-decoration" target="_blank" href="https://t.me/ArchEthic_ENG">
+                    <img class="social" src="./img/white_logos/telegram.svg" />
+                </a>
+                <a class="none-decoration" target="_blank" href="https://discord.com/invite/CJZJvVReBx">
+                    <img class="social" src="./img/white_logos/discord.svg" />
+                </a>
+                <a class="none-decoration" target="_blank" href="https://www.reddit.com/r/ArchEthic/">
+                    <img class="social" src="./img/white_logos/reddit.svg" />
+                </a>
+                <a class="none-decoration" target="_blank"
+                    href="https://www.youtube.com/channel/UCmP7Sg_TdBfbO1_u4EyIKzg">
+                    <img class="social" src="./img/white_logos/youtube.svg" />
+                </a>
+                <a class="none-decoration" target="_blank" href="https://github.com/archethic-foundation">
+                    <img class="social" src="./img/white_logos/github.svg" />
+                </a>
+                <a class="none-decoration" target="_blank"
+                    href="https://www.linkedin.com/company/archethic-technologies/">
+                    <img class="social" src="./img/white_logos/linkedin.svg" />
+                </a>
+                <a class="none-decoration" target="_blank" href="https://medium.com/archethic">
+                    <img class="social" src="./img//white_logos/medium.png" />
+                </a>
+                <a class="none-decoration" target="_blank" href="https://coinmarketcap.com/currencies/uniris/">
+                    <img class="social" src="./img/white_logos/cmc.png" />
+                </a>
+                <a class="none-decoration" target="_blank" href="https://www.coingecko.com/en/coins/archethic">
+                    <img class="social" src="./img/white_logos/cg.png" />
+                </a>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.2/jquery.min.js"
+        integrity="sha512-tWHlutFnuG0C6nQRlpvrEhE4QpkG1nn2MOUMWmUeRePl4e3Aki0VB6W1v3oLjFtd0hVOtRQ9PHpSfN6u6/QXkQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.6/umd/popper.min.js"
+        integrity="sha512-6UofPqm0QupIL0kzS/UIzekR73/luZdC6i/kXDbWnLOJoqwklBK6519iUnShaYceJ0y4FaiPtX/hRnV/X/xlUQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous">
+        </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/archethic/dist/archethic.min.js"></script>
+    <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="application/javascript"></script>
+
+    <script src="./app.js"></script>
+</body>
+
+</html>
