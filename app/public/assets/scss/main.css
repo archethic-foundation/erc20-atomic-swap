@@ -348,6 +348,19 @@ body {
   text-align: right;
 }
 
+.main .icon-block .box .three-block ul li .i-box span {
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 17px;
+  text-align: justify;
+  letter-spacing: 2.56232px;
+  color: #FFFFFF;
+  position: absolute;
+  top: 5px;
+  left: auto;
+  right: 8px;
+}
+
 .main .icon-block .box .three-block h4 {
   font-weight: 700;
   font-size: 10px;
