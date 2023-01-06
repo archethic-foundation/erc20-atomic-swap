@@ -1,0 +1,10 @@
+{
+    outDir?: string,
+    removeComments?: boolean,
+    sourceMaps?: boolean,
+    indentType?: "space" | "tab",
+    indentWidth?: number,
+    linefeed?: "cr" | "crlf" | "lf" | "lfcr",
+    omitSourceMapUrl?: boolean,
+    outputStyle?: "expanded" | "compressed"
+}
