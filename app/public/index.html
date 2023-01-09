@@ -90,10 +90,12 @@
 									<a href="#"><img src="assets/images/logo.svg" alt=""></a>
 								</div>
 								<p>
-									Archethic Bridge gives you the power<br>
-									to transfer your ERC20 $UCO to the<br>
-									Archethic Blockchain without the need<br>
-									of a trusted third.
+									Archethic Bridge gives you the power to transfer your ERC20 $UCO to the Archethic
+									Blockchain without the need of a trusted third.</br></br>
+								</p>
+								<p>During the bridge launch phase, for security reasons and to protect your funds, we
+									have limited each
+									transfer to <u>300 UCO</u> per transaction (fees excluded).</br></br>
 								</p>
 							</div>
 						</div>
@@ -110,14 +112,46 @@
 											</div>
 										</div>
 									</div>
+									<div class="para-text">
+										<p><br><br>The destination address must exists on Archethic Network.</p>
+										<p>Please make sure the address entered is correct, to avoid any loss.</br></br>
+										</p>
+									</div>
 									<div class="icon-bar">
 										<div class="row mb-4">
 											<div class="col-6">
 												<!-- //TODO: Load selected blockchain logo in assets/images/bc-logos folder -->
-												<img src="assets/images/bc-logos/Ethereum-logo.svg" alt="" id="sourceChainImg">
+												<img src="assets/images/bc-logos/Ethereum-logo.svg" alt=""
+													id="sourceChainImg">
 											</div>
 											<div class="col-6 text-end">
 												<img src="assets/images/Logo-alone.svg" alt="">
+											</div>
+										</div>
+										<div class="three-block">
+											<div class="row">
+												<div class="col">
+													<ul>
+														<li>
+															<div class="col">
+																<h4>Your balance</h4>
+																<!-- TODO: Add balance in UCO -->
+																<h3 id="fromBalanceUCO">235.5677<br>UCO</h3>
+																<h4 id="fromBalanceUSD"></h4>
+															</div>
+														</li>
+														<li>
+														</li>
+														<li>
+															<div class="col">
+																<h4>Your balance</h4>
+																<!-- TODO: Add balance in UCO -->
+																<h3 id="toBalanceUCO">12345.678<br>UCO</h3>
+																<h4 id="toBalanceUSD"></h4>
+															</div>
+														</li>
+													</ul>
+												</div>
 											</div>
 										</div>
 										<div class="row">
@@ -131,29 +165,19 @@
 											<div class="col-12">
 												<ul>
 													<li>
-														<div class="col-12">
-															<h4>Amount</br>to transfer</h4>
-														</div>
+													</li>
+													<li>
 														<div class="i-box">
-															<input type="number" min="1" max="300" value="1" class="form-control" id="nbTokensToSwap">
+															<input type="number" min="1" max="300" value="1"
+																class="form-control" id="nbTokensToSwap">
 															<span>UCO</span>
 														</div>
 														<div class="row">
-															<h4 style="text-align: right; display: none" id="fromBalanceUSD">= 12.34 $</h4>
+															<h4 style="text-align: right; display: none"
+																id="fromBalanceUSD"></h4>
 														</div>
 													</li>
-													<li></li>
 													<li>
-														<div class="col-12">
-															<h4>Archethic's blockchain</br>balance after transfer</h4>
-														</div>
-														<div class="i-box">
-															<input type="text" class="form-control" disabled id="ucoArchethicBalance">
-															<span>UCO</span>
-														</div> 
-														<div class="row">
-															<h4 style="text-align: right; display: none" id="toBalanceUSD">= 0.0 $</h4>
-														</div>
 													</li>
 												</ul>
 											</div>
@@ -165,21 +189,26 @@
 										</div>
 									</div>
 									<div class="para-text">
-										<p>The swap is currently limited to 300 UCO.</p>
-										<p>The destination address must exists on Archethic Network.</p>
-										<p>Please make sure the address entered is correct, to avoid any loss.</p>
+										<p><u>Fee policy</u></p>
+										<p>Archethic network fees <u>will be supported</u> by Archethic.</p>
+										<p>Ethereum, BSC or Polygon fees <u>will not be supported</u> by
+											Archethic.</br></br></p>
+										<p>Fees will be visible in Metamask. Be careful regarding ETH fees.</p>
 									</div>
 									<div class="row mb-3">
-                    <p id="error" class="text-danger"></p>
-                  </div>
+										<p id="error" class="text-danger"></p>
+									</div>
 									<div class="btn-area">
 										<button class="btn sp-btn" style="display: none" id="btnSwap">Swap</button>
 									</div>
+									<div class="row mb-3">
+										<p><br><br></p>
+									</div>
 									<div class="container-fluid" id="steps" style="display: none">
 										<ul class="list-unstyled multi-steps">
-										  <li style="font-size: small;" id="connectingStep">Connecting</li>
-										  <li style="font-size: small;" id="swapStep" >Swap in progress</li>
-										  <li style="font-size: small;" id="endStep" >Swap validated</li>
+											<li style="font-size: small;" id="connectingStep">Connecting</li>
+											<li style="font-size: small;" id="swapStep">Swap in progress</li>
+											<li style="font-size: small;" id="endStep">Swap validated</li>
 										</ul>
 									</div>
 								</div>
