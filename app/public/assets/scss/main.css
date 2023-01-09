@@ -281,15 +281,15 @@ body {
   flex-wrap: wrap;
 }
 
-.main .icon-block .box .three-block ul li {
+.main .icon-block .box .three-block .iobox {
   width: 35%;
 }
 
-.main .icon-block .box .three-block ul li:nth-child(2) {
+.main .icon-block .box .three-block .iobox:nth-child(2) {
   width: 30%;
 }
 
-.main .icon-block .box .three-block ul li .i-box {
+.main .icon-block .box .three-block .iobox .i-box {
   position: relative;
   background-clip: padding-box;
   border: solid 1px transparent;
@@ -297,7 +297,7 @@ body {
   z-index: 1;
 }
 
-.main .icon-block .box .three-block ul li .i-box::before {
+.main .icon-block .box .three-block .iobox .i-box::before {
   content: "";
   position: absolute;
   top: 0;
@@ -317,7 +317,7 @@ body {
   /* IE6-9 */
 }
 
-.main .icon-block .box .three-block ul li .i-box input {
+.main .icon-block .box .three-block .iobox .i-box input {
   background: #000000;
   border-radius: 10px;
   font-weight: 700;
@@ -329,26 +329,26 @@ body {
   border: none;
 }
 
-.main .icon-block .box .three-block ul li .i-box input:focus {
+.main .icon-block .box .three-block .iobox .i-box input:focus {
   box-shadow: none;
 }
 
-.main .icon-block .box .three-block ul li .i-box input::-moz-placeholder {
+.main .icon-block .box .three-block .iobox .i-box input::-moz-placeholder {
   color: #fff;
   text-align: right;
 }
 
-.main .icon-block .box .three-block ul li .i-box input:-ms-input-placeholder {
+.main .icon-block .box .three-block .iobox .i-box input:-ms-input-placeholder {
   color: #fff;
   text-align: right;
 }
 
-.main .icon-block .box .three-block ul li .i-box input::placeholder {
+.main .icon-block .box .three-block .iobox .i-box input::placeholder {
   color: #fff;
   text-align: right;
 }
 
-.main .icon-block .box .three-block ul li .i-box span {
+.main .icon-block .box .three-block .iobox .i-box span {
   font-weight: 700;
   font-size: 14px;
   line-height: 17px;
