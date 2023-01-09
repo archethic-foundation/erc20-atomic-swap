@@ -23,6 +23,8 @@ In order to create the token on ethereum, you need to:
 
 ```bash
 cd truffle
+npm install -g truffle
+npm install
 truffle deploy --network development
 ```
 
@@ -34,6 +36,7 @@ You need to execute the following commands:
 
 ```bash
 cd app
+npm install
 ARCHETHIC_ENDPOINT=https://testnet.archethic.net npm run start
 ```
 
