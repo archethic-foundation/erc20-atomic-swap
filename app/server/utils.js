@@ -11,7 +11,7 @@ const baseSeedContract = "197D7B086613BCB8AB991683D39CC489C343662B3DFF7990B567A2
 
 const ethConfig = {
   1337: {
-    providerEndpoint: "http://localhost:7545",
+    providerEndpoint: "http://127.0.0.1:7545",
     recipientEthereum: "0xCF026E727C1A5A71058316D223cA5BDb51c962A6", // account #9 (mnemonic: test)
     privateKey: "91478b9ed07e05d331f3eb12be41541d61ffaefee8ccaec3249897c597814bf8", // account #9 (mnemonic: test)
     unirisTokenAddress: process.env["ETHEREUM_UNIRIS_TOKEN"] || "0x6de6baDcC399a836258fa92d91EbA0a02cC40eE2" // (mnemonic: test)
