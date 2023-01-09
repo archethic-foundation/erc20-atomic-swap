@@ -7,12 +7,12 @@ window.onload = async function () {
 };
 
 $("#connectMetamaskBtn").on("click", async () => {
-  provider = new ethers.providers.Web3Provider(window.ethereum);
-
-  // MetaMask requires requesting permission to connect users accounts
-  await provider.send("eth_requestAccounts", []);
 
   try {
+    provider = new ethers.providers.Web3Provider(window.ethereum);
+
+    // MetaMask requires requesting permission to connect users accounts
+    await provider.send("eth_requestAccounts", []);
     await startApp(provider);
   }
   catch(e) {
@@ -25,6 +25,7 @@ $("#connectMetamaskBtn").on("click", async () => {
 async function startApp(provider) {
 
   const { chainId: ethChainId } = await provider.getNetwork();
+  const signer = provider.getSigner();
 
   let sourceChainLogo;
   switch (ethChainId) {
@@ -65,8 +66,6 @@ async function startApp(provider) {
   const archethic = new Archethic(archethicEndpoint);
   await archethic.connect();
   console.log("Archethic endpoint: ", archethicEndpoint);
-
-  const signer = provider.getSigner();
 
   const account = await signer.getAddress();
   const unirisContract = await getERC20Contract(unirisTokenAddress, provider);
