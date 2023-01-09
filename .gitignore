@@ -2,3 +2,14 @@ node_modules
 app/public/app.js
 app/public/app.js.map
 .vscode/settings.json
+truffle/build/contracts/ERC20.json
+truffle/build/contracts/ERC20Detailed.json
+truffle/build/contracts/ERC20Pausable.json
+truffle/build/contracts/HTLC.json
+truffle/build/contracts/IERC20.json
+truffle/build/contracts/Migrations.json
+truffle/build/contracts/Pausable.json
+truffle/build/contracts/PauserRole.json
+truffle/build/contracts/Roles.json
+truffle/build/contracts/SafeMath.json
+truffle/build/contracts/UnirisToken.json
