@@ -15,7 +15,7 @@ $("#connectMetamaskBtn").on("click", async () => {
     await provider.send("eth_requestAccounts", []);
     await startApp(provider);
   }
-  catch(e) {
+  catch (e) {
     $("#error")
       .text(`An error occured: ${e.message || e}`)
       .show();
@@ -53,8 +53,8 @@ async function startApp(provider) {
   $("#swapForm").show();
 
   $("#ucoPrice").text(`1 UCO = ${UCOPrice}$`).show()
-  $("#fromBalanceUSD").text(`= ${UCOPrice}`).show()
-  $("#toBalanceUSD").text(`= 0.0`).show()
+  $("#fromBalanceUSD").text(`= ${UCOPrice}$`).show()
+  $("#toBalanceUSD").text(`= 0.0$`).show()
 
   if (!sufficientFunds) {
     $("#error").text(
@@ -69,7 +69,7 @@ async function startApp(provider) {
 
   const account = await signer.getAddress();
   const unirisContract = await getERC20Contract(unirisTokenAddress, provider);
-  
+
 
   const balance = await unirisContract.balanceOf(account);
   $("#ucoEthBalance").text(ethers.utils.formatUnits(balance, 18));
