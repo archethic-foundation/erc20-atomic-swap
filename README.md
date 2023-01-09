@@ -18,7 +18,7 @@ In order to develop and test the applications, you need to have some prerequisit
 
 In order to create the token on ethereum, you need to:
 
-- Start ganache and use the mnemonic `test`
+- Start ganache with network id (1337) and use the mnemonic `test`
 - Execute the following command to deploy the contract
 
 ```bash
