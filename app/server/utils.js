@@ -36,7 +36,8 @@ export {
   bridgeAddress,
   baseSeedContract,
   ethConfig,
-  hasSufficientFunds
+  hasSufficientFunds,
+  getUCOPrice
 };
 
 async function hasSufficientFunds(ethChainId) {
@@ -123,3 +124,10 @@ async function getBridgeInputs(archethic) {
   })
 }
 
+async function getUCOPrice() {
+  const archethic = new Archethic(archethicEndpoint)
+  await archethic.connect()
+  const oracleData = await archethic.network.getOracleData()
+
+  return oracleData.services.uco.usd
+}

@@ -57,13 +57,6 @@
 											</div>
 										</div>
 									</div>
-									<div class="three-block">
-										<div class="row">
-											<div class="col-12">
-												<h4>1 UCO = 0.090011 $</h4>
-											</div>
-										</div>
-									</div>
 									<div class="btn-area">
 										<button id="connectMetamaskBtn" class="btn sp-btn"
 											style="margin-top: 5%;  width: 400px;">
@@ -121,7 +114,7 @@
 										<div class="row mb-4">
 											<div class="col-6">
 												<!-- //TODO: Load selected blockchain logo in assets/images/bc-logos folder -->
-												<img src="assets/images/bc-logos/Polygon-logo.svg" alt="">
+												<img src="assets/images/bc-logos/Ethereum-logo.svg" alt="" id="sourceChainImg">
 											</div>
 											<div class="col-6 text-end">
 												<img src="assets/images/Logo-alone.svg" alt="">
@@ -142,11 +135,11 @@
 															<h4>Amount</br>to transfer</h4>
 														</div>
 														<div class="i-box">
-															<input type="text" class="form-control">
+															<input type="number" min="1" max="300" value="1" class="form-control" id="nbTokensToSwap">
 															<span>UCO</span>
 														</div>
 														<div class="row">
-															<h4 style="text-align: right;">= 12.34 $</h4>
+															<h4 style="text-align: right; display: none" id="fromBalanceUSD">= 12.34 $</h4>
 														</div>
 													</li>
 													<li></li>
@@ -154,11 +147,12 @@
 														<div class="col-12">
 															<h4>Archethic's blockchain</br>balance after transfer</h4>
 														</div>
-														<div style="text-align: right; font-weight: 700;font-size: 14px; letter-spacing: 2.56232px;"> 
+														<div class="i-box">
+															<input type="text" class="form-control" disabled id="ucoArchethicBalance">
 															<span>UCO</span>
 														</div> 
 														<div class="row">
-															<h4 style="text-align: right;">= 12.34 $</h4>
+															<h4 style="text-align: right; display: none" id="toBalanceUSD">= 0.0 $</h4>
 														</div>
 													</li>
 												</ul>
@@ -166,7 +160,7 @@
 										</div>
 										<div class="row">
 											<div class="col-12">
-												<h4>1 UCO = 0.090011 $</h4>
+												<h4 id="ucoPrice" style="display: none">1 UCO = 0.090011 $</h4>
 											</div>
 										</div>
 									</div>
@@ -175,15 +169,17 @@
 										<p>The destination address must exists on Archethic Network.</p>
 										<p>Please make sure the address entered is correct, to avoid any loss.</p>
 									</div>
+									<div class="row mb-3">
+                    <p id="error" class="text-danger"></p>
+                  </div>
 									<div class="btn-area">
-										<button class="btn sp-btn" id="btnSwap">Swap</button>
-										<p id="error" style="margin-top: 100px" class="text-danger"></p>
+										<button class="btn sp-btn" style="display: none" id="btnSwap">Swap</button>
 									</div>
-									<div class="container-fluid">
+									<div class="container-fluid" id="steps" style="display: none">
 										<ul class="list-unstyled multi-steps">
-										  <li style="font-size: small;" >Connecting</li>
-										  <li style="font-size: small;" class="is-active">Swap in progress</li>
-										  <li style="font-size: small;">Swap validated</li>
+										  <li style="font-size: small;" id="connectingStep">Connecting</li>
+										  <li style="font-size: small;" id="swapStep" >Swap in progress</li>
+										  <li style="font-size: small;" id="endStep" >Swap validated</li>
 										</ul>
 									</div>
 								</div>

@@ -1,4 +1,4 @@
-window.onload = async function() {
+window.onload = async function () {
   if (typeof window.ethereum !== "undefined") {
     console.log("MetaMask is installed!");
   } else {
@@ -6,54 +6,107 @@ window.onload = async function() {
   }
 };
 
-$("#connectMetamaskBtn").on('click', async () => {
+$("#connectMetamaskBtn").on("click", async () => {
   provider = new ethers.providers.Web3Provider(window.ethereum);
 
   // MetaMask requires requesting permission to connect users accounts
   await provider.send("eth_requestAccounts", []);
 
-  $("#main").hide()
-  await startApp(provider);
-})
+  try {
+    await startApp(provider);
+  }
+  catch(e) {
+    $("#error")
+      .text(`An error occured: ${e.message || e}`)
+      .show();
+  }
+});
 
 async function startApp(provider) {
-  $("#swapForm").show();
 
-  const { chainId: ethChainId } = await provider.getNetwork()
-  const { archethicEndpoint, unirisTokenAddress, recipientEthereum, sufficientFunds } = await getConfig(ethChainId);
+  const { chainId: ethChainId } = await provider.getNetwork();
 
-  if (!sufficientFunds) {
-    $("#error").text("An error occured: Bridge has insuffficient funds. Please retry later")
-    $("#btnSwap").hide()
-    return
+  let sourceChainLogo;
+  switch (ethChainId) {
+    case 137:
+      sourceChainLogo = "Polygon-logo.svg";
+      break;
+    case 56:
+      sourceChainLogo = "BSC-logo.svg";
+      break;
+    default:
+      sourceChainLogo = "Ethereum-logo.svg";
+      break;
   }
 
-  const archethic = new Archethic(archethicEndpoint)
-  await archethic.connect()
+  const {
+    archethicEndpoint,
+    unirisTokenAddress,
+    recipientEthereum,
+    sufficientFunds,
+    UCOPrice
+  } = await getConfig(ethChainId);
+
+  $("#sourceChainImg").attr("src", `assets/images/bc-logos/${sourceChainLogo}`);
+  $("#main").hide();
+  $("#swapForm").show();
+
+  $("#ucoPrice").text(`1 UCO = ${UCOPrice}$`).show()
+  $("#fromBalanceUSD").text(`= ${UCOPrice}`).show()
+  $("#toBalanceUSD").text(`= 0.0`).show()
+
+  if (!sufficientFunds) {
+    $("#error").text(
+      "An error occured: Bridge has insuffficient funds. Please retry later"
+    );
+    return;
+  }
+
+  const archethic = new Archethic(archethicEndpoint);
+  await archethic.connect();
   console.log("Archethic endpoint: ", archethicEndpoint);
 
   const signer = provider.getSigner();
 
   const account = await signer.getAddress();
   const unirisContract = await getERC20Contract(unirisTokenAddress, provider);
+  
 
   const balance = await unirisContract.balanceOf(account);
-  $("#ucoEthBalance").text(ethers.utils.formatUnits(balance, 18))
+  $("#ucoEthBalance").text(ethers.utils.formatUnits(balance, 18));
 
   $("#recipientAddress").on("change", async (e) => {
-    const archethicBalance = await getLastTransactionBalance(archethic, $(e.target).val())
-    $("#ucoArchethicBalance").text(archethicBalance / 1e8)
-  })
+    const archethicBalance = await getLastTransactionBalance(
+      archethic,
+      $(e.target).val()
+    );
+    $("#ucoArchethicBalance").val(archethicBalance / 1e8);
+    $("#toBalanceUSD").text(`= ${UCOPrice * (archethicBalance / 1e8)}`).show()
+  });
 
-  $("#swapForm").on('submit', async (e) => {
+  $("#nbTokenToSwap").on("change", (e) => {
+    const amount = $(e.target).val()
+    $("#fromBalanceUSD").text(`= ${amount * UCOPrice}`)
+  })
+  $("#btnSwap").show();
+
+  $("#swapForm").on("submit", async (e) => {
     e.preventDefault();
     if (!e.target.checkValidity()) {
       return;
     }
 
     const recipientAddress = $("#recipientAddress").val();
-    await handleFormSubmit(signer, unirisContract, recipientEthereum, recipientAddress, ethChainId, archethic);
-  })
+    await handleFormSubmit(
+      signer,
+      unirisContract,
+      recipientEthereum,
+      recipientAddress,
+      ethChainId,
+      archethic,
+      UCOPrice
+    );
+  });
 }
 
 async function getERC20Contract(unirisTokenAddress, provider) {
@@ -61,8 +114,16 @@ async function getERC20Contract(unirisTokenAddress, provider) {
   return new ethers.Contract(unirisTokenAddress, unirisTokenABI, provider);
 }
 
-async function handleFormSubmit(signer, unirisContract, recipientEthereum, recipientArchethic, ethChainId, archethic) {
-  $("#progressBar").show()
+async function handleFormSubmit(
+  signer,
+  unirisContract,
+  recipientEthereum,
+  recipientArchethic,
+  ethChainId,
+  archethic,
+  UCOPrice
+) {
+  $("#steps").show();
 
   const secret = new Uint8Array(32);
   crypto.getRandomValues(secret);
@@ -75,11 +136,9 @@ async function handleFormSubmit(signer, unirisContract, recipientEthereum, recip
   const secretDigestHex = uint8ArrayToHex(secretDigest);
 
   const amount = $("#nbTokensToSwap").val();
+  $("#connectingStep").addClass("is-active");
 
   try {
-
-    $("#deployEthProgress").css({ color: "white" })
-
     const HTLC_Contract = await deployHTLC(
       recipientEthereum,
       unirisContract.address,
@@ -91,10 +150,7 @@ async function handleFormSubmit(signer, unirisContract, recipientEthereum, recip
 
     const HTLCAddress = HTLC_Contract.address;
 
-    await transferTokensToHTLC(amount, HTLCAddress, unirisContract, signer)
-
-    $("#deployEthProgress").css({ color: "greenyellow" })
-    $("#deployArchethicProgress").css({ color: "white" })
+    await transferTokensToHTLC(amount, HTLCAddress, unirisContract, signer);
 
     const contractAddress = await sendDeployRequest(
       secretDigestHex,
@@ -105,23 +161,41 @@ async function handleFormSubmit(signer, unirisContract, recipientEthereum, recip
     );
     console.log("Contract address on Archethic", contractAddress);
 
-    $("#deployArchethicProgress").css({ color: "greenyellow" })
-    await sendWithdrawRequest(contractAddress, HTLCAddress, secretHex, ethChainId);
+    $("#connectingStep").removeClass("is-active");
+    $("#swapStep").addClass("is-active");
+
+    await sendWithdrawRequest(
+      contractAddress,
+      HTLCAddress,
+      secretHex,
+      ethChainId
+    );
     console.log("Token swap finish");
 
-    $("#swapProgress").css({ color: "greenyellow" })
-    $("#swapValidated").css({ color: "greenyellow" })
+    $("#swapStep").removeClass("is-active");
+    $("#endPhase").addClass("is-active");
 
-    const archethicBalance = await getLastTransactionBalance(archethic, recipientArchethic)
-    $("#ucoArchethicBalance").text(archethicBalance / 1e8)
-
+    const archethicBalance = await getLastTransactionBalance(
+      archethic,
+      recipientArchethic
+    );
+    $("#ucoArchethicBalance").val(archethicBalance / 1e8);
+    $("#toBalanceUSD").text(`= ${UCOPrice * (archethicBalance / 1e8)}`).show()
   } catch (e) {
     console.error(e.message || e);
-    $("#error").text(`An error occured: ${e.message || e}`).show()
+    $("#error")
+      .text(`An error occured: ${e.message || e}`)
+      .show();
   }
 }
 
-async function sendDeployRequest(secretDigestHex, recipientAddress, amount, ethereumContractAddress, ethChainId) {
+async function sendDeployRequest(
+  secretDigestHex,
+  recipientAddress,
+  amount,
+  ethereumContractAddress,
+  ethChainId
+) {
   const endTime = new Date();
   endTime.setSeconds(endTime.getSeconds() + 10000);
   const endTimeUNIX = Math.floor(endTime / 1000);
@@ -138,14 +212,19 @@ async function sendDeployRequest(secretDigestHex, recipientAddress, amount, ethe
       amount: amount * 1e8,
       endTime: endTimeUNIX,
       ethereumContractAddress: ethereumContractAddress,
-      ethereumChainId: ethChainId
+      ethereumChainId: ethChainId,
     }),
   })
     .then(handleResponse)
     .then((r) => r.contractAddress);
 }
 
-async function sendWithdrawRequest(archethicContractAddress, ethereumContractAddress, secret, ethChainId) {
+async function sendWithdrawRequest(
+  archethicContractAddress,
+  ethereumContractAddress,
+  secret,
+  ethChainId
+) {
   return fetch("/swap/withdraw", {
     method: "POST",
     headers: {
@@ -156,10 +235,9 @@ async function sendWithdrawRequest(archethicContractAddress, ethereumContractAdd
       archethicContractAddress: archethicContractAddress,
       ethereumContractAddress: ethereumContractAddress,
       secret: secret,
-      ethereumChainId: ethChainId
+      ethereumChainId: ethChainId,
     }),
-  })
-    .then(handleResponse)
+  }).then(handleResponse);
 }
 
 async function deployHTLC(
@@ -177,7 +255,9 @@ async function deployHTLC(
     recipientEthereum,
     unirisTokenAddress,
     ethers.utils.parseUnits(amount, 18),
-    hash, lockTime, { gasLimit: 1000000 }
+    hash,
+    lockTime,
+    { gasLimit: 1000000 }
   );
 
   await contract.deployTransaction.wait();
@@ -233,16 +313,21 @@ async function getConfig(ethChainId) {
       Accept: "application/json",
     },
     body: JSON.stringify({
-      ethereumChainId: ethChainId
-    })
+      ethereumChainId: ethChainId,
+    }),
   })
     .then(handleResponse)
     .then((r) => {
+      if (r.status != "ok") {
+        throw r.status;
+      }
+
       return {
         archethicEndpoint: r.archethicEndpoint,
         unirisTokenAddress: r.unirisTokenAddress,
         recipientEthereum: r.recipientEthereum,
-        sufficientFunds: r.sufficientFunds
+        sufficientFunds: r.sufficientFunds,
+        UCOPrice: r.UCOPrice
       };
     });
 }
@@ -262,7 +347,6 @@ async function getHTLC() {
 }
 
 async function getArchethicBalance(archethic, address) {
-
   archethic.requestNode(async (endpoint) => {
     const url = new URL("/api", endpoint);
     const r = await fetch(url, {
@@ -278,17 +362,16 @@ async function getArchethicBalance(archethic, address) {
               uco
             }
           }
-        `
-      })
+        `,
+      }),
     });
     const res = await r.json();
     if (res.data.balance && res.data.balance.uco) {
       return res.data.balance.uco;
     }
     return 0;
-  })
+  });
 }
-
 
 async function getLastTransactionBalance(archethic, address) {
   return archethic.requestNode(async (endpoint) => {
@@ -308,13 +391,16 @@ async function getLastTransactionBalance(archethic, address) {
                  }
               }
             }
-          `
-      })
+          `,
+      }),
     });
     const res = await r.json();
 
-    if (res.errors && res.errors.find(x => x.message == "transaction_not_exists")) {
-      return await getInputs(archethic, address)
+    if (
+      res.errors &&
+      res.errors.find((x) => x.message == "transaction_not_exists")
+    ) {
+      return await getInputs(archethic, address);
     }
 
     if (res.data.lastTransaction && res.data.lastTransaction.balance) {
@@ -322,7 +408,7 @@ async function getLastTransactionBalance(archethic, address) {
     }
 
     return 0;
-  })
+  });
 }
 
 async function getInputs(archethic, address) {
@@ -342,27 +428,28 @@ async function getInputs(archethic, address) {
                  amount
               }
             }
-          `
-      })
+          `,
+      }),
     });
     const res = await r.json();
     if (res.data.transactionInputs && res.data.transactionInputs.length > 0) {
       return res.data.transactionInputs
-        .filter(r => r.type == "UCO")
-        .reduce((acc, { amount: amount }) => acc + amount, 0)
+        .filter((r) => r.type == "UCO")
+        .reduce((acc, { amount: amount }) => acc + amount, 0);
     }
     return 0;
-  })
+  });
 }
 
 async function handleResponse(response) {
-  return new Promise(function(resolve, reject) {
+  return new Promise(function (resolve, reject) {
     if (response.status >= 200 && response.status <= 299) {
       response.json().then(resolve);
     } else {
-      response.json()
+      response
+        .json()
         .then(reject)
-        .catch(() => reject(response.statusText))
+        .catch(() => reject(response.statusText));
     }
   });
 }
