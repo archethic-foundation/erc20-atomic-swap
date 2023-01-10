@@ -53,8 +53,7 @@ async function startApp(provider) {
   $("#swapForm").show();
 
   $("#ucoPrice").text(`1 UCO = ${UCOPrice}$`).show()
-  $("#fromBalanceUSD").text(`= ${UCOPrice}$`).show()
-  $("#toBalanceUSD").text(`= 0.0$`).show()
+  $("#swapBalanceUSD").text(UCOPrice)
 
   if (!sufficientFunds) {
     $("#error").text(
@@ -70,22 +69,26 @@ async function startApp(provider) {
   const account = await signer.getAddress();
   const unirisContract = await getERC20Contract(unirisTokenAddress, provider);
 
-
   const balance = await unirisContract.balanceOf(account);
-  $("#ucoEthBalance").text(ethers.utils.formatUnits(balance, 18));
+  const erc20Amount = ethers.utils.formatUnits(balance, 18)
+  $("#fromBalanceUCO").text(erc20Amount);
+  $("#fromBalanceUSD").text(erc20Amount * UCOPrice);
 
   $("#recipientAddress").on("change", async (e) => {
     const archethicBalance = await getLastTransactionBalance(
       archethic,
       $(e.target).val()
     );
-    $("#ucoArchethicBalance").val(archethicBalance / 1e8);
-    $("#toBalanceUSD").text(`= ${UCOPrice * (archethicBalance / 1e8)}`).show()
+
+    const ucoAmount = archethicBalance / 1e8
+
+    $("#toBalanceUCO").text(ucoAmount);
+    $("#toBalanceUSD").text(UCOPrice * ucoAmount);
   });
 
-  $("#nbTokenToSwap").on("change", (e) => {
+  $("#nbTokensToSwap").on("change", (e) => {
     const amount = $(e.target).val()
-    $("#fromBalanceUSD").text(`= ${amount * UCOPrice}`)
+    $("#swapBalanceUSD").text(amount * UCOPrice)
   })
   $("#btnSwap").show();
 
@@ -171,15 +174,19 @@ async function handleFormSubmit(
     );
     console.log("Token swap finish");
 
-    $("#swapStep").removeClass("is-active");
-    $("#endPhase").addClass("is-active");
 
     const archethicBalance = await getLastTransactionBalance(
       archethic,
       recipientArchethic
     );
-    $("#ucoArchethicBalance").val(archethicBalance / 1e8);
-    $("#toBalanceUSD").text(`= ${UCOPrice * (archethicBalance / 1e8)}`).show()
+
+    const newUCOBalance = archethicBalance / 1e8
+
+    $("#toBalanceUCO").text(newUCOBalance);
+    $("#toBalanceUSD").text(UCOPrice * newUCOBalance)
+
+    $("#swapStep").removeClass("is-active");
+    $("#endPhase").addClass("is-active");
   } catch (e) {
     console.error(e.message || e);
     $("#error")
