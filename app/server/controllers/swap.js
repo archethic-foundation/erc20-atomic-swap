@@ -44,8 +44,9 @@ async function deployContract(req, res, next) {
     const contractAddress = Crypto.deriveAddress(contractSeed, 0);
     const contractAddressHex = Utils.uint8ArrayToHex(contractAddress);
 
-    const chainSize = await archethic.transaction.getTransactionIndex(contractSeed)
+    const chainSize = await archethic.transaction.getTransactionIndex(contractAddress)
     if (chainSize != 0) {
+      console.log(req.body.ethereumContractAddress)
       return res.status(400).json({ message: "Contract already deployed" })
     }
 
@@ -84,16 +85,21 @@ async function withdraw(req, res, next) {
 
     const ethWallet = new ethers.Wallet(privateKey, provider)
 
+    const ethereumReceipt = await withdrawEthereumContract(ethWallet, ethContractInstance, req.body.secret)
+    console.log(`Withdraw transaction - ${ethereumReceipt.transactionHash}`);
+
     const tx = await createRevealSecretTransaction(req.body.archethicContractAddress, req.body.secret)
     await sendTransaction(tx)
     console.log(`Reveal transaction created - ${Utils.uint8ArrayToHex(tx.address)}`);
 
-    await withdrawEthereumContract(ethWallet, ethContractInstance, req.body.secret)
-
-    res.json({ status: "ok" })
+    res.json({ status: "ok", ethereumWithdrawTransaction: ethereumReceipt.transactionHash, archethicWithdrawTransaction: Utils.uint8ArrayToHex(tx.address) })
   }
   catch (error) {
-    next(error.message || error)
+    if (error.receipt) {
+      console.log(error.receipt.logs)
+    }
+    console.log(error)
+    next(error.message || "Unable to withdraw")
   }
 }
 
@@ -125,7 +131,8 @@ function getEthereumContract(ethereumContractAddress, provider) {
 async function withdrawEthereumContract(ethWallet, ethContractInstance, secret) {
   const nonce = await ethWallet.getTransactionCount()
   const contractSigner = ethContractInstance.connect(ethWallet)
-  await contractSigner.withdraw(`0x${secret}`, { gasLimit: 100000, nonce: nonce || undefined })
+  const transaction = await contractSigner.withdraw(`0x${secret}`, { gasLimit: 10000000, nonce: nonce || undefined })
+  return await transaction.wait()
 }
 
 function fundContract(contractSeed, amount) {

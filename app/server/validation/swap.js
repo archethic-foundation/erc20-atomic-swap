@@ -8,7 +8,8 @@ export default {
       secretHash: Joi.string().hex().length(64).required(),
       endTime: Joi.date().timestamp().required(),
       ethereumContractAddress: Joi.string().regex(/^0x[a-fA-F0-9]{40}$/).required(),
-      ethereumChainId: Joi.number().required().valid(1, 5, 1337)
+      //ethereumChainId: Joi.number().required().valid(1, 137)
+      ethereumChainId: Joi.number().required().valid(5, 1337, 80001) // Testnet only
     })
   },
   withdraw: {
@@ -16,7 +17,8 @@ export default {
       archethicContractAddress: Joi.string().hex().length(68).required(),
       ethereumContractAddress: Joi.string().regex(/^0x[a-fA-F0-9]{40}$/).required(),
       secret: Joi.string().hex().required(),
-      ethereumChainId: Joi.number().required().valid(1, 5, 1337)
+      //ethereumChainId: Joi.number().required().valid(1, 137)
+      ethereumChainId: Joi.number().required().valid(5, 1337, 80001) // Testnet only
     })
   }
 }

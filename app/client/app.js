@@ -29,6 +29,9 @@ async function startApp(provider) {
 
   let sourceChainLogo;
   switch (ethChainId) {
+    case 80001:
+      sourceChainLogo = "Polygon-logo.svg";
+      break;
     case 137:
       sourceChainLogo = "Polygon-logo.svg";
       break;
@@ -174,7 +177,6 @@ async function handleFormSubmit(
     );
     console.log("Token swap finish");
 
-
     const archethicBalance = await getLastTransactionBalance(
       archethic,
       recipientArchethic
@@ -243,7 +245,12 @@ async function sendWithdrawRequest(
       secret: secret,
       ethereumChainId: ethChainId,
     }),
-  }).then(handleResponse);
+  }).then(handleResponse)
+  .then(r => {
+    const { ethereumWithdrawTransaction, archethicWithdrawTransaction } = r
+    console.log(`Ethereum's withdraw transaction ${ethereumWithdrawTransaction}`)
+    console.log(`Archethic's withdraw transaction ${archethicWithdrawTransaction}`)
+  })
 }
 
 async function deployHTLC(
@@ -280,18 +287,13 @@ async function transferTokensToHTLC(
 ) {
   const unirisWithSigner = unirisContract.connect(signer);
 
-  await unirisWithSigner.transfer(
+  const tx = await unirisWithSigner.transfer(
     HTLCAddress,
     ethers.utils.parseUnits(amount, 18)
   );
-  const filter = unirisContract.filters.Transfer(null, HTLCAddress);
 
-  return new Promise((resolve, _reject) => {
-    unirisContract.on(filter, (_from, _to, amount, _event) => {
-      console.log(ethers.utils.formatUnits(amount, 18) + " UCO transfered");
-      resolve();
-    });
-  });
+  await tx.wait()
+  console.log(`${amount} UCO transfered`);
 }
 
 const byteToHex = [];
