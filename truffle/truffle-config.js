@@ -65,6 +65,15 @@ module.exports = {
       gasPrice: 10000000000
     },
 
+    // Polygon testnet
+    mumbai: {
+      provider: () => new HDWalletProvider(mnemonic, `https://polygon-mumbai.g.alchemy.com/v2/-8zo2X19AmwNv7AGVIsGF5LWJQLc92Oj`),
+      network_id: 80001,
+      confirmations: 2,
+      timeoutBlocks: 200,
+      skipDryRun: true
+    }
+
     //    mainnet: {
     //      provider: () => new HDWalletProvider(mnemonic, `https://mainnet.infura.io/v3/${infura_key}`),
     //      network_id: 1,       // Mainnet's id
