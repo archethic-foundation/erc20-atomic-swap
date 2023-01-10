@@ -1,1 +1,5 @@
 .vscode/settings.json
+truffle/node_modules
+truffle/build
+app/node_modules
+app/public/app.js.map
