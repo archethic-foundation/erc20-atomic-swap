@@ -1,7 +1,15 @@
 import fs from "fs";
+import path from "path"
+import { fileURLToPath } from 'url';
+
 import { ethers } from "ethers";
 
-const contractJSON = fs.readFileSync("../truffle/build/contracts/HTLC.json", "utf8")
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+console.log(__dirname)
+
+
+const contractJSON = fs.readFileSync(path.join(__dirname, "../../public/HTLC.json"), "utf8")
 
 const contractABI = JSON.parse(contractJSON).abi
 
