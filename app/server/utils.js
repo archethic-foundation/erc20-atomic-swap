@@ -32,12 +32,28 @@ const ethConfig = {
     unirisTokenAddress: process.env["UNIRIS_TOKEN_ADDRESS"] || "0x51279e98d99AA8D65763a885BEFA5463dCd84Af6" // (mnemonic: orphan bamboo rabbit depart truth kidney sick slot push board expect marriage)
   },
 
+  // BSC (testnet)
+  97: {
+    providerEndpoint: "https://data-seed-prebsc-2-s3.binance.org:8545",
+    recipientEthereum: process.env["BSC_TESTNET_ADDRESS"] || "0x85864179f21518251DC16Bf5f34831d8Bb73B953", // account #9 (mnemonic: orphan bamboo rabbit depart truth kidney sick slot push board expect marriage)
+    privateKey: process.env["BSC_TESTNET_KEY"] || "0x5f9e832af2e6a12536eac84794812603b2174c7b97d219bbf2404e4ea6703ba1", // account #9 (mnemonic: orphan bamboo rabbit depart truth kidney sick slot push board expect marriage)
+    unirisTokenAddress: process.env["UNIRIS_TOKEN_ADDRESS"] || "0x5e6554593E4fe61276AD09094f16A6D5133461A5" // (mnemonic: orphan bamboo rabbit depart truth kidney sick slot push board expect marriage)
+  },
+
   // Polygon(mainnet)
   137: {
     providerEndpoint: "https://polygon-mainnet.g.alchemy.com/v2/DynWKvz6PUFaeZNmlxPXNiV1nK4Ac_2D",
     privateKey: process.env["POLYGON_MAINNET_KEY"],
     recipientEthereum: process.env["POLYGON_MAINNET_ADDRESS"],
     unirisTokenAddress: "0x3C720206bFaCB2d16fA3ac0ed87D2048Dbc401Fc"
+  },
+
+  // BSC (mainnet)
+  56: {
+    providerEndpoint: "https://bsc-dataseed1.binance.org/",
+    privateKey: process.env["BSC_MAINNET_KEY"],
+    recipientEthereum: process.env["BSC_MAINNET_ADDRESS"],
+    unirisTokenAddress: "0xb001f1e7c8bda414ac7cf7ecba5469fe8d24b6de"
   },
 
   // Ethereum (mainnet)

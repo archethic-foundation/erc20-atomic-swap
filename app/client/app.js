@@ -35,6 +35,9 @@ async function startApp(provider) {
     case 137:
       sourceChainLogo = "Polygon-logo.svg";
       break;
+    case 97:
+      sourceChainLogo = "BSC-logo.svg";
+      break;
     case 56:
       sourceChainLogo = "BSC-logo.svg";
       break;
