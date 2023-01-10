@@ -44,11 +44,16 @@ async function deployContract(req, res, next) {
     const contractAddress = Crypto.deriveAddress(contractSeed, 0);
     const contractAddressHex = Utils.uint8ArrayToHex(contractAddress);
 
+    const chainSize = await archethic.transaction.getTransactionIndex(contractSeed)
+    if (chainSize != 0) {
+      return res.status(400).json({ message: "Contract already deployed" })
+    }
+
     await fundContract(contractSeed, req.body.amount);
     console.log(`Contract ${contractAddressHex} funded`);
     const tx = await createContract(contractSeed, req.body.recipientAddress, req.body.amount, req.body.endTime, req.body.secretHash);
     await sendTransaction(tx);
-    console.log("Contract transaction created");
+    console.log(`Contract transaction created - ${Utils.uint8ArrayToHex(tx.address)}`);
 
     res.json({ status: "ok", contractAddress: contractAddressHex });
   }
@@ -59,6 +64,11 @@ async function deployContract(req, res, next) {
 
 async function withdraw(req, res, next) {
   try {
+
+    const chainSize = await archethic.transaction.getTransactionIndex(req.body.archethicContractAddress)
+    if (chainSize == 0) {
+      return res.status(400).json({ message: "Archethic's contract not deployed" })
+    }
 
     if (!await hasSufficientFunds(req.body.ethereumChainId)) {
       return res.status(500).json({ message: "Unsufficient funds" })
@@ -76,6 +86,8 @@ async function withdraw(req, res, next) {
 
     const tx = await createRevealSecretTransaction(req.body.archethicContractAddress, req.body.secret)
     await sendTransaction(tx)
+    console.log(`Reveal transaction created - ${Utils.uint8ArrayToHex(tx.address)}`);
+
     await withdrawEthereumContract(ethWallet, ethContractInstance, req.body.secret)
 
     res.json({ status: "ok" })
