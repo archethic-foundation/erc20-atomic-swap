@@ -344,7 +344,7 @@ async function getConfig(ethChainId) {
 }
 
 async function getUnirisTokenABI() {
-  const r = await fetch("uco_ABI.json");
+  const r = await fetch("uco_abi.json");
   return await r.json();
 }
 
