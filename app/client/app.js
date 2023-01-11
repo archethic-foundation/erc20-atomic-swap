@@ -7,15 +7,20 @@ window.onload = async function () {
 };
 
 $("#connectMetamaskBtn").on("click", async () => {
-
   try {
+    $("#connectMetamaskBtn").hide();
+    $("#connectMetamaskBtnSpinner").show();
     provider = new ethers.providers.Web3Provider(window.ethereum);
 
     // MetaMask requires requesting permission to connect users accounts
     await provider.send("eth_requestAccounts", []);
     await startApp(provider);
+    $("#connectMetamaskBtnSpinner").hide();
+    $("#connectMetamaskBtn").show();
   }
   catch (e) {
+    $("#connectMetamaskBtnSpinner").hide();
+    $("#connectMetamaskBtn").show();
     $("#error")
       .text(`An error occured: ${e.message || e}`)
       .show();
@@ -249,11 +254,11 @@ async function sendWithdrawRequest(
       ethereumChainId: ethChainId,
     }),
   }).then(handleResponse)
-  .then(r => {
-    const { ethereumWithdrawTransaction, archethicWithdrawTransaction } = r
-    console.log(`Ethereum's withdraw transaction ${ethereumWithdrawTransaction}`)
-    console.log(`Archethic's withdraw transaction ${archethicWithdrawTransaction}`)
-  })
+    .then(r => {
+      const { ethereumWithdrawTransaction, archethicWithdrawTransaction } = r
+      console.log(`Ethereum's withdraw transaction ${ethereumWithdrawTransaction}`)
+      console.log(`Archethic's withdraw transaction ${archethicWithdrawTransaction}`)
+    })
 }
 
 async function deployHTLC(

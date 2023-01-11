@@ -7,6 +7,7 @@
 	<title>Archethic Bridge</title>
 	<!-- Library -->
 	<link rel="stylesheet" href="assets/css/bootstrap.min.css" />
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.1.0/css/font-awesome.min.css">
 	<!-- font-family -->
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -58,13 +59,22 @@
 										</div>
 									</div>
 									<div class="btn-area">
-										<button id="connectMetamaskBtn" class="btn sp-btn"
-											style="margin-top: 5%;  width: 400px;">
+										<button id="connectMetamaskBtn" class="btn sp-btn" type="button"
+											style="margin-top: 5%; width: 400px;">
 											Connect to Metamask
 											<img class="metamask-icon" src="assets/images/icons8-metamask-logo-48.png"
-												width="25px" />
+												width="20px" />
 										</button>
+										<button id="connectMetamaskBtnSpinner" class="btn sp-btn" type="button" disabled
+											style="margin-top: 5%; width: 400px; height: 41px; display: none;">
+											<span>Connecting...</span>
+											<span class="spinner-border spinner-border-sm" role="status"
+												aria-hidden="true"></span>
+
 									</div>
+									</button>
+
+
 								</div>
 							</div>
 							<div class="row">
@@ -135,8 +145,8 @@
 														<li>
 															<div class="col">
 																<h4>Your balance</h4>
-                                <h3><span id="fromBalanceUCO">0</span><br>UCO</h3>
-                                <h4><span id="fromBalanceUSD">0</span>$</h4>
+																<h3><span id="fromBalanceUCO">0</span><br>UCO</h3>
+																<h4><span id="fromBalanceUSD">0</span>$</h4>
 															</div>
 														</li>
 														<li>
@@ -144,8 +154,8 @@
 														<li>
 															<div class="col">
 																<h4>Your balance</h4>
-                                <h3><span id="toBalanceUCO">0</span><br>UCO</h3>
-                                <h4><span id="toBalanceUSD">0</span>$</h4>
+																<h3><span id="toBalanceUCO">0</span><br>UCO</h3>
+																<h4><span id="toBalanceUSD">0</span>$</h4>
 															</div>
 														</li>
 													</ul>
@@ -166,12 +176,12 @@
 													</li>
 													<li>
 														<div class="i-box">
-															<input type="number" min="1" max="300" value="1"
-																class="form-control" id="nbTokensToSwap">
-															<span>UCO</span>
+															<input type="number" min="1" max="300" class="form-control"
+																required id="nbTokensToSwap" placeholder="UCO">
 														</div>
 														<div class="row">
-															<h4 style="text-align: right;">=<span id="swapBalanceUSD">0</span>$</h4>
+															<h4 style="text-align: right;">=<span
+																	id="swapBalanceUSD">0</span>$</h4>
 														</div>
 													</li>
 													<li>
