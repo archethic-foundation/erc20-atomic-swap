@@ -77,7 +77,7 @@ async function startApp(provider) {
 
   const balance = await unirisContract.balanceOf(account);
   const erc20Amount = ethers.utils.formatUnits(balance, 18)
-  $("#fromBalanceUCO").text(erc20Amount);
+  $("#fromBalanceUCO").text(parseFloat(erc20Amount).toFixed(2));
   $("#fromBalanceUSD").text(erc20Amount * UCOPrice);
 
   $("#recipientAddress").on("change", async (e) => {
@@ -88,7 +88,7 @@ async function startApp(provider) {
 
     const ucoAmount = archethicBalance / 1e8
 
-    $("#toBalanceUCO").text(ucoAmount);
+    $("#toBalanceUCO").text(parseFloat(ucoAmount).toFixed(2));
     $("#toBalanceUSD").text(UCOPrice * ucoAmount);
   });
 
@@ -187,7 +187,7 @@ async function handleFormSubmit(
 
     const newUCOBalance = archethicBalance / 1e8
 
-    $("#toBalanceUCO").text(newUCOBalance);
+    $("#toBalanceUCO").text(parseFloat(newUCOBalance).toFixed(2));
     $("#toBalanceUSD").text(UCOPrice * newUCOBalance)
 
     $("#swapStep").removeClass("is-active");
