@@ -69,7 +69,7 @@ async function startApp(provider) {
   $("#swapForm").show();
 
   $("#ucoPrice").text(`1 UCO = ${UCOPrice}$`).show()
-  $("#swapBalanceUSD").text(UCOPrice)
+  $("#swapBalanceUSD").text(0)
 
   if (!sufficientFunds) {
     $("#error").text(
@@ -85,33 +85,33 @@ async function startApp(provider) {
 
   const balance = await unirisContract.balanceOf(account);
   const erc20Amount = ethers.utils.formatUnits(balance, 18)
-  $("#fromBalanceUCO").text(parseFloat(erc20Amount).toFixed(2));
-  $("#fromBalanceUSD").text(erc20Amount * UCOPrice);
+  $("#fromBalanceUCO").text(new Intl.NumberFormat().format(parseFloat(erc20Amount).toFixed(2)));
+  $("#fromBalanceUSD").text(new Intl.NumberFormat().format((erc20Amount * UCOPrice).toFixed(2)));
 
   $("#recipientAddress").on("change", async (e) => {
     const archethicBalance = await getArchethicBalance($(e.target).val());
 
     const ucoAmount = archethicBalance / 1e8
 
-    $("#toBalanceUCO").text(parseFloat(ucoAmount).toFixed(2));
-    $("#toBalanceUSD").text(UCOPrice * ucoAmount);
+    $("#toBalanceUCO").text(new Intl.NumberFormat().format(parseFloat(ucoAmount).toFixed(2)));
+    $("#toBalanceUSD").text(new Intl.NumberFormat().format((UCOPrice * ucoAmount).toFixed(2)));
     $("#btnSwap").show();
   });
-  
+
   $("#recipientAddress").focus()
 
   $("#nbTokensToSwap").on("change", (e) => {
     const amount = $(e.target).val()
-    $("#swapBalanceUSD").text(amount * UCOPrice)
+    $("#swapBalanceUSD").text((amount * UCOPrice).toFixed(2))
   })
-  
+
 
   $("#swapForm").on("submit", async (e) => {
     e.preventDefault();
     if (!e.target.checkValidity()) {
       return;
     }
-    
+
     $("#btnSwap").hide();
 
     const recipientAddress = $("#recipientAddress").val();
@@ -167,46 +167,46 @@ async function handleFormSubmit(
     $("#ethDeploymentStep").removeClass("is-active");
 
     const HTLCAddress = HTLC_Contract.address
-    
+
     $("#ethTransferStep").addClass("is-active")
     await transferTokensToHTLC(amount, HTLCAddress, unirisContract, signer);
     $("#ethTransferStep").removeClass("is-active")
 
     $("#archethicDeploymentStep").addClass("is-active");
-    
+
     const contractAddress = await sendDeployRequest(
-     secretDigestHex,
-     recipientArchethic,
-     amount,
-     HTLCAddress,
-     ethChainId
+      secretDigestHex,
+      recipientArchethic,
+      amount,
+      HTLCAddress,
+      ethChainId
     );
     console.log("Contract address on Archethic", contractAddress);
-    
+
     $("#archethicDeploymentStep").removeClass("is-active");
 
     $("#swapStep").addClass("is-active");
-    
+
     const txReceipt = await withdrawERC20Token(HTLC_Contract, signer, secretHex)
     console.log(`Ethereum's withdraw transaction - ${txReceipt.transactionHash}`);
-    
+
     const ethAccount = await signer.getAddress();
     const erc20Balance = await unirisContract.balanceOf(ethAccount);
     const erc20Amount = ethers.utils.formatUnits(erc20Balance, 18)
-    $("#fromBalanceUCO").text(parseFloat(erc20Amount).toFixed(2));
+    $("#fromBalanceUCO").text(new Intl.NumberFormat().format(parseFloat(erc20Amount).toFixed(2)));
     $("#fromBalanceUSD").text(erc20Amount * UCOPrice);
 
     await sendWithdrawRequest(
-     contractAddress,
-     HTLCAddress,
-     txReceipt.transactionHash,
-     secretHex,
-     ethChainId
+      contractAddress,
+      HTLCAddress,
+      txReceipt.transactionHash,
+      secretHex,
+      ethChainId
     );
     console.log("Token swap finish");
 
     $("#swapStep").removeClass("is-active");
-    
+
     const archethicBalance = await getArchethicBalance(recipientArchethic);
 
     const newUCOBalance = archethicBalance / 1e8
@@ -399,7 +399,7 @@ async function handleResponse(response) {
 }
 
 async function getArchethicBalance(address) {
-   return fetch(`/balances/archethic/${address}`)
+  return fetch(`/balances/archethic/${address}`)
     .then(handleResponse)
     .then((r) => {
       return r.balance
