@@ -110,22 +110,29 @@
 						<div class="col-lg-7 col-md-7">
 							<div class="icon-block">
 								<div class="box">
-									<h2>2) Enter the recipient’s address</h2>
-									<div class="row">
-										<div class="col-12">
-											<div class="in-box">
-												<input type="text" class="form-control" id="recipientAddress" required
-													pattern="^([0-9A-Fa-f]){68}$"
-													placeholder="Enter your Archethic's address">
+									<div class="icon-bar">
+										<div class="three-block">
+											<div class="row">
+												<div class="col">
+													<ul>
+														<li>
+															<div class="col">
+																<h3><span id="fromNetworkLabel"></span></br></br>
+																</h3>
+															</div>
+														</li>
+														<li>
+														</li>
+														<li>
+															<div class="col">
+																<h3><span id="toNetworkLabel">
+																	</span></br></br></h3>
+															</div>
+														</li>
+													</ul>
+												</div>
 											</div>
 										</div>
-									</div>
-									<div class="para-text">
-										<p><br><br>The destination address must exists on Archethic Network.</p>
-										<p>Please make sure the address entered is correct, to avoid any loss.</br></br>
-										</p>
-									</div>
-									<div class="icon-bar">
 										<div class="row mb-4">
 											<div class="col-6">
 												<!-- //TODO: Load selected blockchain logo in assets/images/bc-logos folder -->
@@ -159,6 +166,22 @@
 													</ul>
 												</div>
 											</div>
+										</div>
+										<h2>2) Enter the recipient’s address</h2>
+										<div class="row">
+											<div class="col-12">
+												<div class="in-box">
+													<input type="text" class="form-control" id="recipientAddress"
+														required pattern="^([0-9A-Fa-f]){68}$"
+														placeholder="Enter your Archethic's address">
+												</div>
+											</div>
+										</div>
+										<div class="para-text">
+											<p><br><br>The destination address must exists on Archethic Network.</p>
+											<p>Please make sure the address entered is correct, to avoid any
+												loss.</br></br>
+											</p>
 										</div>
 										<div class="row">
 											<div class="col-12">
@@ -198,7 +221,8 @@
 										<p>Archethic network fees <u>will be supported</u> by Archethic.</p>
 										<p>Ethereum, BSC or Polygon fees <u>will not be supported</u> by
 											Archethic.</br></br></p>
-										<p>Fees will be visible in Metamask. Be careful regarding ETH fees.</p>
+										<p>Fees will be visible in Metamask.</p>
+										<p>Be careful regarding ETH fees.</p>
 									</div>
 									<div class="row mb-3">
 										<p id="error" class="text-danger"></p>
@@ -211,13 +235,21 @@
 									</div>
 									<div class="container-fluid" id="steps" style="display: none">
 										<ul class="list-unstyled multi-steps">
-											<li style="font-size: small;" id="ethDeploymentStep">Setup on <span
-													id="fromChain">Ethereum</span></li>
-											<li style="font-size: small;" id="ethTransferStep">Transfer UCOs</li>
-											<li style="font-size: small;" id="archethicDeploymentStep">Setup on
+											<li style=" font-weight: 700;
+											font-size: 10px; font-family: Lato, sans-serif;" id="ethDeploymentStep">Setup on <span
+													id="fromChain">Ethereum</span>
+											</li>
+											<li style=" font-weight: 700;
+											font-size: 10px; font-family: Lato, sans-serif;" id="ethTransferStep">Transfer UCOs</li>
+											<li style="font-weight: 700;
+											font-size: 10px; font-family: Lato, sans-serif;" id="archethicDeploymentStep">Setup on
 												Archethic</li>
-											<li style="font-size: small;" id="swapStep">Swap</li>
-											<li style="font-size: small;" id="endStep">Completion</li>
+											<li style=" font-weight: 700;
+											font-size: 10px; font-family: Lato, sans-serif;" id="swapStep">
+												Swap</li>
+											<li style=" font-weight: 700;
+											font-size: 10px;font-family: Lato, sans-serif;" id="endStep">
+												Completion</li>
 										</ul>
 									</div>
 								</div>

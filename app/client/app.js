@@ -37,22 +37,44 @@ async function startApp(provider) {
     case 80001:
       sourceChainLogo = "Polygon-logo.svg";
       $("#fromChain").text("Polygon")
+      $("#fromNetworkLabel").text("Mumbai Polygon Testnet")
+      $("#toNetworkLabel").text("Archethic Testnet")
       break;
     case 137:
       sourceChainLogo = "Polygon-logo.svg";
       $("#fromChain").text("Polygon")
+      $("#fromNetworkLabel").text("Polygon")
+      $("#toNetworkLabel").text("Archethic")
       break;
     case 97:
       sourceChainLogo = "BSC-logo.svg";
       $("#fromChain").text("Binance")
+      $("#fromNetworkLabel").text("BSC Testnet")
+      $("#toNetworkLabel").text("Archethic Testnet")
       break;
     case 56:
       sourceChainLogo = "BSC-logo.svg";
       $("#fromChain").text("Binance")
+      $("#fromNetworkLabel").text("BSC")
+      $("#toNetworkLabel").text("Archethic")
+      break;
+    case 5:
+      sourceChainLogo = "Ethereum-logo.svg";
+      $("#fromChain").text("Ethereum")
+      $("#fromNetworkLabel").text("Goerli Ethereum Testnet")
+      $("#toNetworkLabel").text("Archethic Testnet")
+      break;
+    case 1337:
+      sourceChainLogo = "Ethereum-logo.svg";
+      $("#fromChain").text("Ethereum")
+      $("#fromNetworkLabel").text("Ethereum Devnet")
+      $("#toNetworkLabel").text("Archethic Devnet")
       break;
     default:
       sourceChainLogo = "Ethereum-logo.svg";
       $("#fromChain").text("Ethereum")
+      $("#fromNetworkLabel").text("Ethereum")
+      $("#toNetworkLabel").text("Archethic")
       break;
   }
 
