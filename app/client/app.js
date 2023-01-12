@@ -163,6 +163,7 @@ async function handleFormSubmit(
   UCOPrice
 ) {
   $("#steps").show();
+  $("#txSummary").hide();
 
   const secret = new Uint8Array(32);
   crypto.getRandomValues(secret);
@@ -177,6 +178,9 @@ async function handleFormSubmit(
   const amount = $("#nbTokensToSwap").val();
   $("#ethDeploymentStep").addClass("is-active");
 
+  $("#txSummary1Label").text(`????? : ${unirisContract.address}`)
+  $("#txSummary1").show();
+
   try {
     const HTLC_Contract = await deployHTLC(
       recipientEthereum,
@@ -188,7 +192,12 @@ async function handleFormSubmit(
     );
     $("#ethDeploymentStep").removeClass("is-active");
 
+    $("#txSummary").show();
+
     const HTLCAddress = HTLC_Contract.address
+
+    $("#txSummary2Label").text(`????? : ${HTLC_Contract.address}`)
+    $("#txSummary2").show();
 
     $("#ethTransferStep").addClass("is-active")
     await transferTokensToHTLC(amount, HTLCAddress, unirisContract, signer);
@@ -204,6 +213,8 @@ async function handleFormSubmit(
       ethChainId
     );
     console.log("Contract address on Archethic", contractAddress);
+    $("#txSummary3Label").text(`Contract address on Archethic : ${contractAddress}`)
+    $("#txSummary3").show();
 
     $("#archethicDeploymentStep").removeClass("is-active");
 
@@ -235,6 +246,7 @@ async function handleFormSubmit(
 
     $("#toBalanceUCO").text(parseFloat(newUCOBalance).toFixed(2));
     $("#toBalanceUSD").text(UCOPrice * newUCOBalance)
+    $("#txSummary").show();
   } catch (e) {
     console.error(e.message || e);
     $("#error")

@@ -22,8 +22,8 @@
 		<div class="container no-pad">
 			<main id="main" role="main" class="main">
 				<div class="container-fluid px-0">
-					<div class="row align-items-center">
-						<div class="col-lg-5 col-md-5 d-flex justify-content-center">
+					<div class="row align-items-start">
+						<div class="col-lg-5 col-md-5 d-flex justify-content-center" style="padding-top: 100px;">
 							<div class="left-bar">
 								<h1>Welcome to</h1>
 								<div class="logo-bar">
@@ -40,10 +40,7 @@
 						<div class="col-lg-7 col-md-7">
 							<div class="icon-block">
 								<div class="box">
-									<div>
-										<br /><br /><br />
-									</div>
-									<div class="icon-bar">
+									<div class="icon-bar" style="padding-top: 60px;">
 										<div class="row mb-4">
 											<div class="col-6">
 												<img src="assets/images/Blockchains.svg" alt="">
@@ -79,7 +76,7 @@
 									<footer id="footer">
 										<p>Archethic Bridge powered by <a href="#"><img
 													src="assets/images/Archethic-Technologies-White-logo.svg"
-													height="10" alt=""></a>
+													height="20px" alt=""></a>
 										</p>
 									</footer>
 								</div>
@@ -90,8 +87,8 @@
 			</main>
 			<form id="swapForm" role="main" class="main" style="display: none">
 				<div class="container-fluid px-0">
-					<div class="row align-items-center">
-						<div class="col-lg-5 col-md-5 d-flex justify-content-center">
+					<div class="row align-items-start">
+						<div class="col-lg-5 col-md-5 d-flex justify-content-center" style="padding-top: 100px;">
 							<div class="left-bar">
 								<h1>Welcome to</h1>
 								<div class="logo-bar">
@@ -109,7 +106,7 @@
 						</div>
 						<div class="col-lg-7 col-md-7">
 							<div class="icon-block">
-								<div class="box">
+								<div class="box" style="padding-top: 30px;">
 									<div class="icon-bar">
 										<div class="three-block">
 											<div class="row">
@@ -227,13 +224,10 @@
 									<div class="row mb-3">
 										<p id="error" class="text-danger"></p>
 									</div>
-									<div class="btn-area">
-										<button class="btn sp-btn" style="display: none" id="btnSwap">Swap</button>
+									<div class="btn-area" style="display: none" id="btnSwap">
+										<button class="btn sp-btn">Swap</button>
 									</div>
-									<div class="row mb-3">
-										<p><br><br></p>
-									</div>
-									<div class="container-fluid" id="steps" style="display: none">
+									<div class="container-fluid" id="steps" style="display: none; padding-top: 30px;">
 										<ul class="list-unstyled multi-steps">
 											<li style=" font-weight: 700;
 											font-size: 10px; font-family: Lato, sans-serif;" id="ethDeploymentStep">Setup on <span
@@ -252,6 +246,19 @@
 												Completion</li>
 										</ul>
 									</div>
+									<div class="para-text" style="display: none; padding-top: 30px;" id="txSummary">
+										<p><u>Transactions Summary</u></p>
+										<p style="display: none; text-overflow: ellipsis;
+										word-wrap: break-word;" id="txSummary1"><span id="txSummary1Label"></span></p>
+										<p style="display: none; text-overflow: ellipsis;
+										word-wrap: break-word;" id="txSummary2"><span id="txSummary2Label"></span></p>
+										<p style="display: none; text-overflow: ellipsis;
+										word-wrap: break-word;" id="txSummary3"><span id="txSummary3Label"></span></p>
+										<p style="display: none; text-overflow: ellipsis;
+										word-wrap: break-word;" id="txSummary4"><span id="txSummary4Label"></span></p>
+										<p style="display: none; text-overflow: ellipsis;
+										word-wrap: break-word;" id="txSummary5"><span id="txSummary5Label"></span></p>
+									</div>
 								</div>
 							</div>
 							<div class="row">
@@ -259,7 +266,7 @@
 									<footer id="footer">
 										<p>Archethic Bridge powered by <a href="#"><img
 													src="assets/images/Archethic-Technologies-White-logo.svg"
-													height="10" alt=""></a>
+													height="20px" alt=""></a>
 										</p>
 									</footer>
 								</div>
@@ -306,7 +313,7 @@
 						<img class="social" src="assets/images/links/cg.png" />
 					</a>
 				</div>
-				<div class="inner">
+				<div class="inner" style="padding-bottom: 10px;">
 					<div class="col-12">
 						<div id="footer">
 							<p>Archethic ©
