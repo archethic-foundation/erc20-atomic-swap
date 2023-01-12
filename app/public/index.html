@@ -97,12 +97,12 @@
 									<a href="#"><img src="assets/images/logo.svg" alt=""></a>
 								</div>
 								<p>
-									Archethic Bridge gives you the power to transfer your ERC20 $UCO to the Archethic
+									Archethic Bridge gives you the power to transfer your $UCO to the Archethic
 									Blockchain without the need of a trusted third.</br></br>
 								</p>
 								<p>During the bridge launch phase, for security reasons and to protect your funds, we
 									have limited each
-									transfer to <u>300 UCO</u> per transaction (fees excluded).</br></br>
+									transfer to <u>1000 UCO</u> per transaction (fees excluded).</br></br>
 								</p>
 							</div>
 						</div>
@@ -173,8 +173,8 @@
 													</li>
 													<li>
 														<div class="i-box">
-															<input type="number" min="1" max="300" class="form-control"
-																required id="nbTokensToSwap" placeholder="UCO">
+															<input type="number" min="1" max="1000" class="form-control"
+																required id="nbTokensToSwap" placeholder="UCO" value="1">
 														</div>
 														<div class="row">
 															<h4 style="text-align: right;">=<span
@@ -210,9 +210,11 @@
 									</div>
 									<div class="container-fluid" id="steps" style="display: none">
 										<ul class="list-unstyled multi-steps">
-											<li style="font-size: small;" id="connectingStep">Connecting</li>
-											<li style="font-size: small;" id="swapStep">Swap in progress</li>
-											<li style="font-size: small;" id="endStep">Swap validated</li>
+											<li style="font-size: small;" id="ethDeploymentStep">Setup on <span id="fromChain">Ethereum</span></li>
+											<li style="font-size: small;" id="ethTransferStep">Transfer UCOs</li>
+											<li style="font-size: small;" id="archethicDeploymentStep">Setup on Archethic</li>
+											<li style="font-size: small;" id="swapStep">Swap</li>
+											<li style="font-size: small;" id="endStep">Completion</li>
 										</ul>
 									</div>
 								</div>

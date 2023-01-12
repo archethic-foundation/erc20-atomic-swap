@@ -23,7 +23,6 @@
    }
 
    function withdraw(bytes32 _secret) public {
-     require(msg.sender == recipient, "only the recipient can claim the funds");
      require(block.timestamp < startTime + lockTime, 'too late');
      require(sha256(abi.encodePacked(_secret)) == hash, 'wrong secret');
      require(token.balanceOf(address(this)) > 0, 'not enough funds');

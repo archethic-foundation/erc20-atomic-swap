@@ -8,37 +8,20 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 console.log(__dirname)
 
-
 const contractJSON = fs.readFileSync(path.join(__dirname, "../../public/HTLC.json"), "utf8")
 
 const contractABI = JSON.parse(contractJSON).abi
 
-import Archethic, { Crypto, Utils } from "archethic";
+import { Crypto, Utils } from "archethic";
 import { createHmac } from "crypto";
 const { originPrivateKey } = Utils;
 
-import { hasSufficientFunds, archethicEndpoint, ethConfig, baseSeedContract, bridgeAddress, bridgeSeed } from "../utils.js";
-
-const archethic = new Archethic(archethicEndpoint)
-
-archethic.connect()
-  .then(() => {
-    console.log(`Connected to ${archethicEndpoint}`)
-  })
-  .catch((e) => {
-    console.error("Cannot connect to Archethic endpoint")
-    console.error(e.message)
-    process.exit()
-  })
+import { archethicConnection, ethConfig, baseSeedContract, bridgeAddress, bridgeSeed } from "../utils.js";
 
 export default { deployContract, withdraw }
 
 async function deployContract(req, res, next) {
   try {
-
-    if (!await hasSufficientFunds(req.body.ethereumChainId)) {
-      return res.status(500).json({ message: "Unsufficient funds" })
-    }
 
     const { providerEndpoint, unirisTokenAddress, recipientEthereum } = ethConfig[req.body.ethereumChainId]
     const provider = new ethers.providers.JsonRpcProvider(providerEndpoint)
@@ -52,17 +35,20 @@ async function deployContract(req, res, next) {
     const contractAddress = Crypto.deriveAddress(contractSeed, 0);
     const contractAddressHex = Utils.uint8ArrayToHex(contractAddress);
 
+    const archethic  = await archethicConnection()
     const chainSize = await archethic.transaction.getTransactionIndex(contractAddress)
     if (chainSize != 0) {
       console.log(req.body.ethereumContractAddress)
       return res.status(400).json({ message: "Contract already deployed" })
     }
 
-    await fundContract(contractSeed, req.body.amount);
+    const fundingTx = await fundContract(archethic, contractSeed, req.body.amount);
+    await sendTransaction(fundingTx)
     console.log(`Contract ${contractAddressHex} funded`);
-    const tx = await createContract(contractSeed, req.body.recipientAddress, req.body.amount, req.body.endTime, req.body.secretHash);
-    await sendTransaction(tx);
-    console.log(`Contract transaction created - ${Utils.uint8ArrayToHex(tx.address)}`);
+    
+    const contractTx = await createContract(archethic, contractSeed, req.body.recipientAddress, req.body.amount, req.body.endTime, req.body.secretHash);
+    await sendTransaction(contractTx)
+    console.log(`Contract transaction created - ${Utils.uint8ArrayToHex(contractTx.address)}`);
 
     res.json({ status: "ok", contractAddress: contractAddressHex });
   }
@@ -73,41 +59,34 @@ async function deployContract(req, res, next) {
 
 async function withdraw(req, res, next) {
   try {
-
-    const chainSize = await archethic.transaction.getTransactionIndex(req.body.archethicContractAddress)
-    if (chainSize == 0) {
-      return res.status(400).json({ message: "Archethic's contract not deployed" })
-    }
-
-    if (!await hasSufficientFunds(req.body.ethereumChainId)) {
-      return res.status(500).json({ message: "Unsufficient funds" })
-    }
-
-    const { providerEndpoint, privateKey } = ethConfig[req.body.ethereumChainId]
+    
+    const { providerEndpoint } = ethConfig[req.body.ethereumChainId]
     const provider = new ethers.providers.JsonRpcProvider(providerEndpoint)
 
     const ethContractInstance = getEthereumContract(req.body.ethereumContractAddress, provider)
     if (ethContractInstance === undefined) {
       throw "Invalid ethereum contract's address"
     }
+    
+    if (!checkEthereumWithdraw(req.body.ethereumWithdrawTransaction, req.body.ethereumContractAddress, req.body.secret, provider)) {
+      throw "Invalid Ethereum withdraw transaction"
+    }
+    
+    const archethic  = await archethicConnection()
+    const chainSize = await archethic.transaction.getTransactionIndex(req.body.archethicContractAddress)
+    if (chainSize == 0) {
+      return res.status(400).json({ message: "Archethic's contract not deployed" })
+    }
 
-    const ethWallet = new ethers.Wallet(privateKey, provider)
+    const revealTx = await createRevealSecretTransaction(archethic, req.body.archethicContractAddress, req.body.secret)
+    await sendTransaction(revealTx)
+    console.log(`Reveal transaction created - ${Utils.uint8ArrayToHex(revealTx.address)}`);
 
-    const ethereumReceipt = await withdrawEthereumContract(ethWallet, ethContractInstance, req.body.secret)
-    console.log(`Withdraw transaction - ${ethereumReceipt.transactionHash}`);
-
-    const tx = await createRevealSecretTransaction(req.body.archethicContractAddress, req.body.secret)
-    await sendTransaction(tx)
-    console.log(`Reveal transaction created - ${Utils.uint8ArrayToHex(tx.address)}`);
-
-    res.json({ status: "ok", ethereumWithdrawTransaction: ethereumReceipt.transactionHash, archethicWithdrawTransaction: Utils.uint8ArrayToHex(tx.address) })
+    res.json({ status: "ok", archethicWithdrawTransaction: Utils.uint8ArrayToHex(revealTx.address) })
   }
   catch (error) {
-    if (error.receipt) {
-      console.log(error.receipt.logs)
-    }
     console.log(error)
-    next(error.message || "Unable to withdraw")
+    next(error.message)
   }
 }
 
@@ -132,43 +111,33 @@ function checkEthereumContract(ethereumContractAddress, amount, hash, recipientE
   })
 }
 
+async function checkEthereumWithdraw(ethereumWithdrawTransaction, contractAddress, secret, provider) {
+  const tx = await provider.getTransaction(ethereumWithdrawTransaction)
+  const receipt = await provider.getTransactionReceipt(ethereumWithdrawTransaction)
+  
+  const iface = new ethers.utils.Interface(['function withdraw(bytes32 _secret)'])
+  const values = iface.decodeFunctionData('withdraw', tx.data)
+  
+  return  receipt.status == 1 && tx.to == contractAddress && values[0] == `0x${secret}` 
+}
+
 function getEthereumContract(ethereumContractAddress, provider) {
   return new ethers.Contract(ethereumContractAddress, contractABI, provider)
 }
 
-async function withdrawEthereumContract(ethWallet, ethContractInstance, secret) {
-  const nonce = await ethWallet.getTransactionCount()
-  const contractSigner = ethContractInstance.connect(ethWallet)
-  const transaction = await contractSigner.withdraw(`0x${secret}`, { gasLimit: 10000000, nonce: nonce || undefined })
-  return await transaction.wait()
-}
-
-function fundContract(contractSeed, amount) {
-  return new Promise(async (resolve, reject) => {
-    try {
+async function fundContract(archethic, contractSeed, amount) {
       const index = await archethic.transaction.getTransactionIndex(bridgeAddress);
 
       const contractAddress = Crypto.deriveAddress(contractSeed, 0);
-      archethic.transaction
+      return archethic.transaction
         .new()
         .setType("transfer")
         .addUCOTransfer(contractAddress, amount + 50_000_000) // Send 0.5 UCO to the contract to pay the fees
         .build(bridgeSeed, index)
         .originSign(originPrivateKey)
-        .on("requiredConfirmation", () => {
-          resolve();
-        })
-        .on("error", (_context, reason) => {
-          reject(reason);
-        })
-        .send();
-    } catch (e) {
-      return reject(e);
-    }
-  });
 }
 
-async function createContract(contractSeed, recipientAddress, amount, endTime, secretHash) {
+async function createContract(archethic, contractSeed, recipientAddress, amount, endTime, secretHash) {
   const storageNoncePublicKey = await archethic.network.getStorageNoncePublicKey();
 
   const secretKey = Crypto.randomSecretKey();
@@ -220,7 +189,7 @@ async function createContract(contractSeed, recipientAddress, amount, endTime, s
       end
     `)
     .build(contractSeed, 0)
-    .originSign(originPrivateKey);
+    .originSign(originPrivateKey)
 }
 
 function sendTransaction(tx) {
@@ -232,7 +201,7 @@ function sendTransaction(tx) {
   })
 }
 
-async function createRevealSecretTransaction(contractAddress, secret) {
+async function createRevealSecretTransaction(archethic, contractAddress, secret) {
   const index = await archethic.transaction.getTransactionIndex(bridgeAddress);
 
   return archethic.transaction

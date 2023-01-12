@@ -36,18 +36,23 @@ async function startApp(provider) {
   switch (ethChainId) {
     case 80001:
       sourceChainLogo = "Polygon-logo.svg";
+      $("#fromChain").text("Polygon")
       break;
     case 137:
       sourceChainLogo = "Polygon-logo.svg";
+      $("#fromChain").text("Polygon")
       break;
     case 97:
       sourceChainLogo = "BSC-logo.svg";
+      $("#fromChain").text("Binance")
       break;
     case 56:
       sourceChainLogo = "BSC-logo.svg";
+      $("#fromChain").text("Binance")
       break;
     default:
       sourceChainLogo = "Ethereum-logo.svg";
+      $("#fromChain").text("Ethereum")
       break;
   }
 
@@ -73,8 +78,6 @@ async function startApp(provider) {
     return;
   }
 
-  const archethic = new Archethic(archethicEndpoint);
-  await archethic.connect();
   console.log("Archethic endpoint: ", archethicEndpoint);
 
   const account = await signer.getAddress();
@@ -86,28 +89,30 @@ async function startApp(provider) {
   $("#fromBalanceUSD").text(erc20Amount * UCOPrice);
 
   $("#recipientAddress").on("change", async (e) => {
-    const archethicBalance = await getLastTransactionBalance(
-      archethic,
-      $(e.target).val()
-    );
+    const archethicBalance = await getArchethicBalance($(e.target).val());
 
     const ucoAmount = archethicBalance / 1e8
 
     $("#toBalanceUCO").text(parseFloat(ucoAmount).toFixed(2));
     $("#toBalanceUSD").text(UCOPrice * ucoAmount);
+    $("#btnSwap").show();
   });
+  
+  $("#recipientAddress").focus()
 
   $("#nbTokensToSwap").on("change", (e) => {
     const amount = $(e.target).val()
     $("#swapBalanceUSD").text(amount * UCOPrice)
   })
-  $("#btnSwap").show();
+  
 
   $("#swapForm").on("submit", async (e) => {
     e.preventDefault();
     if (!e.target.checkValidity()) {
       return;
     }
+    
+    $("#btnSwap").hide();
 
     const recipientAddress = $("#recipientAddress").val();
     await handleFormSubmit(
@@ -133,7 +138,6 @@ async function handleFormSubmit(
   recipientEthereum,
   recipientArchethic,
   ethChainId,
-  archethic,
   UCOPrice
 ) {
   $("#steps").show();
@@ -149,7 +153,7 @@ async function handleFormSubmit(
   const secretDigestHex = uint8ArrayToHex(secretDigest);
 
   const amount = $("#nbTokensToSwap").val();
-  $("#connectingStep").addClass("is-active");
+  $("#ethDeploymentStep").addClass("is-active");
 
   try {
     const HTLC_Contract = await deployHTLC(
@@ -158,45 +162,57 @@ async function handleFormSubmit(
       amount,
       secretDigest,
       signer,
-      10000
+      7200 // 2 hours of locktime
     );
+    $("#ethDeploymentStep").removeClass("is-active");
 
-    const HTLCAddress = HTLC_Contract.address;
-
+    const HTLCAddress = HTLC_Contract.address
+    
+    $("#ethTransferStep").addClass("is-active")
     await transferTokensToHTLC(amount, HTLCAddress, unirisContract, signer);
+    $("#ethTransferStep").removeClass("is-active")
 
+    $("#archethicDeploymentStep").addClass("is-active");
+    
     const contractAddress = await sendDeployRequest(
-      secretDigestHex,
-      recipientArchethic,
-      amount,
-      HTLCAddress,
-      ethChainId
+     secretDigestHex,
+     recipientArchethic,
+     amount,
+     HTLCAddress,
+     ethChainId
     );
     console.log("Contract address on Archethic", contractAddress);
+    
+    $("#archethicDeploymentStep").removeClass("is-active");
 
-    $("#connectingStep").removeClass("is-active");
     $("#swapStep").addClass("is-active");
+    
+    const txReceipt = await withdrawERC20Token(HTLC_Contract, signer, secretHex)
+    console.log(`Ethereum's withdraw transaction - ${txReceipt.transactionHash}`);
+    
+    const ethAccount = await signer.getAddress();
+    const erc20Balance = await unirisContract.balanceOf(ethAccount);
+    const erc20Amount = ethers.utils.formatUnits(erc20Balance, 18)
+    $("#fromBalanceUCO").text(parseFloat(erc20Amount).toFixed(2));
+    $("#fromBalanceUSD").text(erc20Amount * UCOPrice);
 
     await sendWithdrawRequest(
-      contractAddress,
-      HTLCAddress,
-      secretHex,
-      ethChainId
+     contractAddress,
+     HTLCAddress,
+     txReceipt.transactionHash,
+     secretHex,
+     ethChainId
     );
     console.log("Token swap finish");
 
-    const archethicBalance = await getLastTransactionBalance(
-      archethic,
-      recipientArchethic
-    );
+    $("#swapStep").removeClass("is-active");
+    
+    const archethicBalance = await getArchethicBalance(recipientArchethic);
 
     const newUCOBalance = archethicBalance / 1e8
 
     $("#toBalanceUCO").text(parseFloat(newUCOBalance).toFixed(2));
     $("#toBalanceUSD").text(UCOPrice * newUCOBalance)
-
-    $("#swapStep").removeClass("is-active");
-    $("#endPhase").addClass("is-active");
   } catch (e) {
     console.error(e.message || e);
     $("#error")
@@ -235,9 +251,16 @@ async function sendDeployRequest(
     .then((r) => r.contractAddress);
 }
 
+async function withdrawERC20Token(HTLC_Contract, signer, secret) {
+  const HTLC_ContractSigner = await HTLC_Contract.connect(signer)
+  const tx = await HTLC_ContractSigner.withdraw(`0x${secret}`, { gasLimit: 10000000 })
+  return await tx.wait()
+}
+
 async function sendWithdrawRequest(
   archethicContractAddress,
   ethereumContractAddress,
+  ethereumWithdrawTransaction,
   secret,
   ethChainId
 ) {
@@ -250,13 +273,13 @@ async function sendWithdrawRequest(
     body: JSON.stringify({
       archethicContractAddress: archethicContractAddress,
       ethereumContractAddress: ethereumContractAddress,
+      ethereumWithdrawTransaction: ethereumWithdrawTransaction,
       secret: secret,
       ethereumChainId: ethChainId,
     }),
   }).then(handleResponse)
     .then(r => {
-      const { ethereumWithdrawTransaction, archethicWithdrawTransaction } = r
-      console.log(`Ethereum's withdraw transaction ${ethereumWithdrawTransaction}`)
+      const { archethicWithdrawTransaction } = r
       console.log(`Archethic's withdraw transaction ${archethicWithdrawTransaction}`)
     })
 }
@@ -362,101 +385,6 @@ async function getHTLC() {
   };
 }
 
-async function getArchethicBalance(archethic, address) {
-  archethic.requestNode(async (endpoint) => {
-    const url = new URL("/api", endpoint);
-    const r = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      body: JSON.stringify({
-        query: `
-          query {
-            balance(address: "${address}") {
-              uco
-            }
-          }
-        `,
-      }),
-    });
-    const res = await r.json();
-    if (res.data.balance && res.data.balance.uco) {
-      return res.data.balance.uco;
-    }
-    return 0;
-  });
-}
-
-async function getLastTransactionBalance(archethic, address) {
-  return archethic.requestNode(async (endpoint) => {
-    const url = new URL("/api", endpoint);
-    const r = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      body: JSON.stringify({
-        query: `
-            query {
-              lastTransaction(address: "${address}") {
-                 balance {
-                   uco
-                 }
-              }
-            }
-          `,
-      }),
-    });
-    const res = await r.json();
-
-    if (
-      res.errors &&
-      res.errors.find((x) => x.message == "transaction_not_exists")
-    ) {
-      return await getInputs(archethic, address);
-    }
-
-    if (res.data.lastTransaction && res.data.lastTransaction.balance) {
-      return res.data.lastTransaction.balance.uco;
-    }
-
-    return 0;
-  });
-}
-
-async function getInputs(archethic, address) {
-  return archethic.requestNode(async (endpoint) => {
-    const url = new URL("/api", endpoint);
-    const r = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      body: JSON.stringify({
-        query: `
-            query {
-              transactionInputs(address: "${address}") {
-                 type,
-                 amount
-              }
-            }
-          `,
-      }),
-    });
-    const res = await r.json();
-    if (res.data.transactionInputs && res.data.transactionInputs.length > 0) {
-      return res.data.transactionInputs
-        .filter((r) => r.type == "UCO")
-        .reduce((acc, { amount: amount }) => acc + amount, 0);
-    }
-    return 0;
-  });
-}
-
 async function handleResponse(response) {
   return new Promise(function (resolve, reject) {
     if (response.status >= 200 && response.status <= 299) {
@@ -468,4 +396,12 @@ async function handleResponse(response) {
         .catch(() => reject(response.statusText));
     }
   });
+}
+
+async function getArchethicBalance(address) {
+   return fetch(`/balances/archethic/${address}`)
+    .then(handleResponse)
+    .then((r) => {
+      return r.balance
+    });
 }
