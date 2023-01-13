@@ -36,13 +36,13 @@ async function startApp(provider) {
   const signer = provider.getSigner();
 
   let sourceChainLogo;
-  
-  
+
+
   switch (ethChainId) {
     case 80001:
       sourceChainLogo = "Polygon-logo.svg";
       sourceChainExplorer = "https://mumbai.polygonscan.com"
-      
+
       $("#fromChain").text("Polygon")
       $("#fromNetworkLabel").text("Mumbai Polygon Testnet")
       $("#toNetworkLabel").text("Archethic Testnet")
@@ -50,7 +50,7 @@ async function startApp(provider) {
     case 137:
       sourceChainLogo = "Polygon-logo.svg";
       sourceChainExplorer = "https://polygonscan.com"
-      
+
       $("#fromChain").text("Polygon")
       $("#fromNetworkLabel").text("Polygon")
       $("#toNetworkLabel").text("Archethic")
@@ -58,7 +58,7 @@ async function startApp(provider) {
     case 97:
       sourceChainLogo = "BSC-logo.svg";
       sourceChainExplorer = "https://testnet.bscscan.com"
-      
+
       $("#fromChain").text("Binance")
       $("#fromNetworkLabel").text("BSC Testnet")
       $("#toNetworkLabel").text("Archethic Testnet")
@@ -66,7 +66,7 @@ async function startApp(provider) {
     case 56:
       sourceChainLogo = "BSC-logo.svg";
       sourceChainExplorer = "https://bscscan.com"
-      
+
       $("#fromChain").text("Binance")
       $("#fromNetworkLabel").text("BSC")
       $("#toNetworkLabel").text("Archethic")
@@ -74,7 +74,7 @@ async function startApp(provider) {
     case 5:
       sourceChainLogo = "Ethereum-logo.svg";
       sourceChainExplorer = "https://goerli.etherscan.io"
-      
+
       $("#fromChain").text("Ethereum")
       $("#fromNetworkLabel").text("Goerli Ethereum Testnet")
       $("#toNetworkLabel").text("Archethic Testnet")
@@ -82,7 +82,7 @@ async function startApp(provider) {
     case 1337:
       sourceChainLogo = "Ethereum-logo.svg";
       sourceChainExplorer = ""
-      
+
       $("#fromChain").text("Ethereum")
       $("#fromNetworkLabel").text("Ethereum Devnet")
       $("#toNetworkLabel").text("Archethic Devnet")
@@ -90,7 +90,7 @@ async function startApp(provider) {
     default:
       sourceChainLogo = "Ethereum-logo.svg";
       sourceChainExplorer = "https://etherscan.io"
-      
+
       $("#fromChain").text("Ethereum")
       $("#fromNetworkLabel").text("Ethereum")
       $("#toNetworkLabel").text("Archethic")
@@ -104,7 +104,7 @@ async function startApp(provider) {
     sufficientFunds,
     UCOPrice
   } = await getConfig(ethChainId);
-  
+
   toChainExplorer = `${archethicEndpoint}/explorer/transaction`
 
   $("#sourceChainImg").attr("src", `assets/images/bc-logos/${sourceChainLogo}`);
@@ -128,7 +128,7 @@ async function startApp(provider) {
 
   const balance = await unirisContract.balanceOf(account);
   const erc20Amount = ethers.utils.formatUnits(balance, 18)
-  $("#fromBalanceUCO").text(new Intl.NumberFormat().format(parseFloat(erc20Amount).toFixed(2)));
+  $("#fromBalanceUCO").text(new Intl.NumberFormat().format(parseFloat(erc20Amount).toFixed(8)));
   $("#fromBalanceUSD").text(new Intl.NumberFormat().format((erc20Amount * UCOPrice).toFixed(2)));
 
   $("#recipientAddress").on("change", async (e) => {
@@ -136,7 +136,7 @@ async function startApp(provider) {
 
     const ucoAmount = archethicBalance / 1e8
 
-    $("#toBalanceUCO").text(new Intl.NumberFormat().format(parseFloat(ucoAmount).toFixed(2)));
+    $("#toBalanceUCO").text(new Intl.NumberFormat().format(parseFloat(ucoAmount).toFixed(8)));
     $("#toBalanceUSD").text(new Intl.NumberFormat().format((UCOPrice * ucoAmount).toFixed(2)));
     $("#btnSwap").show();
   });
@@ -214,14 +214,14 @@ async function handleFormSubmit(
 
     const HTLCAddress = HTLC_Contract.address
 
-    $("#txSummary1Label").html(`Contract address on Ethereum: <a href="${sourceChainExplorer}/address/${HTLC_Contract.address}">${HTLC_Contract.address}</a>`)
+    $("#txSummary1Label").html(`Contract address on Ethereum: <a href="${sourceChainExplorer}/address/${HTLC_Contract.address}" target="_blank">${HTLC_Contract.address}</a>`)
     $("#txSummary1").show();
 
     $("#ethTransferStep").addClass("is-active")
     const transferTokenTx = await transferTokensToHTLC(amount, HTLCAddress, unirisContract, signer);
     console.log(`${amount} UCO transfered`);
-    
-    $("#txSummary2Label").html(`Provision UCO: <a href="${sourceChainExplorer}/tx/${transferTokenTx.transactionHash}">${transferTokenTx.transactionHash}</a>`)
+
+    $("#txSummary2Label").html(`Provision UCO: <a href="${sourceChainExplorer}/tx/${transferTokenTx.transactionHash}" target="_blank">${transferTokenTx.transactionHash}</a>`)
     $("#txSummary2").show();
 
     $("#ethTransferStep").removeClass("is-active")
@@ -236,7 +236,7 @@ async function handleFormSubmit(
       ethChainId
     );
     console.log("Contract address on Archethic", contractAddress);
-    $("#txSummary3Label").html(`Contract address on Archethic : <a href="${toChainExplorer}/${contractAddress}">${contractAddress}</a>`)
+    $("#txSummary3Label").html(`Contract address on Archethic : <a href="${toChainExplorer}/${contractAddress}" target="_blank">${contractAddress}</a>`)
     $("#txSummary3").show();
 
     $("#archethicDeploymentStep").removeClass("is-active");
@@ -245,7 +245,7 @@ async function handleFormSubmit(
 
     const withdrawTx = await withdrawERC20Token(HTLC_Contract, signer, secretHex)
     console.log(`Ethereum's withdraw transaction - ${withdrawTx.transactionHash}`);
-    $("#txSummary4Label").html(`Ethereum swap: <a href="${sourceChainExplorer}/tx/${withdrawTx.transactionHash}">${withdrawTx.transactionHash}</a>`)
+    $("#txSummary4Label").html(`Ethereum swap: <a href="${sourceChainExplorer}/tx/${withdrawTx.transactionHash}" target="_blank">${withdrawTx.transactionHash}</a>`)
     $("#txSummary4").show();
 
     const ethAccount = await signer.getAddress();
@@ -262,11 +262,11 @@ async function handleFormSubmit(
       ethChainId
     );
     console.log(`Archethic's withdraw transaction ${archethicWithdrawTx}`)
-    $("#txSummary5Label").html(`Archethic swap : <a href="${toChainExplorer}/${archethicWithdrawTx}">${archethicWithdrawTx}</a>`)
+    $("#txSummary5Label").html(`Archethic swap : <a href="${toChainExplorer}/${archethicWithdrawTx}" target="_blank">${archethicWithdrawTx}</a>`)
     $("#txSummary5").show();
 
     $("#swapStep").removeClass("is-active");
-    
+
     console.log("Token swap finish");
 
     const archethicBalance = await getArchethicBalance(recipientArchethic);
