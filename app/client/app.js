@@ -27,51 +27,70 @@ $("#connectMetamaskBtn").on("click", async () => {
   }
 });
 
+let sourceChainExplorer;
+let toChainExplorer;
+
 async function startApp(provider) {
 
   const { chainId: ethChainId } = await provider.getNetwork();
   const signer = provider.getSigner();
 
   let sourceChainLogo;
+  
+  
   switch (ethChainId) {
     case 80001:
       sourceChainLogo = "Polygon-logo.svg";
+      sourceChainExplorer = "https://mumbai.polygonscan.com"
+      
       $("#fromChain").text("Polygon")
       $("#fromNetworkLabel").text("Mumbai Polygon Testnet")
       $("#toNetworkLabel").text("Archethic Testnet")
       break;
     case 137:
       sourceChainLogo = "Polygon-logo.svg";
+      sourceChainExplorer = "https://polygonscan.com"
+      
       $("#fromChain").text("Polygon")
       $("#fromNetworkLabel").text("Polygon")
       $("#toNetworkLabel").text("Archethic")
       break;
     case 97:
       sourceChainLogo = "BSC-logo.svg";
+      sourceChainExplorer = "https://testnet.bscscan.com"
+      
       $("#fromChain").text("Binance")
       $("#fromNetworkLabel").text("BSC Testnet")
       $("#toNetworkLabel").text("Archethic Testnet")
       break;
     case 56:
       sourceChainLogo = "BSC-logo.svg";
+      sourceChainExplorer = "https://bscscan.com"
+      
       $("#fromChain").text("Binance")
       $("#fromNetworkLabel").text("BSC")
       $("#toNetworkLabel").text("Archethic")
       break;
     case 5:
       sourceChainLogo = "Ethereum-logo.svg";
+      sourceChainExplorer = "https://goerli.etherscan.io"
+      
       $("#fromChain").text("Ethereum")
       $("#fromNetworkLabel").text("Goerli Ethereum Testnet")
       $("#toNetworkLabel").text("Archethic Testnet")
       break;
     case 1337:
       sourceChainLogo = "Ethereum-logo.svg";
+      sourceChainExplorer = ""
+      
       $("#fromChain").text("Ethereum")
       $("#fromNetworkLabel").text("Ethereum Devnet")
       $("#toNetworkLabel").text("Archethic Devnet")
       break;
     default:
       sourceChainLogo = "Ethereum-logo.svg";
+      sourceChainExplorer = "https://etherscan.io"
+      
       $("#fromChain").text("Ethereum")
       $("#fromNetworkLabel").text("Ethereum")
       $("#toNetworkLabel").text("Archethic")
@@ -85,6 +104,8 @@ async function startApp(provider) {
     sufficientFunds,
     UCOPrice
   } = await getConfig(ethChainId);
+  
+  toChainExplorer = `${archethicEndpoint}/explorer/transaction`
 
   $("#sourceChainImg").attr("src", `assets/images/bc-logos/${sourceChainLogo}`);
   $("#main").hide();
@@ -193,13 +214,14 @@ async function handleFormSubmit(
 
     const HTLCAddress = HTLC_Contract.address
 
-    $("#txSummary1Label").text(`????? : ${HTLC_Contract.address}`)
+    $("#txSummary1Label").html(`Contract address on Ethereum: <a href="${sourceChainExplorer}/address/${HTLC_Contract.address}">${HTLC_Contract.address}</a>`)
     $("#txSummary1").show();
 
     $("#ethTransferStep").addClass("is-active")
-    // TODO: Get the transaction address
-    await transferTokensToHTLC(amount, HTLCAddress, unirisContract, signer);
-    $("#txSummary2Label").text(`????? : ??????`)
+    const transferTokenTx = await transferTokensToHTLC(amount, HTLCAddress, unirisContract, signer);
+    console.log(`${amount} UCO transfered`);
+    
+    $("#txSummary2Label").html(`Provision UCO: <a href="${sourceChainExplorer}/tx/${transferTokenTx.transactionHash}">${transferTokenTx.transactionHash}</a>`)
     $("#txSummary2").show();
 
     $("#ethTransferStep").removeClass("is-active")
@@ -214,16 +236,16 @@ async function handleFormSubmit(
       ethChainId
     );
     console.log("Contract address on Archethic", contractAddress);
-    $("#txSummary3Label").text(`Contract address on Archethic : ${contractAddress}`)
+    $("#txSummary3Label").html(`Contract address on Archethic : <a href="${toChainExplorer}/${contractAddress}">${contractAddress}</a>`)
     $("#txSummary3").show();
 
     $("#archethicDeploymentStep").removeClass("is-active");
 
     $("#swapStep").addClass("is-active");
 
-    const txReceipt = await withdrawERC20Token(HTLC_Contract, signer, secretHex)
-    console.log(`Ethereum's withdraw transaction - ${txReceipt.transactionHash}`);
-    $("#txSummary4Label").text(`???? : ${txReceipt}`)
+    const withdrawTx = await withdrawERC20Token(HTLC_Contract, signer, secretHex)
+    console.log(`Ethereum's withdraw transaction - ${withdrawTx.transactionHash}`);
+    $("#txSummary4Label").html(`Ethereum swap: <a href="${sourceChainExplorer}/tx/${withdrawTx.transactionHash}">${withdrawTx.transactionHash}</a>`)
     $("#txSummary4").show();
 
     const ethAccount = await signer.getAddress();
@@ -232,19 +254,20 @@ async function handleFormSubmit(
     $("#fromBalanceUCO").text(new Intl.NumberFormat().format(parseFloat(erc20Amount).toFixed(2)));
     $("#fromBalanceUSD").text(erc20Amount * UCOPrice);
 
-    // TODO : Get transaction address
-    await sendWithdrawRequest(
+    const archethicWithdrawTx = await sendWithdrawRequest(
       contractAddress,
       HTLCAddress,
-      txReceipt.transactionHash,
+      withdrawTx.transactionHash,
       secretHex,
       ethChainId
     );
-    console.log("Token swap finish");
-    $("#txSummary5Label").text(`Swap : ${txReceipt}`)
+    console.log(`Archethic's withdraw transaction ${archethicWithdrawTx}`)
+    $("#txSummary5Label").html(`Archethic swap : <a href="${toChainExplorer}/${archethicWithdrawTx}">${archethicWithdrawTx}</a>`)
     $("#txSummary5").show();
 
     $("#swapStep").removeClass("is-active");
+    
+    console.log("Token swap finish");
 
     const archethicBalance = await getArchethicBalance(recipientArchethic);
 
@@ -320,7 +343,7 @@ async function sendWithdrawRequest(
   }).then(handleResponse)
     .then(r => {
       const { archethicWithdrawTransaction } = r
-      console.log(`Archethic's withdraw transaction ${archethicWithdrawTransaction}`)
+      return archethicWithdrawTransaction
     })
 }
 
@@ -363,8 +386,7 @@ async function transferTokensToHTLC(
     ethers.utils.parseUnits(amount, 18)
   );
 
-  await tx.wait()
-  console.log(`${amount} UCO transfered`);
+  return await tx.wait()
 }
 
 const byteToHex = [];
