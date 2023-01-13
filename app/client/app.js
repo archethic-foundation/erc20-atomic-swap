@@ -178,9 +178,6 @@ async function handleFormSubmit(
   const amount = $("#nbTokensToSwap").val();
   $("#ethDeploymentStep").addClass("is-active");
 
-  $("#txSummary1Label").text(`????? : ${unirisContract.address}`)
-  $("#txSummary1").show();
-
   try {
     const HTLC_Contract = await deployHTLC(
       recipientEthereum,
@@ -196,11 +193,15 @@ async function handleFormSubmit(
 
     const HTLCAddress = HTLC_Contract.address
 
-    $("#txSummary2Label").text(`????? : ${HTLC_Contract.address}`)
-    $("#txSummary2").show();
+    $("#txSummary1Label").text(`????? : ${HTLC_Contract.address}`)
+    $("#txSummary1").show();
 
     $("#ethTransferStep").addClass("is-active")
+    // TODO: Get the transaction address
     await transferTokensToHTLC(amount, HTLCAddress, unirisContract, signer);
+    $("#txSummary2Label").text(`????? : ??????`)
+    $("#txSummary2").show();
+
     $("#ethTransferStep").removeClass("is-active")
 
     $("#archethicDeploymentStep").addClass("is-active");
@@ -222,6 +223,8 @@ async function handleFormSubmit(
 
     const txReceipt = await withdrawERC20Token(HTLC_Contract, signer, secretHex)
     console.log(`Ethereum's withdraw transaction - ${txReceipt.transactionHash}`);
+    $("#txSummary4Label").text(`???? : ${txReceipt}`)
+    $("#txSummary4").show();
 
     const ethAccount = await signer.getAddress();
     const erc20Balance = await unirisContract.balanceOf(ethAccount);
@@ -229,6 +232,7 @@ async function handleFormSubmit(
     $("#fromBalanceUCO").text(new Intl.NumberFormat().format(parseFloat(erc20Amount).toFixed(2)));
     $("#fromBalanceUSD").text(erc20Amount * UCOPrice);
 
+    // TODO : Get transaction address
     await sendWithdrawRequest(
       contractAddress,
       HTLCAddress,
@@ -237,6 +241,8 @@ async function handleFormSubmit(
       ethChainId
     );
     console.log("Token swap finish");
+    $("#txSummary5Label").text(`Swap : ${txReceipt}`)
+    $("#txSummary5").show();
 
     $("#swapStep").removeClass("is-active");
 
