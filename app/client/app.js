@@ -87,20 +87,25 @@ async function startApp(provider) {
       break;
   }
 
+  $("#main").hide();
+  $("#swapForm").show();
+
   const {
     archethicEndpoint,
     unirisTokenAddress,
     recipientEthereum,
     sufficientFunds,
     UCOPrice,
-    sourceChainExplorer
+    sourceChainExplorer,
+    bridgeAddress
   } = await getConfig(ethChainId);
+
+  let maxSwap = 20 / UCOPrice
+  $("#nbTokensToSwap").attr("max", maxSwap)
 
   toChainExplorer = `${archethicEndpoint}/explorer/transaction`
 
   $("#sourceChainImg").attr("src", `assets/images/bc-logos/${sourceChainLogo}`);
-  $("#main").hide();
-  $("#swapForm").show();
 
   $("#ucoPrice").text(`1 UCO = ${UCOPrice}$`).show()
   $("#swapBalanceUSD").text(0)
@@ -156,7 +161,8 @@ async function startApp(provider) {
       ethChainId,
       archethic,
       UCOPrice,
-      sourceChainExplorer
+      sourceChainExplorer,
+      bridgeAddress
     );
   });
 }
@@ -174,10 +180,19 @@ async function handleFormSubmit(
   ethChainId,
   archethic,
   UCOPrice,
-  sourceChainExplorer
+  sourceChainExplorer,
+  bridgeAddress
 ) {
 
-  console.log(sourceChainExplorer)
+  const amount = $("#nbTokensToSwap").val();
+
+  const bridgeBalance = await getArchethicBalance(bridgeAddress)
+  if (bridgeBalance <= amount * 10e8) {
+    $("#error").text(
+      "An error occured: Bridge has insuffficient funds. Please retry later"
+    );
+    return;
+  }
 
   $("#steps").show();
   $("#txSummary").hide();
@@ -192,7 +207,6 @@ async function handleFormSubmit(
 
   const secretDigestHex = uint8ArrayToHex(secretDigest);
 
-  const amount = $("#nbTokensToSwap").val();
   $("#ethDeploymentStep").addClass("is-active");
 
   try {
@@ -425,7 +439,8 @@ async function getConfig(ethChainId) {
         recipientEthereum: r.recipientEthereum,
         sufficientFunds: r.sufficientFunds,
         UCOPrice: r.UCOPrice,
-        sourceChainExplorer: r.sourceChainExplorer
+        sourceChainExplorer: r.sourceChainExplorer,
+        bridgeAddress: r.bridgeAddress
       };
     });
 }

@@ -16,6 +16,13 @@ router.post("/status", async (req, res) => {
         })
     }
 
+    const supportedNetworks = [5, 1337, 80001, 97]
+    if (!supportedNetworks.includes(ethChainId)) {
+        return res.json({
+            status: `Network not supported`
+        })
+    }
+
     const { recipientEthereum, unirisTokenAddress, sourceChainExplorer } = networkConf
 
     res.json({
