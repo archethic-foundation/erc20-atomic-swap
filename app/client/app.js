@@ -27,7 +27,6 @@ $("#connectMetamaskBtn").on("click", async () => {
   }
 });
 
-let sourceChainExplorer;
 let toChainExplorer;
 
 async function startApp(provider) {
@@ -37,11 +36,9 @@ async function startApp(provider) {
 
   let sourceChainLogo;
 
-
   switch (ethChainId) {
     case 80001:
       sourceChainLogo = "Polygon-logo.svg";
-      sourceChainExplorer = "https://mumbai.polygonscan.com"
 
       $("#fromChain").text("Polygon")
       $("#fromNetworkLabel").text("Mumbai Polygon Testnet")
@@ -49,7 +46,6 @@ async function startApp(provider) {
       break;
     case 137:
       sourceChainLogo = "Polygon-logo.svg";
-      sourceChainExplorer = "https://polygonscan.com"
 
       $("#fromChain").text("Polygon")
       $("#fromNetworkLabel").text("Polygon")
@@ -57,15 +53,12 @@ async function startApp(provider) {
       break;
     case 97:
       sourceChainLogo = "BSC-logo.svg";
-      sourceChainExplorer = "https://testnet.bscscan.com"
-
       $("#fromChain").text("Binance")
       $("#fromNetworkLabel").text("BSC Testnet")
       $("#toNetworkLabel").text("Archethic Testnet")
       break;
     case 56:
       sourceChainLogo = "BSC-logo.svg";
-      sourceChainExplorer = "https://bscscan.com"
 
       $("#fromChain").text("Binance")
       $("#fromNetworkLabel").text("BSC")
@@ -73,7 +66,6 @@ async function startApp(provider) {
       break;
     case 5:
       sourceChainLogo = "Ethereum-logo.svg";
-      sourceChainExplorer = "https://goerli.etherscan.io"
 
       $("#fromChain").text("Ethereum")
       $("#fromNetworkLabel").text("Goerli Ethereum Testnet")
@@ -81,7 +73,6 @@ async function startApp(provider) {
       break;
     case 1337:
       sourceChainLogo = "Ethereum-logo.svg";
-      sourceChainExplorer = ""
 
       $("#fromChain").text("Ethereum")
       $("#fromNetworkLabel").text("Ethereum Devnet")
@@ -89,7 +80,6 @@ async function startApp(provider) {
       break;
     default:
       sourceChainLogo = "Ethereum-logo.svg";
-      sourceChainExplorer = "https://etherscan.io"
 
       $("#fromChain").text("Ethereum")
       $("#fromNetworkLabel").text("Ethereum")
@@ -102,7 +92,8 @@ async function startApp(provider) {
     unirisTokenAddress,
     recipientEthereum,
     sufficientFunds,
-    UCOPrice
+    UCOPrice,
+    sourceChainExplorer
   } = await getConfig(ethChainId);
 
   toChainExplorer = `${archethicEndpoint}/explorer/transaction`
@@ -148,7 +139,6 @@ async function startApp(provider) {
     $("#swapBalanceUSD").text((amount * UCOPrice).toFixed(2))
   })
 
-
   $("#swapForm").on("submit", async (e) => {
     e.preventDefault();
     if (!e.target.checkValidity()) {
@@ -165,7 +155,8 @@ async function startApp(provider) {
       recipientAddress,
       ethChainId,
       archethic,
-      UCOPrice
+      UCOPrice,
+      sourceChainExplorer
     );
   });
 }
@@ -181,8 +172,13 @@ async function handleFormSubmit(
   recipientEthereum,
   recipientArchethic,
   ethChainId,
-  UCOPrice
+  archethic,
+  UCOPrice,
+  sourceChainExplorer
 ) {
+
+  console.log(sourceChainExplorer)
+
   $("#steps").show();
   $("#txSummary").hide();
 
@@ -428,7 +424,8 @@ async function getConfig(ethChainId) {
         unirisTokenAddress: r.unirisTokenAddress,
         recipientEthereum: r.recipientEthereum,
         sufficientFunds: r.sufficientFunds,
-        UCOPrice: r.UCOPrice
+        UCOPrice: r.UCOPrice,
+        sourceChainExplorer: r.sourceChainExplorer
       };
     });
 }

@@ -1,6 +1,5 @@
 import Archethic, { Crypto, Utils } from "archethic";
 import fetch from "node-fetch"
-import { ethers } from "ethers";
 
 const archethicEndpoint =
   process.env["ARCHETHIC_ENDPOINT"] || "https://mainnet.archethic.net";
@@ -19,42 +18,48 @@ const ethConfig = {
   5: {
     providerEndpoint: "https://goerli.infura.io/v3/3a7a2dbdbec046a4961550ddf8c7d78a",
     recipientEthereum: process.env["ETHEREUM_GOERLY_ADDRESS"] || "0x85864179f21518251DC16Bf5f34831d8Bb73B953", // account #9 (mnemonic: orphan bamboo rabbit depart truth kidney sick slot push board expect marriage)
-    unirisTokenAddress: process.env["UNIRIS_TOKEN_ADDRESS"] || "0x51279e98d99AA8D65763a885BEFA5463dCd84Af6" // (mnemonic: orphan bamboo rabbit depart truth kidney sick slot push board expect marriage)
+    unirisTokenAddress: process.env["UNIRIS_TOKEN_ADDRESS"] || "0x51279e98d99AA8D65763a885BEFA5463dCd84Af6", // (mnemonic: orphan bamboo rabbit depart truth kidney sick slot push board expect marriage)
+    sourceChainExplorer: "https://goerli.etherscan.io"
   },
   
   // Mumbai (Polygon testnet)
   80001: {
     providerEndpoint: "https://polygon-mumbai.g.alchemy.com/v2/-8zo2X19AmwNv7AGVIsGF5LWJQLc92Oj",
     recipientEthereum: process.env["POLYGON_MUMBAI_ADDRESS"] || "0x85864179f21518251DC16Bf5f34831d8Bb73B953", // account #9 (mnemonic: orphan bamboo rabbit depart truth kidney sick slot push board expect marriage)
-    unirisTokenAddress: process.env["UNIRIS_TOKEN_ADDRESS"] || "0x51279e98d99AA8D65763a885BEFA5463dCd84Af6" // (mnemonic: orphan bamboo rabbit depart truth kidney sick slot push board expect marriage)
+    unirisTokenAddress: process.env["UNIRIS_TOKEN_ADDRESS"] || "0x51279e98d99AA8D65763a885BEFA5463dCd84Af6", // (mnemonic: orphan bamboo rabbit depart truth kidney sick slot push board expect marriage)
+    sourceChainExplorer: "https://mumbai.polygonscan.com"
   },
 
   // BSC (testnet)
   97: {
     providerEndpoint: "https://data-seed-prebsc-2-s3.binance.org:8545",
     recipientEthereum: process.env["BSC_TESTNET_ADDRESS"] || "0x85864179f21518251DC16Bf5f34831d8Bb73B953", // account #9 (mnemonic: orphan bamboo rabbit depart truth kidney sick slot push board expect marriage)
-    unirisTokenAddress: process.env["UNIRIS_TOKEN_ADDRESS"] || "0x5e6554593E4fe61276AD09094f16A6D5133461A5" // (mnemonic: orphan bamboo rabbit depart truth kidney sick slot push board expect marriage)
+    unirisTokenAddress: process.env["UNIRIS_TOKEN_ADDRESS"] || "0x5e6554593E4fe61276AD09094f16A6D5133461A5", // (mnemonic: orphan bamboo rabbit depart truth kidney sick slot push board expect marriage)
+    sourceChainExplorer: "https://testnet.bscscan.com"
   },
 
   // Polygon(mainnet)
   137: {
     providerEndpoint: "https://polygon-mainnet.g.alchemy.com/v2/DynWKvz6PUFaeZNmlxPXNiV1nK4Ac_2D",
     recipientEthereum: process.env["POLYGON_MAINNET_ADDRESS"],
-    unirisTokenAddress: "0x3C720206bFaCB2d16fA3ac0ed87D2048Dbc401Fc"
+    unirisTokenAddress: "0x3C720206bFaCB2d16fA3ac0ed87D2048Dbc401Fc",
+    sourceChainExplorer: "https://polygonscan.com"
   },
 
   // BSC (mainnet)
   56: {
     providerEndpoint: "https://bsc-dataseed1.binance.org/",
     recipientEthereum: process.env["BSC_MAINNET_ADDRESS"],
-    unirisTokenAddress: "0xb001f1e7c8bda414ac7cf7ecba5469fe8d24b6de"
+    unirisTokenAddress: "0xb001f1e7c8bda414ac7cf7ecba5469fe8d24b6de",
+    sourceChainExplorer: "https://bscscan.com"
   },
 
   // Ethereum (mainnet)
   1: {
     providerEndpoint: "https://mainnet.infura.io/v3/3a7a2dbdbec046a4961550ddf8c7d78a",
     recipientEthereum: process.env["ETHEREUM_MAINNET_ADDRESS"],
-    unirisTokenAddress: "0x8a3d77e9d6968b780564936d15B09805827C21fa"
+    unirisTokenAddress: "0x8a3d77e9d6968b780564936d15B09805827C21fa",
+    sourceChainExplorer: "https://etherscan.io"
   }
 }
 
@@ -78,7 +83,7 @@ async function archethicConnection() {
     console.log(`Connected to ${archethicEndpoint}`)
     return archethic
   }
-  
+
   return archethic
 }
 

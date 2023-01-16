@@ -16,7 +16,7 @@ router.post("/status", async (req, res) => {
         })
     }
 
-    const { recipientEthereum, unirisTokenAddress } = networkConf
+    const { recipientEthereum, unirisTokenAddress, sourceChainExplorer } = networkConf
 
     res.json({
         status: "ok",
@@ -25,7 +25,8 @@ router.post("/status", async (req, res) => {
         recipientEthereum: recipientEthereum,
         unirisTokenAddress: unirisTokenAddress,
         sufficientFunds: await hasSufficientFunds(),
-        UCOPrice: await getUCOPrice()
+        UCOPrice: await getUCOPrice(),
+        sourceChainExplorer: sourceChainExplorer
     })
 });
 
