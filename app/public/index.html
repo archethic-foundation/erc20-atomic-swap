@@ -22,8 +22,8 @@
 		<div class="container no-pad">
 			<main id="main" role="main" class="main">
 				<div class="container-fluid px-0">
-					<div class="row align-items-center">
-						<div class="col-lg-5 col-md-5 d-flex justify-content-center">
+					<div class="row align-items-start">
+						<div class="col-lg-5 col-md-5 d-flex justify-content-center" style="padding-top: 100px;">
 							<div class="left-bar">
 								<h1>Welcome to</h1>
 								<div class="logo-bar">
@@ -31,7 +31,7 @@
 								</div>
 								<p>
 									Archethic Bridge gives you the power<br>
-									to transfer your ERC20 $UCO to the<br>
+									to transfer your $UCO to the<br>
 									Archethic Blockchain without the need<br>
 									of a trusted third.
 								</p>
@@ -40,10 +40,7 @@
 						<div class="col-lg-7 col-md-7">
 							<div class="icon-block">
 								<div class="box">
-									<div>
-										<br /><br /><br />
-									</div>
-									<div class="icon-bar">
+									<div class="icon-bar" style="padding-top: 60px;">
 										<div class="row mb-4">
 											<div class="col-6">
 												<img src="assets/images/Blockchains.svg" alt="">
@@ -54,7 +51,7 @@
 										</div>
 										<div class="row">
 											<div class="col-12">
-												<h3>1) Please, connect your ERC20 Wallet</h3>
+												<h3>1) Please, connect your wallet</h3>
 											</div>
 										</div>
 									</div>
@@ -78,7 +75,8 @@
 								<div class="col-12">
 									<footer id="footer">
 										<p>Archethic Bridge powered by <a href="#"><img
-													src="assets/images/small-logo.svg" alt=""></a>
+													src="assets/images/Archethic-Technologies-White-logo.svg"
+													height="20px" alt=""></a>
 										</p>
 									</footer>
 								</div>
@@ -89,8 +87,8 @@
 			</main>
 			<form id="swapForm" role="main" class="main" style="display: none">
 				<div class="container-fluid px-0">
-					<div class="row align-items-center">
-						<div class="col-lg-5 col-md-5 d-flex justify-content-center">
+					<div class="row align-items-start">
+						<div class="col-lg-5 col-md-5 d-flex justify-content-center" style="padding-top: 100px;">
 							<div class="left-bar">
 								<h1>Welcome to</h1>
 								<div class="logo-bar">
@@ -108,23 +106,30 @@
 						</div>
 						<div class="col-lg-7 col-md-7">
 							<div class="icon-block">
-								<div class="box">
-									<h2>2) Enter the recipient’s address</h2>
-									<div class="row">
-										<div class="col-12">
-											<div class="in-box">
-												<input type="text" class="form-control" id="recipientAddress" required
-													pattern="^([0-9A-Fa-f]){68}$"
-													placeholder="Enter your Archethic's address">
+								<div class="box" style="padding-top: 30px;">
+									<div class="icon-bar">
+										<div class="three-block">
+											<div class="row">
+												<div class="col">
+													<ul>
+														<li>
+															<div class="col">
+																<h3><span id="fromNetworkLabel"></span></br></br>
+																</h3>
+															</div>
+														</li>
+														<li>
+														</li>
+														<li>
+															<div class="col">
+																<h3><span id="toNetworkLabel">
+																	</span></br></br></h3>
+															</div>
+														</li>
+													</ul>
+												</div>
 											</div>
 										</div>
-									</div>
-									<div class="para-text">
-										<p><br><br>The destination address must exists on Archethic Network.</p>
-										<p>Please make sure the address entered is correct, to avoid any loss.</br></br>
-										</p>
-									</div>
-									<div class="icon-bar">
 										<div class="row mb-4">
 											<div class="col-6">
 												<!-- //TODO: Load selected blockchain logo in assets/images/bc-logos folder -->
@@ -159,131 +164,183 @@
 												</div>
 											</div>
 										</div>
+										<h2>2) Enter the recipient’s address</h2>
 										<div class="row">
 											<div class="col-12">
-												<h3>3) Enter the nb of tokens to transfer</h3>
+												<div class="in-box">
+													<input type="text" class="form-control" id="recipientAddress"
+														required pattern="^([0-9A-Fa-f]){68}$"
+														placeholder="Enter your Archethic's address">
+												</div>
 											</div>
 										</div>
-									</div>
-									<div class="three-block">
-										<div class="row mb-3">
-											<div class="col-12">
-												<ul>
-													<li>
-													</li>
-													<li>
-														<div class="i-box">
-															<input type="number" min="1" max="1000" class="form-control"
-																required id="nbTokensToSwap" placeholder="UCO" value="1">
-														</div>
-														<div class="row">
-															<h4 style="text-align: right;">=<span
-																	id="swapBalanceUSD">0</span>$</h4>
-														</div>
-													</li>
-													<li>
-													</li>
-												</ul>
-											</div>
+										<div class="para-text">
+											<p><br><br>The destination address must exists on Archethic Network.</p>
+											<p>Please make sure the address entered is correct, to avoid any
+												loss.</br></br>
+											</p>
 										</div>
-										<div class="row">
-											<div class="col-12">
-												<h4 id="ucoPrice" style="display: none">1 UCO = 0.090011 $</h4>
+										<h2>3) Enter the nb of tokens to transfer</h2>
+
+										<div class="three-block">
+											<div class="row mb-3">
+												<div class="col-12">
+													<ul>
+														<li>
+														</li>
+														<li>
+															<div class="i-box">
+																<input type="number" min="1" max="1000" step=".00000001"
+																	class="form-control" required id="nbTokensToSwap"
+																	placeholder="UCO">
+															</div>
+															<div class="row">
+																<h4 style="text-align: right;">=<span
+																		id="swapBalanceUSD">0</span>$</h4>
+															</div>
+														</li>
+														<li>
+														</li>
+													</ul>
+												</div>
+											</div>
+											<div class="row">
+												<div class="col-12">
+													<h4 id="ucoPrice" style="display: none"></h4>
+												</div>
 											</div>
 										</div>
 									</div>
 									<div class="para-text">
-										<p><u>Fee policy</u></p>
+										<p><u>Fee policy</br></br></u></p>
 										<p>Archethic network fees <u>will be supported</u> by Archethic.</p>
 										<p>Ethereum, BSC or Polygon fees <u>will not be supported</u> by
 											Archethic.</br></br></p>
-										<p>Fees will be visible in Metamask. Be careful regarding ETH fees.</p>
+										<p>Fees will be visible in Metamask.</p>
+										<p>Be careful regarding ETH fees.</p>
 									</div>
 									<div class="row mb-3">
 										<p id="error" class="text-danger"></p>
 									</div>
-									<div class="btn-area">
-										<button class="btn sp-btn" style="display: none" id="btnSwap">Swap</button>
+									<div class="btn-area" style="display: none" id="btnSwap">
+										<button class="btn sp-btn">Swap</button>
 									</div>
-									<div class="row mb-3">
-										<p><br><br></p>
-									</div>
-									<div class="container-fluid" id="steps" style="display: none">
+									<div class="container-fluid" id="steps"
+										style="display: none; padding-top: 30px; padding-bottom: 20px;">
 										<ul class="list-unstyled multi-steps">
-											<li style="font-size: small;" id="ethDeploymentStep">Setup on <span id="fromChain">Ethereum</span></li>
-											<li style="font-size: small;" id="ethTransferStep">Transfer UCOs</li>
-											<li style="font-size: small;" id="archethicDeploymentStep">Setup on Archethic</li>
-											<li style="font-size: small;" id="swapStep">Swap</li>
-											<li style="font-size: small;" id="endStep">Completion</li>
+											<li style="letter-spacing: 2px; font-weight: 300;
+											font-size: 12px; font-family: Lato, sans-serif;" id="ethDeploymentStep">Setup on <span
+													id="fromChain">Ethereum</span>
+											</li>
+											<li style="letter-spacing: 2px; font-weight: 300;
+											font-size: 12px; font-family: Lato, sans-serif;" id="ethTransferStep">Transfer</br>UCOs</li>
+											<li style="letter-spacing: 2px; font-weight: 300;
+											font-size: 12px; font-family: Lato, sans-serif;" id="archethicDeploymentStep">Setup on
+												Archethic</li>
+											<li style="letter-spacing: 2px; font-weight: 300;
+											font-size: 12px; font-family: Lato, sans-serif;" id="swapStep">
+												Swap</li>
+											<li style="letter-spacing: 2px; font-weight: 300;
+											font-size: 12px;font-family: Lato, sans-serif;" id="endStep">
+												Completion</li>
 										</ul>
 									</div>
+									<div class="para-text" style="padding-top: 10;">
+										<div class="para-text" id="txSummary1" style="padding-top: 30px; background: linear-gradient(135deg, rgba(0, 164, 219, 0.3) -10%, rgba(204, 0, 255, 0.3) 100%);
+										border-radius: 20px; line-height: 20px; padding: 10px 10px 10px 10px; display: none;" id="txSummary">
+											<p style="text-overflow: ellipsis;
+										word-wrap: break-word;"><span id="txSummary1Label"></span></p>
+										</div>
+										<div class="para-text" id="txSummary2" style="padding-top: 10px; background: linear-gradient(135deg, rgba(0, 164, 219, 0.3) -10%, rgba(204, 0, 255, 0.3) 100%);
+										border-radius: 20px; line-height: 20px; padding: 10px 10px 10px 10px; display: none;" id="txSummary">
+											<p style="text-overflow: ellipsis;
+										word-wrap: break-word;"><span id="txSummary2Label"></span></p>
+										</div>
+										<div class="para-text" id="txSummary3" style="padding-top: 10px; background: linear-gradient(135deg, rgba(0, 164, 219, 0.3) -10%, rgba(204, 0, 255, 0.3) 100%);
+										border-radius: 20px; line-height: 20px; padding: 10px 10px 10px 10px; display: none;" id="txSummary">
+											<p style="text-overflow: ellipsis;
+										word-wrap: break-word;"><span id="txSummary3Label"></span></p>
+										</div>
+										<div class="para-text" id="txSummary4" style="padding-top: 10px; background: linear-gradient(135deg, rgba(0, 164, 219, 0.3) -10%, rgba(204, 0, 255, 0.3) 100%);
+										border-radius: 20px; line-height: 20px; padding: 10px 10px 10px 10px; display: none;" id="txSummary">
+											<p style="text-overflow: ellipsis;
+										word-wrap: break-word;"><span id="txSummary4Label"></span></p>
+										</div>
+										<div class="para-text" id="txSummary5" style="padding-top: 10px; background: linear-gradient(135deg, rgba(0, 164, 219, 0.3) -10%, rgba(204, 0, 255, 0.3) 100%);
+										border-radius: 20px; line-height: 20px; padding: 10px 10px 10px 10px; display: none;" id="txSummary">
+											<p style="text-overflow: ellipsis;
+										word-wrap: break-word;"><span id="txSummary5Label"></span></p>
+										</div>
+									</div>
 								</div>
 							</div>
-							<div class="row">
-								<div class="col-12">
-									<footer id="footer">
-										<p>Archethic Bridge powered by <a href="#"><img
-													src="assets/images/small-logo.svg" alt=""></a>
-										</p>
-									</footer>
-								</div>
+						</div>
+						<div class="row">
+							<div class="col-12">
+								<footer id="footer">
+									<p>Archethic Bridge powered by <a href="#"><img
+												src="assets/images/Archethic-Technologies-White-logo.svg" height="20px"
+												alt=""></a>
+									</p>
+								</footer>
 							</div>
 						</div>
 					</div>
 				</div>
-			</form>
-			<footer class="mastfoot">
-				<div class="inner">
-					<a class="none-decoration" target="_blank" href="https://twitter.com/archethic">
-						<img class="social" src="assets/images/links/twitter.svg" />
-					</a>
-					<a class="none-decoration" target="_blank" href="https://www.instagram.com/the_official_archethic/">
-						<img class="social" src="assets/images/links/instagram.svg" />
-					</a>
-					<a class="none-decoration" target="_blank" href="https://t.me/ArchEthic_ENG">
-						<img class="social" src="assets/images/links/telegram.svg" />
-					</a>
-					<a class="none-decoration" target="_blank" href="https://discord.com/invite/CJZJvVReBx">
-						<img class="social" src="assets/images/links/discord.svg" />
-					</a>
-					<a class="none-decoration" target="_blank" href="https://www.reddit.com/r/ArchEthic/">
-						<img class="social" src="assets/images/links/reddit.svg" />
-					</a>
-					<a class="none-decoration" target="_blank"
-						href="https://www.youtube.com/channel/UCmP7Sg_TdBfbO1_u4EyIKzg">
-						<img class="social" src="assets/images/links/youtube.svg" />
-					</a>
-					<a class="none-decoration" target="_blank" href="https://github.com/archethic-foundation">
-						<img class="social" src="assets/images/links/github.svg" />
-					</a>
-					<a class="none-decoration" target="_blank"
-						href="https://www.linkedin.com/company/archethic-technologies/">
-						<img class="social" src="assets/images/links/linkedin.svg" />
-					</a>
-					<a class="none-decoration" target="_blank" href="https://medium.com/archethic">
-						<img class="social" src="assets/images//links/medium.png" />
-					</a>
-					<a class="none-decoration" target="_blank" href="https://coinmarketcap.com/currencies/uniris/">
-						<img class="social" src="assets/images/links/cmc.png" />
-					</a>
-					<a class="none-decoration" target="_blank" href="https://www.coingecko.com/en/coins/archethic">
-						<img class="social" src="assets/images/links/cg.png" />
-					</a>
-				</div>
-				<div class="inner">
-					<div class="col-12">
-						<div id="footer">
-							<p>Archethic ©
-								<script type="text/javascript">
-									document.write(new Date()
-										.getFullYear());
-								</script> All rights reserved.
-							</p>
-						</div>
-					</div>
-				</div>
-			</footer>
 		</div>
+		</form>
+		<footer class="mastfoot">
+			<div class="inner">
+				<a class="none-decoration" target="_blank" href="https://twitter.com/archethic">
+					<img class="social" src="assets/images/links/twitter.svg" />
+				</a>
+				<a class="none-decoration" target="_blank" href="https://www.instagram.com/the_official_archethic/">
+					<img class="social" src="assets/images/links/instagram.svg" />
+				</a>
+				<a class="none-decoration" target="_blank" href="https://t.me/ArchEthic_ENG">
+					<img class="social" src="assets/images/links/telegram.svg" />
+				</a>
+				<a class="none-decoration" target="_blank" href="https://discord.com/invite/CJZJvVReBx">
+					<img class="social" src="assets/images/links/discord.svg" />
+				</a>
+				<a class="none-decoration" target="_blank" href="https://www.reddit.com/r/ArchEthic/">
+					<img class="social" src="assets/images/links/reddit.svg" />
+				</a>
+				<a class="none-decoration" target="_blank"
+					href="https://www.youtube.com/channel/UCmP7Sg_TdBfbO1_u4EyIKzg">
+					<img class="social" src="assets/images/links/youtube.svg" />
+				</a>
+				<a class="none-decoration" target="_blank" href="https://github.com/archethic-foundation">
+					<img class="social" src="assets/images/links/github.svg" />
+				</a>
+				<a class="none-decoration" target="_blank"
+					href="https://www.linkedin.com/company/archethic-technologies/">
+					<img class="social" src="assets/images/links/linkedin.svg" />
+				</a>
+				<a class="none-decoration" target="_blank" href="https://medium.com/archethic">
+					<img class="social" src="assets/images//links/medium.png" />
+				</a>
+				<a class="none-decoration" target="_blank" href="https://coinmarketcap.com/currencies/uniris/">
+					<img class="social" src="assets/images/links/cmc.png" />
+				</a>
+				<a class="none-decoration" target="_blank" href="https://www.coingecko.com/en/coins/archethic">
+					<img class="social" src="assets/images/links/cg.png" />
+				</a>
+			</div>
+			<div class="inner" style="padding-bottom: 10px;">
+				<div class="col-12">
+					<div id="footer">
+						<p>Archethic ©
+							<script type="text/javascript">
+								document.write(new Date()
+									.getFullYear());
+							</script> All rights reserved.
+						</p>
+					</div>
+				</div>
+			</div>
+		</footer>
+	</div>
 	</div>
 </body>
 

@@ -27,32 +27,73 @@ $("#connectMetamaskBtn").on("click", async () => {
   }
 });
 
+let sourceChainExplorer;
+let toChainExplorer;
+
 async function startApp(provider) {
 
   const { chainId: ethChainId } = await provider.getNetwork();
   const signer = provider.getSigner();
 
   let sourceChainLogo;
+
+
   switch (ethChainId) {
     case 80001:
       sourceChainLogo = "Polygon-logo.svg";
+      sourceChainExplorer = "https://mumbai.polygonscan.com"
+
       $("#fromChain").text("Polygon")
+      $("#fromNetworkLabel").text("Mumbai Polygon Testnet")
+      $("#toNetworkLabel").text("Archethic Testnet")
       break;
     case 137:
       sourceChainLogo = "Polygon-logo.svg";
+      sourceChainExplorer = "https://polygonscan.com"
+
       $("#fromChain").text("Polygon")
+      $("#fromNetworkLabel").text("Polygon")
+      $("#toNetworkLabel").text("Archethic")
       break;
     case 97:
       sourceChainLogo = "BSC-logo.svg";
+      sourceChainExplorer = "https://testnet.bscscan.com"
+
       $("#fromChain").text("Binance")
+      $("#fromNetworkLabel").text("BSC Testnet")
+      $("#toNetworkLabel").text("Archethic Testnet")
       break;
     case 56:
       sourceChainLogo = "BSC-logo.svg";
+      sourceChainExplorer = "https://bscscan.com"
+
       $("#fromChain").text("Binance")
+      $("#fromNetworkLabel").text("BSC")
+      $("#toNetworkLabel").text("Archethic")
+      break;
+    case 5:
+      sourceChainLogo = "Ethereum-logo.svg";
+      sourceChainExplorer = "https://goerli.etherscan.io"
+
+      $("#fromChain").text("Ethereum")
+      $("#fromNetworkLabel").text("Goerli Ethereum Testnet")
+      $("#toNetworkLabel").text("Archethic Testnet")
+      break;
+    case 1337:
+      sourceChainLogo = "Ethereum-logo.svg";
+      sourceChainExplorer = ""
+
+      $("#fromChain").text("Ethereum")
+      $("#fromNetworkLabel").text("Ethereum Devnet")
+      $("#toNetworkLabel").text("Archethic Devnet")
       break;
     default:
       sourceChainLogo = "Ethereum-logo.svg";
+      sourceChainExplorer = "https://etherscan.io"
+
       $("#fromChain").text("Ethereum")
+      $("#fromNetworkLabel").text("Ethereum")
+      $("#toNetworkLabel").text("Archethic")
       break;
   }
 
@@ -64,12 +105,14 @@ async function startApp(provider) {
     UCOPrice
   } = await getConfig(ethChainId);
 
+  toChainExplorer = `${archethicEndpoint}/explorer/transaction`
+
   $("#sourceChainImg").attr("src", `assets/images/bc-logos/${sourceChainLogo}`);
   $("#main").hide();
   $("#swapForm").show();
 
   $("#ucoPrice").text(`1 UCO = ${UCOPrice}$`).show()
-  $("#swapBalanceUSD").text(UCOPrice)
+  $("#swapBalanceUSD").text(0)
 
   if (!sufficientFunds) {
     $("#error").text(
@@ -85,33 +128,33 @@ async function startApp(provider) {
 
   const balance = await unirisContract.balanceOf(account);
   const erc20Amount = ethers.utils.formatUnits(balance, 18)
-  $("#fromBalanceUCO").text(parseFloat(erc20Amount).toFixed(2));
-  $("#fromBalanceUSD").text(erc20Amount * UCOPrice);
+  $("#fromBalanceUCO").text(new Intl.NumberFormat().format(parseFloat(erc20Amount).toFixed(8)));
+  $("#fromBalanceUSD").text(new Intl.NumberFormat().format((erc20Amount * UCOPrice).toFixed(2)));
 
   $("#recipientAddress").on("change", async (e) => {
     const archethicBalance = await getArchethicBalance($(e.target).val());
 
     const ucoAmount = archethicBalance / 1e8
 
-    $("#toBalanceUCO").text(parseFloat(ucoAmount).toFixed(2));
-    $("#toBalanceUSD").text(UCOPrice * ucoAmount);
+    $("#toBalanceUCO").text(new Intl.NumberFormat().format(parseFloat(ucoAmount).toFixed(8)));
+    $("#toBalanceUSD").text(new Intl.NumberFormat().format((UCOPrice * ucoAmount).toFixed(2)));
     $("#btnSwap").show();
   });
-  
+
   $("#recipientAddress").focus()
 
   $("#nbTokensToSwap").on("change", (e) => {
     const amount = $(e.target).val()
-    $("#swapBalanceUSD").text(amount * UCOPrice)
+    $("#swapBalanceUSD").text((amount * UCOPrice).toFixed(2))
   })
-  
+
 
   $("#swapForm").on("submit", async (e) => {
     e.preventDefault();
     if (!e.target.checkValidity()) {
       return;
     }
-    
+
     $("#btnSwap").hide();
 
     const recipientAddress = $("#recipientAddress").val();
@@ -141,6 +184,7 @@ async function handleFormSubmit(
   UCOPrice
 ) {
   $("#steps").show();
+  $("#txSummary").hide();
 
   const secret = new Uint8Array(32);
   crypto.getRandomValues(secret);
@@ -166,53 +210,72 @@ async function handleFormSubmit(
     );
     $("#ethDeploymentStep").removeClass("is-active");
 
+    $("#txSummary").show();
+
     const HTLCAddress = HTLC_Contract.address
-    
+
+    $("#txSummary1Label").html(`Contract address on Ethereum: <a href="${sourceChainExplorer}/address/${HTLC_Contract.address}" target="_blank">${HTLC_Contract.address}</a>`)
+    $("#txSummary1").show();
+
     $("#ethTransferStep").addClass("is-active")
-    await transferTokensToHTLC(amount, HTLCAddress, unirisContract, signer);
+    const transferTokenTx = await transferTokensToHTLC(amount, HTLCAddress, unirisContract, signer);
+    console.log(`${amount} UCO transfered`);
+
+    $("#txSummary2Label").html(`Provision UCO: <a href="${sourceChainExplorer}/tx/${transferTokenTx.transactionHash}" target="_blank">${transferTokenTx.transactionHash}</a>`)
+    $("#txSummary2").show();
+
     $("#ethTransferStep").removeClass("is-active")
 
     $("#archethicDeploymentStep").addClass("is-active");
-    
+
     const contractAddress = await sendDeployRequest(
-     secretDigestHex,
-     recipientArchethic,
-     amount,
-     HTLCAddress,
-     ethChainId
+      secretDigestHex,
+      recipientArchethic,
+      amount,
+      HTLCAddress,
+      ethChainId
     );
     console.log("Contract address on Archethic", contractAddress);
-    
+    $("#txSummary3Label").html(`Contract address on Archethic : <a href="${toChainExplorer}/${contractAddress}" target="_blank">${contractAddress}</a>`)
+    $("#txSummary3").show();
+
     $("#archethicDeploymentStep").removeClass("is-active");
 
     $("#swapStep").addClass("is-active");
-    
-    const txReceipt = await withdrawERC20Token(HTLC_Contract, signer, secretHex)
-    console.log(`Ethereum's withdraw transaction - ${txReceipt.transactionHash}`);
-    
+
+    const withdrawTx = await withdrawERC20Token(HTLC_Contract, signer, secretHex)
+    console.log(`Ethereum's withdraw transaction - ${withdrawTx.transactionHash}`);
+    $("#txSummary4Label").html(`Ethereum swap: <a href="${sourceChainExplorer}/tx/${withdrawTx.transactionHash}" target="_blank">${withdrawTx.transactionHash}</a>`)
+    $("#txSummary4").show();
+
     const ethAccount = await signer.getAddress();
     const erc20Balance = await unirisContract.balanceOf(ethAccount);
     const erc20Amount = ethers.utils.formatUnits(erc20Balance, 18)
-    $("#fromBalanceUCO").text(parseFloat(erc20Amount).toFixed(2));
+    $("#fromBalanceUCO").text(new Intl.NumberFormat().format(parseFloat(erc20Amount).toFixed(2)));
     $("#fromBalanceUSD").text(erc20Amount * UCOPrice);
 
-    await sendWithdrawRequest(
-     contractAddress,
-     HTLCAddress,
-     txReceipt.transactionHash,
-     secretHex,
-     ethChainId
+    const archethicWithdrawTx = await sendWithdrawRequest(
+      contractAddress,
+      HTLCAddress,
+      withdrawTx.transactionHash,
+      secretHex,
+      ethChainId
     );
-    console.log("Token swap finish");
+    console.log(`Archethic's withdraw transaction ${archethicWithdrawTx}`)
+    $("#txSummary5Label").html(`Archethic swap : <a href="${toChainExplorer}/${archethicWithdrawTx}" target="_blank">${archethicWithdrawTx}</a>`)
+    $("#txSummary5").show();
 
     $("#swapStep").removeClass("is-active");
-    
+
+    console.log("Token swap finish");
+
     const archethicBalance = await getArchethicBalance(recipientArchethic);
 
     const newUCOBalance = archethicBalance / 1e8
 
     $("#toBalanceUCO").text(parseFloat(newUCOBalance).toFixed(2));
     $("#toBalanceUSD").text(UCOPrice * newUCOBalance)
+    $("#txSummary").show();
   } catch (e) {
     console.error(e.message || e);
     $("#error")
@@ -280,7 +343,7 @@ async function sendWithdrawRequest(
   }).then(handleResponse)
     .then(r => {
       const { archethicWithdrawTransaction } = r
-      console.log(`Archethic's withdraw transaction ${archethicWithdrawTransaction}`)
+      return archethicWithdrawTransaction
     })
 }
 
@@ -323,8 +386,7 @@ async function transferTokensToHTLC(
     ethers.utils.parseUnits(amount, 18)
   );
 
-  await tx.wait()
-  console.log(`${amount} UCO transfered`);
+  return await tx.wait()
 }
 
 const byteToHex = [];
@@ -399,7 +461,7 @@ async function handleResponse(response) {
 }
 
 async function getArchethicBalance(address) {
-   return fetch(`/balances/archethic/${address}`)
+  return fetch(`/balances/archethic/${address}`)
     .then(handleResponse)
     .then((r) => {
       return r.balance

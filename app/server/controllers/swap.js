@@ -32,11 +32,10 @@ async function deployContract(req, res, next) {
       .update(req.body.ethereumContractAddress)
       .digest();
 
-    const contractAddress = Crypto.deriveAddress(contractSeed, 0);
-    const contractAddressHex = Utils.uint8ArrayToHex(contractAddress);
+    const contractChainAddress = Crypto.deriveAddress(contractSeed, 0);
 
     const archethic  = await archethicConnection()
-    const chainSize = await archethic.transaction.getTransactionIndex(contractAddress)
+    const chainSize = await archethic.transaction.getTransactionIndex(contractChainAddress)
     if (chainSize != 0) {
       console.log(req.body.ethereumContractAddress)
       return res.status(400).json({ message: "Contract already deployed" })
@@ -44,12 +43,13 @@ async function deployContract(req, res, next) {
 
     const fundingTx = await fundContract(archethic, contractSeed, req.body.amount);
     await sendTransaction(fundingTx)
-    console.log(`Contract ${contractAddressHex} funded`);
+    console.log(`Contract ${Utils.uint8ArrayToHex(contractChainAddress)} funded`);
     
     const contractTx = await createContract(archethic, contractSeed, req.body.recipientAddress, req.body.amount, req.body.endTime, req.body.secretHash);
     await sendTransaction(contractTx)
     console.log(`Contract transaction created - ${Utils.uint8ArrayToHex(contractTx.address)}`);
 
+    const contractAddressHex = Utils.uint8ArrayToHex(contractTx.address);
     res.json({ status: "ok", contractAddress: contractAddressHex });
   }
   catch (error) {
