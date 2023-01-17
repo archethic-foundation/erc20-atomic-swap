@@ -15,8 +15,6 @@ $("#connectMetamaskBtn").on("click", async () => {
     // MetaMask requires requesting permission to connect users accounts
     await provider.send("eth_requestAccounts", []);
     await startApp(provider);
-    $("#connectMetamaskBtnSpinner").hide();
-    $("#connectMetamaskBtn").show();
   }
   catch (e) {
     $("#connectMetamaskBtnSpinner").hide();
@@ -28,6 +26,7 @@ $("#connectMetamaskBtn").on("click", async () => {
 });
 
 let toChainExplorer;
+let fromChainName
 
 async function startApp(provider) {
 
@@ -40,55 +39,63 @@ async function startApp(provider) {
     case 80001:
       sourceChainLogo = "Polygon-logo.svg";
 
-      $("#fromChain").text("Polygon")
+      fromChainName = "Polygon"
+      $("#fromChain").text(fromChainName)
       $("#fromNetworkLabel").text("Mumbai Polygon Testnet")
       $("#toNetworkLabel").text("Archethic Testnet")
       break;
     case 137:
       sourceChainLogo = "Polygon-logo.svg";
+      fromChainName = "Polygon"
 
-      $("#fromChain").text("Polygon")
+      $("#fromChain").text(fromChainName)
       $("#fromNetworkLabel").text("Polygon")
       $("#toNetworkLabel").text("Archethic")
       break;
     case 97:
       sourceChainLogo = "BSC-logo.svg";
-      $("#fromChain").text("Binance")
+      fromChainName = "Binance"
+
+      $("#fromChain").text(fromChainName)
       $("#fromNetworkLabel").text("BSC Testnet")
       $("#toNetworkLabel").text("Archethic Testnet")
       break;
     case 56:
       sourceChainLogo = "BSC-logo.svg";
+      fromChainName = "Binance"
 
-      $("#fromChain").text("Binance")
+      $("#fromChain").text(fromChainName)
       $("#fromNetworkLabel").text("BSC")
       $("#toNetworkLabel").text("Archethic")
       break;
     case 5:
       sourceChainLogo = "Ethereum-logo.svg";
+      fromChainName = "Ethereum"
 
-      $("#fromChain").text("Ethereum")
+      $("#fromChain").text(fromChainName)
       $("#fromNetworkLabel").text("Goerli Ethereum Testnet")
       $("#toNetworkLabel").text("Archethic Testnet")
       break;
     case 1337:
       sourceChainLogo = "Ethereum-logo.svg";
+      fromChainName = "Ethereum"
 
-      $("#fromChain").text("Ethereum")
+      $("#fromChain").text(fromChainName)
       $("#fromNetworkLabel").text("Ethereum Devnet")
       $("#toNetworkLabel").text("Archethic Devnet")
       break;
     default:
       sourceChainLogo = "Ethereum-logo.svg";
+      fromChain = "Ethereum"
 
-      $("#fromChain").text("Ethereum")
+      $("#fromChain").text(fromChainName)
       $("#fromNetworkLabel").text("Ethereum")
       $("#toNetworkLabel").text("Archethic")
       break;
   }
 
-  $("#main").hide();
-  $("#swapForm").show();
+  $("#sourceChainImg").attr("src", `assets/images/bc-logos/${sourceChainLogo}`);
+
 
   const {
     archethicEndpoint,
@@ -100,12 +107,16 @@ async function startApp(provider) {
     bridgeAddress
   } = await getConfig(ethChainId);
 
+  $("#connectMetamaskBtnSpinner").hide();
+  $("#connectMetamaskBtn").show();
+
+  $("#main").hide();
+  $("#swapForm").show();
+
   let maxSwap = 20 / UCOPrice
   $("#nbTokensToSwap").attr("max", maxSwap)
 
   toChainExplorer = `${archethicEndpoint}/explorer/transaction`
-
-  $("#sourceChainImg").attr("src", `assets/images/bc-logos/${sourceChainLogo}`);
 
   $("#ucoPrice").text(`1 UCO = ${UCOPrice}$`).show()
   $("#swapBalanceUSD").text(0)
@@ -224,7 +235,7 @@ async function handleFormSubmit(
 
     const HTLCAddress = HTLC_Contract.address
 
-    $("#txSummary1Label").html(`Contract address on Ethereum: <a href="${sourceChainExplorer}/address/${HTLC_Contract.address}" target="_blank">${HTLC_Contract.address}</a>`)
+    $("#txSummary1Label").html(`Contract address on ${fromChainName}: <a href="${sourceChainExplorer}/address/${HTLC_Contract.address}" target="_blank">${HTLC_Contract.address}</a>`)
     $("#txSummary1").show();
 
     $("#ethTransferStep").addClass("is-active")
@@ -255,7 +266,7 @@ async function handleFormSubmit(
 
     const withdrawTx = await withdrawERC20Token(HTLC_Contract, signer, secretHex)
     console.log(`Ethereum's withdraw transaction - ${withdrawTx.transactionHash}`);
-    $("#txSummary4Label").html(`Ethereum swap: <a href="${sourceChainExplorer}/tx/${withdrawTx.transactionHash}" target="_blank">${withdrawTx.transactionHash}</a>`)
+    $("#txSummary4Label").html(`${fromChainName} swap: <a href="${sourceChainExplorer}/tx/${withdrawTx.transactionHash}" target="_blank">${withdrawTx.transactionHash}</a>`)
     $("#txSummary4").show();
 
     const ethAccount = await signer.getAddress();

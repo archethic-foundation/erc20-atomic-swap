@@ -34,6 +34,7 @@ async function deployContract(req, res, next) {
     const provider = new ethers.providers.JsonRpcProvider(providerEndpoint)
 
     await checkEthereumContract(req.body.ethereumContractAddress, req.body.amount, req.body.secretHash, recipientEthereum, unirisTokenAddress, provider)
+    console.log("Ethereum contract checked")
 
     const contractSeed = createHmac("sha512", baseSeedContract)
       .update(req.body.ethereumContractAddress)
@@ -42,18 +43,21 @@ async function deployContract(req, res, next) {
     const contractChainAddress = Crypto.deriveAddress(contractSeed, 0);
 
     const archethic  = await archethicConnection()
+    console.log("Connected to Archethic")
     const chainSize = await archethic.transaction.getTransactionIndex(contractChainAddress)
     if (chainSize != 0) {
       console.log(req.body.ethereumContractAddress)
       return res.status(400).json({ message: "Contract already deployed" })
     }
 
+    console.log("Funding tx")
     const fundingTx = await fundContract(archethic, contractSeed, req.body.amount);
     await sendTransaction(fundingTx)
     console.log(`Contract ${Utils.uint8ArrayToHex(contractChainAddress)} funded`);
 
     const explorerEthereumContractURL = `${sourceChainExplorer}/address/${req.body.ethereumContractAddress}`
 
+    console.log("Create contract")
     const contractTx = await createContract(archethic, contractSeed, req.body.recipientAddress, req.body.amount, req.body.endTime, req.body.secretHash, explorerEthereumContractURL);
     await sendTransaction(contractTx)
     console.log(`Contract transaction created - ${Utils.uint8ArrayToHex(contractTx.address)}`);
