@@ -3,7 +3,7 @@ import Joi from 'joi'
 export default {
   deployContract: {
     body: Joi.object({
-      amount: Joi.number().required().min(1e8).max(1000e8),
+      amount: Joi.number().required().min(1e8),
       recipientAddress: Joi.string().hex().length(68).required(),
       secretHash: Joi.string().hex().length(64).required(),
       endTime: Joi.date().timestamp().required(),

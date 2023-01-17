@@ -16,12 +16,19 @@ import { Crypto, Utils } from "archethic";
 import { createHmac } from "crypto";
 const { originPrivateKey } = Utils;
 
-import { archethicConnection, ethConfig, baseSeedContract, bridgeAddress, bridgeSeed } from "../utils.js";
+import { archethicConnection, ethConfig, baseSeedContract, bridgeAddress, bridgeSeed, getUCOPrice } from "../utils.js";
 
 export default { deployContract, withdraw }
 
 async function deployContract(req, res, next) {
   try {
+
+    const ucoPrice = await getUCOPrice()
+    const maxDollar = 20
+    const maxSwap = (maxDollar / ucoPrice) * 1e8
+    if (req.body.amount > maxSwap) {
+      return res.status(400).json({ message: `You cannot swap more than ${maxSwap} UCO - ($${maxDollar})` })
+    }
 
     const { providerEndpoint, unirisTokenAddress, recipientEthereum, sourceChainExplorer } = ethConfig[req.body.ethereumChainId]
     const provider = new ethers.providers.JsonRpcProvider(providerEndpoint)
