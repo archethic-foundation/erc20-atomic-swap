@@ -59,7 +59,7 @@
 										<button id="connectMetamaskBtn" class="btn sp-btn"
 											style="margin-top: 5%; width: 400px;">
 											Connect to Metamask
-											<img class="metamask-icon" src="assets/images/icons8-metamask-logo-48.png"
+											<img class="metamask-icon" src="assets/images/icons/metamask.png"
 												width="20px" />
 										</button>
 										<button id="connectMetamaskBtnSpinner" class="btn sp-btn" disabled
@@ -228,8 +228,11 @@
 										<p>Fees will be visible in Metamask.</p>
 										<p>Be careful regarding ETH fees.</p>
 									</div>
-									<div class="row mb-3">
-										<p id="error" class="text-danger"></p>
+									<div class="para-text" style="padding-top: 10;">
+										<div class="para-text" id="error">
+											<p style="text-overflow: ellipsis;
+										word-wrap: break-word;"><span id="txSummary1Label"></span></p>
+										</div>
 									</div>
 									<div class="btn-area" style="display: none" id="btnSwap">
 										<button class="btn sp-btn">Transfer</button>

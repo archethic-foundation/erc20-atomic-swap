@@ -136,7 +136,7 @@ async function startApp(provider) {
   const balance = await unirisContract.balanceOf(account);
   const erc20Amount = ethers.utils.formatUnits(balance, 18)
   $("#fromBalanceUCO").text(new Intl.NumberFormat().format(parseFloat(erc20Amount).toFixed(8)));
-  $("#maxUCOValue").text(Math.min(erc20Amount, 20));
+  $("#maxUCOValue").text(Math.min(erc20Amount / UCOPrice, maxSwap).toFixed(5));
   $("#fromBalanceUSD").text(new Intl.NumberFormat().format((erc20Amount * UCOPrice).toFixed(5)));
 
   $("#recipientAddress").on("change", async (e) => {
@@ -274,7 +274,8 @@ async function handleFormSubmit(
     const erc20Balance = await unirisContract.balanceOf(ethAccount);
     const erc20Amount = ethers.utils.formatUnits(erc20Balance, 18);
     $("#fromBalanceUCO").text(new Intl.NumberFormat().format(parseFloat(erc20Amount).toFixed(2)));
-    $("#maxUCOValue").text(Math.min(erc20Amount, 20));
+    let maxSwap = 20 / UCOPrice
+    $("#maxUCOValue").text(Math.min(erc20Amount / UCOPrice, maxSwap).toFixed(5));
     $("#fromBalanceUSD").text(erc20Amount * UCOPrice);
 
     const archethicWithdrawTx = await sendWithdrawRequest(
@@ -287,7 +288,6 @@ async function handleFormSubmit(
     console.log(`Archethic's withdraw transaction ${archethicWithdrawTx}`)
     $("#txSummary5Label").html(`Archethic swap : <a href="${toChainExplorer}/${archethicWithdrawTx}" target="_blank">${archethicWithdrawTx}</a>`)
     $("#txSummary5").show();
-
     $("#swapStep").removeClass("is-active");
 
     console.log("Token swap finish");

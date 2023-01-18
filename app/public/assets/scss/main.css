@@ -629,3 +629,10 @@ body {
   padding: 10px 10px 10px 10px;
   display: none;
 }
+
+#error {
+  font-weight: 300;
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: #ff0000;
+}
