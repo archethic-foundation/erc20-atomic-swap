@@ -14,7 +14,7 @@
     "author": "",
     "license": "AGPL-3.0-or-later",
     "dependencies": {
-        "archethic": "1.13.0",
+        "archethic": "^1.13.0",
         "ddos": "^0.2.1",
         "ethers": "^5.7.2",
         "express": "^4.18.2",

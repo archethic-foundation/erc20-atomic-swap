@@ -50,8 +50,8 @@ async function deployContract(req, res, next) {
       return res.status(400).json({ message: "Contract already deployed" })
     }
 
-    console.log("Funding tx")
     const fundingTx = await fundContract(archethic, contractSeed, req.body.amount);
+    console.log(`Funding tx ${Utils.uint8ArrayToHex(fundingTx.address)}`)
     await sendTransaction(fundingTx)
     console.log(`Contract ${Utils.uint8ArrayToHex(contractChainAddress)} funded`);
 
@@ -166,7 +166,7 @@ async function createContract(archethic, contractSeed, recipientAddress, amount,
 
   return archethic.transaction
     .new()
-    .setType("transfer")
+    .setType("contract")
     .setContent(explorerEthereumContractURL)
     .addOwnership(cipher, authorizedKeys)
     .setCode(`
@@ -211,7 +211,7 @@ function sendTransaction(tx) {
     tx
       .on("requiredConfirmation", () => resolve())
       .on("error", (_context, reason) => reject(reason))
-      .send()
+      .send(60)
   })
 }
 
