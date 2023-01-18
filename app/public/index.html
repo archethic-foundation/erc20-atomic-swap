@@ -23,7 +23,7 @@
 			<main id="main" role="main" class="main">
 				<div class="container-fluid px-0">
 					<div class="row align-items-start">
-						<div class="col-lg-5 col-md-5 d-flex justify-content-center" style="padding-top: 100px;">
+						<div class="col-lg-5 col-md-5 d-flex justify-content-center" style="padding-top: 60px;">
 							<div class="left-bar">
 								<h1>Welcome to</h1>
 								<div class="logo-bar">
@@ -35,6 +35,11 @@
 									Archethic Blockchain without the need<br>
 									of a trusted third.
 								</p>
+								<p style="padding-top: 20px; font-weight: 400;"><a target="_blank" href="#">Tutorial</a>
+								</p>
+								<p style="padding-top: 10px; font-weight: 400;"><a target="_blank" href="#">Vidéo</a>
+								</p>
+								<p style="padding-top: 10px; font-weight: 400;"><a target="_blank" href="#">FAQ</a></p>
 							</div>
 						</div>
 						<div class="col-lg-7 col-md-7">
@@ -47,11 +52,6 @@
 											</div>
 											<div class="col-6 text-end">
 												<img src="assets/images/Logo-alone.svg" alt="">
-											</div>
-										</div>
-										<div class="row">
-											<div class="col-12">
-												<h3>1) Please, connect your wallet</h3>
 											</div>
 										</div>
 									</div>
@@ -73,7 +73,7 @@
 							</div>
 							<div class="row">
 								<div class="col-12">
-									<footer id="footer">
+									<footer id="footer2">
 										<p>Archethic Bridge powered by <a href="#"><img
 													src="assets/images/Archethic-Technologies-White-logo.svg"
 													height="20px" alt=""></a>
@@ -102,6 +102,11 @@
 									have limited each
 									transfer to <u>20$</u> per transaction (fees excluded).</br></br>
 								</p>
+								<p style="padding-top: 20px; font-weight: 400;"><a target="_blank" href="#">Tutorial</a>
+								</p>
+								<p style="padding-top: 10px; font-weight: 400;"><a target="_blank" href="#">Vidéo</a>
+								</p>
+								<p style="padding-top: 10px; font-weight: 400;"><a target="_blank" href="#">FAQ</a></p>
 							</div>
 						</div>
 						<div class="col-lg-7 col-md-7">
@@ -164,7 +169,6 @@
 												</div>
 											</div>
 										</div>
-										<h2>2) Enter the recipient’s address</h2>
 										<div class="row">
 											<div class="col-12">
 												<div class="in-box">
@@ -180,39 +184,44 @@
 												loss.</br></br>
 											</p>
 										</div>
-										<h2>3) Enter the nb of tokens to transfer</h2>
-
-										<div class="three-block">
-											<div class="row mb-3">
-												<div class="col-12">
-													<ul>
-														<li>
-														</li>
-														<li>
-															<div class="i-box">
-																<input type="number" min="1" max="100" step=".00000001"
-																	class="form-control" required id="nbTokensToSwap"
-																	placeholder="UCO">
-															</div>
-															<div class="row">
-																<h4 style="text-align: right;">=<span
-																		id="swapBalanceUSD">0</span>$</h4>
-															</div>
-														</li>
-														<li>
-														</li>
-													</ul>
+										<div class="row mb-3">
+											<div class="col-12">
+												<div class="in-box">
+													<input type="number" min="1" max="100" step=".00000001"
+														class="form-control" required id="nbTokensToSwap"
+														placeholder="Enter the nb of tokens to transfer in UCO">
 												</div>
-											</div>
-											<div class="row">
-												<div class="col-12">
-													<h4 id="ucoPrice" style="display: none"></h4>
+												<div class="three-block">
+													<div class="row">
+														<div class="col">
+															<ul>
+																<li>
+																	<div class="para-text">
+																		<p style="text-align: left;">
+																			<input type="hidden" id="maxUCOValue" />
+																			<button id="maxButton" type="button"
+																				onclick="document.getElementById('nbTokensToSwap').value=document.getElementById('maxUCOValue').innerText;">MAX</button>
+																		</p>
+																	</div>
+																</li>
+																<li>
+																</li>
+																<li>
+																	<div class="para-text">
+																		<p style="text-align: right;">=<span
+																				id="swapBalanceUSD">0</span>$
+																	</div>
+																</li>
+															</ul>
+														</div>
+													</div>
 												</div>
 											</div>
 										</div>
 									</div>
 									<div class="para-text">
-										<p><u>Fee policy</br></br></u></p>
+										<p style="text-align: center;" id="ucoPrice" style="display: none"></p>
+										<p style="padding-top: 20px;"><u>Fee policy</br></br></u></p>
 										<p>Archethic network fees <u>will be supported</u> by Archethic.</p>
 										<p>Ethereum, BSC or Polygon fees <u>will not be supported</u> by
 											Archethic.</br></br></p>
@@ -223,7 +232,7 @@
 										<p id="error" class="text-danger"></p>
 									</div>
 									<div class="btn-area" style="display: none" id="btnSwap">
-										<button class="btn sp-btn">Swap</button>
+										<button class="btn sp-btn">Transfer</button>
 									</div>
 									<div class="container-fluid" id="steps"
 										style="display: none; padding-top: 30px; padding-bottom: 20px;">
@@ -246,30 +255,40 @@
 										</ul>
 									</div>
 									<div class="para-text" style="padding-top: 10;">
-										<div class="para-text" id="txSummary1" style="padding-top: 30px; background: linear-gradient(135deg, rgba(0, 164, 219, 0.3) -10%, rgba(204, 0, 255, 0.3) 100%);
-										border-radius: 20px; line-height: 20px; padding: 10px 10px 10px 10px; display: none;" id="txSummary">
+										<div class="para-text" id="txSummary1" style="display: none; padding-top: 30px;"
+											id="txSummary">
 											<p style="text-overflow: ellipsis;
-										word-wrap: break-word;"><span id="txSummary1Label"></span></p>
+										word-wrap: break-word;"> <img src="assets/images/icons/contract.png" height="20" alt=""
+													style="padding-right: 5px; padding-bottom: 5px;" /><span
+													id="txSummary1Label"></span></p>
 										</div>
-										<div class="para-text" id="txSummary2" style="padding-top: 10px; background: linear-gradient(135deg, rgba(0, 164, 219, 0.3) -10%, rgba(204, 0, 255, 0.3) 100%);
-										border-radius: 20px; line-height: 20px; padding: 10px 10px 10px 10px; display: none;" id="txSummary">
+										<div class="para-text" id="txSummary2" style="display: none; padding-top: 10px;"
+											id="txSummary">
 											<p style="text-overflow: ellipsis;
-										word-wrap: break-word;"><span id="txSummary2Label"></span></p>
+										word-wrap: break-word;"> <img src="assets/images/icons/contract.png" height="20" alt=""
+													style="padding-right: 5px; padding-bottom: 5px;" /><span
+													id="txSummary2Label"></span></p>
 										</div>
-										<div class="para-text" id="txSummary3" style="padding-top: 10px; background: linear-gradient(135deg, rgba(0, 164, 219, 0.3) -10%, rgba(204, 0, 255, 0.3) 100%);
-										border-radius: 20px; line-height: 20px; padding: 10px 10px 10px 10px; display: none;" id="txSummary">
+										<div class="para-text" id="txSummary3" style="display: none; padding-top: 10px;"
+											id="txSummary">
 											<p style="text-overflow: ellipsis;
-										word-wrap: break-word;"><span id="txSummary3Label"></span></p>
+										word-wrap: break-word;"> <img src="assets/images/icons/contract.png" height="20" alt=""
+													style="padding-right: 5px; padding-bottom: 5px;" /><span
+													id="txSummary3Label"></span></p>
 										</div>
-										<div class="para-text" id="txSummary4" style="padding-top: 10px; background: linear-gradient(135deg, rgba(0, 164, 219, 0.3) -10%, rgba(204, 0, 255, 0.3) 100%);
-										border-radius: 20px; line-height: 20px; padding: 10px 10px 10px 10px; display: none;" id="txSummary">
+										<div class="para-text" id="txSummary4" style="display: none; padding-top: 10px;"
+											id="txSummary">
 											<p style="text-overflow: ellipsis;
-										word-wrap: break-word;"><span id="txSummary4Label"></span></p>
+										word-wrap: break-word;"> <img src="assets/images/icons/contract.png" height="20" alt=""
+													style="padding-right: 5px; padding-bottom: 5px;" /><span
+													id="txSummary4Label"></span></p>
 										</div>
-										<div class="para-text" id="txSummary5" style="padding-top: 10px; background: linear-gradient(135deg, rgba(0, 164, 219, 0.3) -10%, rgba(204, 0, 255, 0.3) 100%);
-										border-radius: 20px; line-height: 20px; padding: 10px 10px 10px 10px; display: none;" id="txSummary">
+										<div class="para-text" id="txSummary5" style="display: none; padding-top: 10px;"
+											id="txSummary">
 											<p style="text-overflow: ellipsis;
-										word-wrap: break-word;"><span id="txSummary5Label"></span></p>
+										word-wrap: break-word;"> <img src="assets/images/icons/contract.png" height="20" alt=""
+													style="padding-right: 5px; padding-bottom: 5px;" /><span
+													id="txSummary5Label"></span></p>
 										</div>
 									</div>
 								</div>
@@ -277,7 +296,7 @@
 						</div>
 						<div class="row">
 							<div class="col-12">
-								<footer id="footer">
+								<footer id="footer2">
 									<p>Archethic Bridge powered by <a href="#"><img
 												src="assets/images/Archethic-Technologies-White-logo.svg" height="20px"
 												alt=""></a>

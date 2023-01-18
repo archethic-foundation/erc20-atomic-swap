@@ -41,6 +41,15 @@ button:focus {
 
 a {
   text-decoration: none;
+  font-family: "Lato", sans-serif;
+  color: #00A4DB;
+
+}
+
+a:hover {
+  text-decoration: none;
+  font-family: "Lato", sans-serif;
+  color: #e683ff;
 }
 
 img {
@@ -485,7 +494,7 @@ body {
   text-align: justify;
   letter-spacing: 1.83023px;
   color: #FFFFFF;
-  text-align: right;
+  text-align: center;
 }
 
 #footer p a {
@@ -499,6 +508,26 @@ body {
     margin: 0 auto;
   }
 }
+
+
+#footer2 {
+  padding: 12px 0 0;
+}
+
+#footer2 p {
+  font-weight: 700;
+  font-size: 10px;
+  line-height: 12px;
+  text-align: justify;
+  letter-spacing: 1.83023px;
+  color: #FFFFFF;
+  text-align: right;
+}
+
+#footer2 p a {
+  margin: 0 0 0 5px;
+}
+
 
 /*# sourceMappingURL=main.css.map */
 
@@ -586,4 +615,17 @@ body {
   100% {
     box-shadow: 0 0 0 0 rgba(93, 185, 0, 0);
   }
+}
+
+#maxButton {
+  letter-spacing: 2px;
+  color: #FFFFFF;
+}
+
+#txSummary {
+  background: linear-gradient(135deg, rgba(0, 164, 219, 0.3) -10%, rgba(204, 0, 255, 0.3) 100%);
+  border-radius: 20px;
+  line-height: 20px;
+  padding: 10px 10px 10px 10px;
+  display: none;
 }
