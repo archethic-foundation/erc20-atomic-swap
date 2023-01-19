@@ -197,8 +197,11 @@ async function handleFormSubmit(
   const amount = $("#nbTokensToSwap").val();
 
   $('#btnSwap').prop('disabled', true);
+  $('#nbTokensToSwap').prop('disabled', true);
+  $('#recipientAddress').prop('disabled', true);
   $("#btnSwap").hide();
   $("#btnSwapSpinner").show();
+
 
   const bridgeBalance = await getArchethicBalance(bridgeAddress)
   if (bridgeBalance <= amount * 10e8) {
@@ -301,6 +304,12 @@ async function handleFormSubmit(
     $("#toBalanceUCO").text(parseFloat(newUCOBalance).toFixed(2));
     $("#toBalanceUSD").text(UCOPrice * newUCOBalance)
     $("#txSummary").show();
+    $('#btnSwap').prop('disabled', false);
+    $('#nbTokensToSwap').prop('disabled', false);
+    $('#recipientAddress').prop('disabled', false);
+    $("#btnSwap").show();
+    $("#btnSwapSpinner").hide();
+
   } catch (e) {
     console.error(e.message || e);
     $("#error")
@@ -308,6 +317,8 @@ async function handleFormSubmit(
       .show();
 
     $('#btnSwap').prop('disabled', false);
+    $('#nbTokensToSwap').prop('disabled', false);
+    $('#recipientAddress').prop('disabled', false);
     $("#btnSwap").show();
     $("#btnSwapSpinner").hide();
 
