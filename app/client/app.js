@@ -27,6 +27,7 @@ $("#connectMetamaskBtn").on("click", async () => {
 
 let toChainExplorer;
 let fromChainName
+let step
 
 async function startApp(provider) {
 
@@ -156,6 +157,96 @@ async function startApp(provider) {
     $("#swapBalanceUSD").text((amount * UCOPrice).toFixed(5))
   })
 
+  let pendingTransferJSON = localStorage.getItem("pendingTransfer")
+  if (pendingTransferJSON) {
+    $("#btnSwapSpinnerText").text("Loading previous transfer...")
+    $("#btnSwapSpinner").show()
+
+    $("#btnSwap").hide()
+    $("#btnSwap").text("Resume transfer")
+    const pendingTransfer = JSON.parse(pendingTransferJSON)
+    const state = {
+      HTLC_Contract: await getHTLC_Contract(pendingTransfer.HTLC_Address, provider),
+      secretHex: pendingTransfer.secretHex,
+      secretDigestHex: pendingTransfer.secretDigestHex,
+      amount: pendingTransfer.amount,
+      UCOPrice: UCOPrice,
+      ethChainId: ethChainId,
+      recipientEthereum: recipientEthereum,
+      recipientArchethic: pendingTransfer.recipientArchethic,
+      unirisContract: unirisContract,
+      signer: signer,
+      erc20transferAddress: pendingTransfer.erc20transferAddress,
+      archethicContractAddress: pendingTransfer.archethicContractAddress,
+      withdrawEthereumAddress: pendingTransfer.withdrawEthereumAddress,
+      sourceChainExplorer: sourceChainExplorer,
+      toChainExplorer: toChainExplorer
+    }
+
+    $("#recipientAddress").val(pendingTransfer.recipientArchethic)
+    $("#nbTokensToSwap").val(pendingTransfer.amount)
+    const archethicBalance = await getArchethicBalance(pendingTransfer.recipientArchethic);
+
+    const ucoAmount = archethicBalance / 1e8
+
+    $("#toBalanceUCO").text(new Intl.NumberFormat().format(parseFloat(ucoAmount).toFixed(8)));
+    $("#toBalanceUSD").text(new Intl.NumberFormat().format((UCOPrice * ucoAmount).toFixed(5)));
+    $("#swapBalanceUSD").text((pendingTransfer.amount * UCOPrice).toFixed(5))
+
+    $("#txSummary").show();
+    $("#steps").show(); 
+
+    $("#ethDeploymentStep").removeClass("is-active");
+    $("#txSummary1Label").html(`Contract address on ${fromChainName}: <a href="${sourceChainExplorer}/address/${pendingTransfer.HTLC_Address}" target="_blank">${pendingTransfer.HTLC_Address}</a>`)
+     $("#txSummary1").show();
+     $("#ethTransferStep").addClass("is-active");
+
+     step = 2
+
+    if (pendingTransfer.erc20transferAddress) {
+      step = 3     
+      $("#txSummary2Label").html(`Provision UCO: <a href="${sourceChainExplorer}/tx/${pendingTransfer.erc20transferAddress}" target="_blank">${pendingTransfer.erc20transferAddress}</a>`)
+      $("#txSummary2").show();
+      $("#ethTransferStep").removeClass("is-active")
+      $("#archethicDeploymentStep").addClass("is-active");
+    }
+
+    if (pendingTransfer.archethicContractAddress) {
+      step = 4
+      $("#txSummary3Label").html(`Contract address on Archethic : <a href="${toChainExplorer}/${pendingTransfer.archethicContractAddress}" target="_blank">${pendingTransfer.archethicContractAddress}</a>`)
+      $("#txSummary3").show();
+      $("#archethicDeploymentStep").removeClass("is-active");
+      $("#swapStep").addClass("is-active")
+    }
+
+    if (pendingTransfer.withdrawEthereumAddress) {
+      $("#swapStep").removeClass("is-active")
+      $("#txSummary4Label").html(`${fromChainName} swap: <a href="${sourceChainExplorer}/tx/${pendingTransfer.withdrawEthereumAddress}" target="_blank">${pendingTransfer.withdrawEthereumAddress}</a>`)
+      $("#txSummary4").show();
+      $("#swapStep").addClass("is-active")
+    }
+
+    $("#btnSwapSpinner").hide()
+    $("#btnSwap").show()
+    $("#btnSwap").prop("disabled", false)
+
+    $("#swapForm").off()
+    $("#swapForm").on("submit", async(e) => {
+      e.preventDefault();
+      $("#btnSwap").hide();
+      $("#btnSwapSpinner").show()
+      $("#btnSwapSpinner").prop("disabled", true)
+      $("#btnSwapSpinnerText").text("Transfering ...")
+      try {
+        await goto(localStorage.getItem("transferStep"), state)
+      }
+      catch(e) {
+        handleError(e)
+      }
+    })
+    return
+  }
+
   $("#swapForm").on("submit", async (e) => {
     e.preventDefault();
     if (!e.target.checkValidity()) {
@@ -169,17 +260,22 @@ async function startApp(provider) {
       recipientEthereum,
       recipientAddress,
       ethChainId,
-      archethic,
       UCOPrice,
       sourceChainExplorer,
       bridgeAddress
     );
   });
+
 }
 
 async function getERC20Contract(unirisTokenAddress, provider) {
   const unirisTokenABI = await getUnirisTokenABI();
   return new ethers.Contract(unirisTokenAddress, unirisTokenABI, provider);
+}
+
+async function getHTLC_Contract(HTLC_Address, provider) {
+  const { abi: HTLCABI } = await getHTLC();
+  return new ethers.Contract(HTLC_Address, HTLCABI, provider)
 }
 
 async function handleFormSubmit(
@@ -188,7 +284,6 @@ async function handleFormSubmit(
   recipientEthereum,
   recipientArchethic,
   ethChainId,
-  archethic,
   UCOPrice,
   sourceChainExplorer,
   bridgeAddress
@@ -201,6 +296,7 @@ async function handleFormSubmit(
   $('#btnSwap').prop('disabled', true);
   $('#nbTokensToSwap').prop('disabled', true);
   $('#recipientAddress').prop('disabled', true);
+
   $("#btnSwap").hide();
   $("#btnSwapSpinner").show();
 
@@ -237,6 +333,15 @@ async function handleFormSubmit(
       signer,
       7200 // 2 hours of locktime
     );
+    localStorage.setItem("pendingTransfer", JSON.stringify({
+      HTLC_Address: HTLC_Contract.address,
+      secretHex: secretHex,
+      secretDigestHex: secretDigestHex,
+      amount: amount,
+      recipientArchethic: recipientArchethic
+    }))
+    localStorage.setItem("transferStep", "deployedEthContract")
+
     $("#ethDeploymentStep").removeClass("is-active");
 
     $("#txSummary").show();
@@ -246,16 +351,52 @@ async function handleFormSubmit(
     $("#txSummary1Label").html(`Contract address on ${fromChainName}: <a href="${sourceChainExplorer}/address/${HTLC_Contract.address}" target="_blank">${HTLC_Contract.address}</a>`)
     $("#txSummary1").show();
 
-    $("#ethTransferStep").addClass("is-active");
-    step = 2;
+    let state = {
+      HTLC_Contract: HTLC_Contract,
+      secretHex: secretHex,
+      secretDigestHex: secretDigestHex,
+      amount: amount,
+      UCOPrice: UCOPrice,
+      ethChainId: ethChainId,
+      recipientEthereum: recipientEthereum,
+      recipientArchethic: recipientArchethic,
+      unirisContract: unirisContract,
+      signer: signer,
+      sourceChainExplorer: sourceChainExplorer,
+      toChainExplorer: toChainExplorer
+    }
+    await goto("deployedEthContract", state)
 
-    const transferTokenTx = await transferTokensToHTLC(amount, HTLCAddress, unirisContract, signer);
+  } catch (e) {
+    handleError(e)
+  }
+}
+
+async function transferERC20(state) {
+    const { HTLC_Contract, amount, unirisContract, signer, sourceChainExplorer } = state
+
+    $("#ethTransferStep").addClass("is-active")
+    const transferTokenTx = await transferTokensToHTLC(amount, HTLC_Contract.address, unirisContract, signer);
+    localStorage.setItem("transferStep", "transferedERC20")
+
+    // Update the pending transfer state
+    const pendingTransferJSON = localStorage.getItem("pendingTransfer")
+    let pendingTransfer = JSON.parse(pendingTransferJSON)
+    pendingTransfer.erc20transferAddress = transferTokenTx.transactionHash
+    localStorage.setItem("pendingTransfer", JSON.stringify(pendingTransfer))
+
     console.log(`${amount} UCO transfered`);
 
     $("#txSummary2Label").html(`Provision UCO: <a href="${sourceChainExplorer}/tx/${transferTokenTx.transactionHash}" target="_blank">${transferTokenTx.transactionHash}</a>`)
     $("#txSummary2").show();
+    $("#ethTransferStep").removeClass("is-active")
 
-    $("#ethTransferStep").removeClass("is-active");
+    state.erc20transferAddress = transferTokenTx.transactionHash
+    return state
+}
+
+async function deployArchethic(state ) {
+ const { HTLC_Contract, amount, secretDigestHex, recipientArchethic, ethChainId, toChainExplorer } =  state
 
     $("#archethicDeploymentStep").addClass("is-active");
     step = 3;
@@ -264,19 +405,40 @@ async function handleFormSubmit(
       secretDigestHex,
       recipientArchethic,
       amount,
-      HTLCAddress,
+      HTLC_Contract.address,
       ethChainId
     );
+    localStorage.setItem("transferStep", "deployedArchethicContract")
+
+    // Update the pending transfer state
+    const pendingTransferJSON = localStorage.getItem("pendingTransfer")
+    let pendingTransfer = JSON.parse(pendingTransferJSON)
+    pendingTransfer.archethicContractAddress = contractAddress
+    localStorage.setItem("pendingTransfer", JSON.stringify(pendingTransfer))
+
     console.log("Contract address on Archethic", contractAddress);
     $("#txSummary3Label").html(`Contract address on Archethic : <a href="${toChainExplorer}/${contractAddress}" target="_blank">${contractAddress}</a>`)
     $("#txSummary3").show();
 
     $("#archethicDeploymentStep").removeClass("is-active");
 
-    $("#swapStep").addClass("is-active");
-    step = 4;
+    state.archethicContractAddress = contractAddress
+    return state
+}
+
+
+async function withdrawEthereum(state) {
+    const { HTLC_Contract, signer, secretHex, unirisContract, UCOPrice, sourceChainExplorer } =  state
 
     const withdrawTx = await withdrawERC20Token(HTLC_Contract, signer, secretHex)
+    localStorage.setItem("transferStep", "withdrawEthContract")
+
+    // Update the pending transfer state
+    const pendingTransferJSON = localStorage.getItem("pendingTransfer")
+    let pendingTransfer = JSON.parse(pendingTransferJSON)
+    pendingTransfer.withdrawEthereumAddress = withdrawTx.transactionHash
+    localStorage.setItem("pendingTransfer", JSON.stringify(pendingTransfer))
+
     console.log(`Ethereum's withdraw transaction - ${withdrawTx.transactionHash}`);
     $("#txSummary4Label").html(`${fromChainName} swap: <a href="${sourceChainExplorer}/tx/${withdrawTx.transactionHash}" target="_blank">${withdrawTx.transactionHash}</a>`)
     $("#txSummary4").show();
@@ -289,66 +451,65 @@ async function handleFormSubmit(
     $("#maxUCOValue").text(Math.min(erc20Amount / UCOPrice, maxSwap).toFixed(5));
     $("#fromBalanceUSD").text(erc20Amount * UCOPrice);
 
+    state.withdrawEthereumAddress = withdrawTx.transactionHash
+    return state
+}
+
+async function withdrawArchethic({ archethicContractAddress, HTLC_Contract, withdrawEthereumAddress, secretHex, ethChainId, toChainExplorer }) {
+  console.log(archethicContractAddress)
     const archethicWithdrawTx = await sendWithdrawRequest(
-      contractAddress,
-      HTLCAddress,
-      withdrawTx.transactionHash,
+      archethicContractAddress,
+      HTLC_Contract.address,
+      withdrawEthereumAddress,
       secretHex,
       ethChainId
     );
+    localStorage.setItem("transferStep", "withdrawArchethicContract")
+
     console.log(`Archethic's withdraw transaction ${archethicWithdrawTx}`)
     $("#txSummary5Label").html(`Archethic swap : <a href="${toChainExplorer}/${archethicWithdrawTx}" target="_blank">${archethicWithdrawTx}</a>`)
     $("#txSummary5").show();
-    $("#swapStep").removeClass("is-active");
+}
 
-    console.log("Token swap finish");
+async function goto(step, state) {
+  switch(step) {
+    case "deployedEthContract":
+      step = 2
+      state = await transferERC20(state)
+      return await goto("transferedERC20", state)
+    case "transferedERC20":
+      step = 3
+      state = await deployArchethic(state)
+      return await goto("deployedArchethicContract", state)
+    case "deployedArchethicContract":
+      step = 4
+      $("#swapStep").addClass("is-active");
+      state = await withdrawEthereum(state)
+      return await goto("withdrawEthContract", state)
+    case "withdrawEthContract":
+      await withdrawArchethic(state)
 
-    const archethicBalance = await getArchethicBalance(recipientArchethic);
+      $("#swapStep").removeClass("is-active");
+      $("#btnSwapSpinner").hide()
+      $('#btnSwap').prop('disabled', false);
+      $('#btnSwap').show()
+      $('#nbTokensToSwap').prop('disabled', false);
+      $('#recipientAddress').prop('disabled', false);
 
-    const newUCOBalance = archethicBalance / 1e8
+      console.log("Token swap finish");
+      localStorage.removeItem("transferStep")
+      localStorage.removeItem("pendingTransfer")
 
-    $("#toBalanceUCO").text(parseFloat(newUCOBalance).toFixed(2));
-    $("#toBalanceUSD").text(UCOPrice * newUCOBalance)
-    $("#txSummary").show();
-    $('#btnSwap').prop('disabled', false);
-    $('#nbTokensToSwap').prop('disabled', false);
-    $('#recipientAddress').prop('disabled', false);
-    $("#btnSwap").show();
-    $("#btnSwapSpinner").hide();
-  } catch (e) {
-    console.error(e.message || e);
-    $("#error")
-      .text(`${e.message || e}`)
-      .show();
+      setTimeout(async () => {
+        const archethicBalance = await getArchethicBalance(state.recipientArchethic);
 
-    $('#btnSwap').prop('disabled', false);
-    $('#nbTokensToSwap').prop('disabled', false);
-    $('#recipientAddress').prop('disabled', false);
-    $("#btnSwap").show();
-    $("#btnSwapSpinner").hide();
+        const newUCOBalance = archethicBalance / 1e8
 
-    switch (step) {
-      case 1:
-        $("#ethDeploymentStep").removeClass("is-active");
-        $("#ethDeploymentStep").addClass("is-failed");
-        break;
-      case 2:
-        $("#ethTransferStep").removeClass("is-active");
-        $("#ethTransferStep").addClass("is-failed");
-        break;
-      case 3:
-        $("#archethicDeploymentStep").removeClass("is-active");
-        $("#archethicDeploymentStep").addClass("is-failed");
-        break;
-      case 4:
-        $("#swapStep").removeClass("is-active");
-        $("#swapStep").addClass("is-failed");
-        break;
-      default:
-        break;
-    }
+        $("#toBalanceUCO").text(parseFloat(newUCOBalance).toFixed(2));
+        $("#toBalanceUSD").text(UCOPrice * newUCOBalance)
 
-
+      }, 1000)
+      break
   }
 }
 
@@ -536,4 +697,38 @@ async function getArchethicBalance(address) {
     .then((r) => {
       return r.balance
     });
+}
+
+function handleError(e) {
+  $('#btnSwap').prop('disabled', false);
+  $('#nbTokensToSwap').prop('disabled', false);
+  $('#recipientAddress').prop('disabled', false);
+  $("#btnSwap").show();
+  $("#btnSwapSpinner").hide();
+
+  console.error(e.message || e);
+  $("#error")
+    .text(`${e.message || e}`)
+    .show();
+
+  switch (step) {
+    case 1:
+        $("#ethDeploymentStep").removeClass("is-active");
+        $("#ethDeploymentStep").addClass("is-failed");
+        break;
+      case 2:
+        $("#ethTransferStep").removeClass("is-active");
+        $("#ethTransferStep").addClass("is-failed");
+        break;
+      case 3:
+        $("#archethicDeploymentStep").removeClass("is-active");
+        $("#archethicDeploymentStep").addClass("is-failed");
+        break;
+      case 4:
+        $("#swapStep").removeClass("is-active");
+        $("#swapStep").addClass("is-failed");
+        break;
+      default:
+        break;
+    }
 }

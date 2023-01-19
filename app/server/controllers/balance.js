@@ -42,6 +42,9 @@ async function getBalance(address) {
           `,
             }),
         });
+        if (r.status != 200) {
+          throw "Node not available. Switch to another"
+        }
         const res = await r.json();
 
         if (

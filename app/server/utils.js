@@ -99,6 +99,7 @@ async function getBridgeBalance() {
 }
 
 async function getLastTransactionBalance(archethic) {
+  console.log(bridgeAddress)
   return archethic.requestNode(async (endpoint) => {
     const url = new URL("/api", endpoint);
     const r = await fetch(url, {
@@ -119,6 +120,10 @@ async function getLastTransactionBalance(archethic) {
           `
       })
     });
+
+    if (r.status != 200) {
+      throw "Node not unavailable. Switch to another"
+    }
     const res = await r.json();
 
     if (res.errors && res.errors.find(x => x.message == "transaction_not_exists")) {
@@ -153,6 +158,10 @@ async function getBridgeInputs(archethic) {
           `
       })
     });
+    if (r.status != 200) {
+      throw "Node not unavailable. Switch to another"
+    }
+
     const res = await r.json();
     if (res.data.transactionInputs && res.data.transactionInputs.length > 0) {
       return res.data.transactionInputs
@@ -164,7 +173,7 @@ async function getBridgeInputs(archethic) {
 }
 
 async function getUCOPrice() {
-  const archethic = new Archethic(archethicEndpoint)
+  const  archethic = new Archethic(archethicEndpoint)
   await archethic.connect()
   const oracleData = await archethic.network.getOracleData()
 
