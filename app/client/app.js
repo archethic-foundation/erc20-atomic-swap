@@ -194,6 +194,8 @@ async function handleFormSubmit(
   bridgeAddress
 ) {
 
+  var step = 0;
+
   const amount = $("#nbTokensToSwap").val();
 
   $('#btnSwap').prop('disabled', true);
@@ -224,6 +226,7 @@ async function handleFormSubmit(
   const secretDigestHex = uint8ArrayToHex(secretDigest);
 
   $("#ethDeploymentStep").addClass("is-active");
+  step = 1;
 
   try {
     const HTLC_Contract = await deployHTLC(
@@ -243,16 +246,19 @@ async function handleFormSubmit(
     $("#txSummary1Label").html(`Contract address on ${fromChainName}: <a href="${sourceChainExplorer}/address/${HTLC_Contract.address}" target="_blank">${HTLC_Contract.address}</a>`)
     $("#txSummary1").show();
 
-    $("#ethTransferStep").addClass("is-active")
+    $("#ethTransferStep").addClass("is-active");
+    step = 2;
+
     const transferTokenTx = await transferTokensToHTLC(amount, HTLCAddress, unirisContract, signer);
     console.log(`${amount} UCO transfered`);
 
     $("#txSummary2Label").html(`Provision UCO: <a href="${sourceChainExplorer}/tx/${transferTokenTx.transactionHash}" target="_blank">${transferTokenTx.transactionHash}</a>`)
     $("#txSummary2").show();
 
-    $("#ethTransferStep").removeClass("is-active")
+    $("#ethTransferStep").removeClass("is-active");
 
     $("#archethicDeploymentStep").addClass("is-active");
+    step = 3;
 
     const contractAddress = await sendDeployRequest(
       secretDigestHex,
@@ -268,6 +274,7 @@ async function handleFormSubmit(
     $("#archethicDeploymentStep").removeClass("is-active");
 
     $("#swapStep").addClass("is-active");
+    step = 4;
 
     const withdrawTx = await withdrawERC20Token(HTLC_Contract, signer, secretHex)
     console.log(`Ethereum's withdraw transaction - ${withdrawTx.transactionHash}`);
@@ -319,6 +326,28 @@ async function handleFormSubmit(
     $('#recipientAddress').prop('disabled', false);
     $("#btnSwap").show();
     $("#btnSwapSpinner").hide();
+
+    switch (step) {
+      case 1:
+        $("#ethDeploymentStep").removeClass("is-active");
+        $("#ethDeploymentStep").addClass("is-failed");
+        break;
+      case 2:
+        $("#ethTransferStep").removeClass("is-active");
+        $("#ethTransferStep").addClass("is-failed");
+        break;
+      case 3:
+        $("#archethicDeploymentStep").removeClass("is-active");
+        $("#archethicDeploymentStep").addClass("is-failed");
+        break;
+      case 4:
+        $("#swapStep").removeClass("is-active");
+        $("#swapStep").addClass("is-failed");
+        break;
+      default:
+        break;
+    }
+
 
   }
 }
