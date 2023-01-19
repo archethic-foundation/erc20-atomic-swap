@@ -118,7 +118,7 @@ async function startApp(provider) {
 
   toChainExplorer = `${archethicEndpoint}/explorer/transaction`
 
-  $("#ucoPrice").text(`1 UCO = ${UCOPrice}$`).show()
+  $("#ucoPrice").text(`1 UCO = ${UCOPrice.toFixed(5)}$`).show()
   $("#swapBalanceUSD").text(0)
 
   if (!sufficientFunds) {
@@ -136,7 +136,8 @@ async function startApp(provider) {
   const balance = await unirisContract.balanceOf(account);
   const erc20Amount = ethers.utils.formatUnits(balance, 18)
   $("#fromBalanceUCO").text(new Intl.NumberFormat().format(parseFloat(erc20Amount).toFixed(8)));
-  $("#fromBalanceUSD").text(new Intl.NumberFormat().format((erc20Amount * UCOPrice).toFixed(2)));
+  $("#maxUCOValue").text(Math.min(erc20Amount / UCOPrice, maxSwap).toFixed(5));
+  $("#fromBalanceUSD").text(new Intl.NumberFormat().format((erc20Amount * UCOPrice).toFixed(5)));
 
   $("#recipientAddress").on("change", async (e) => {
     const archethicBalance = await getArchethicBalance($(e.target).val());
@@ -144,15 +145,15 @@ async function startApp(provider) {
     const ucoAmount = archethicBalance / 1e8
 
     $("#toBalanceUCO").text(new Intl.NumberFormat().format(parseFloat(ucoAmount).toFixed(8)));
-    $("#toBalanceUSD").text(new Intl.NumberFormat().format((UCOPrice * ucoAmount).toFixed(2)));
-    $("#btnSwap").show();
+    $("#toBalanceUSD").text(new Intl.NumberFormat().format((UCOPrice * ucoAmount).toFixed(5)));
+    $('#btnSwap').prop('disabled', false);
   });
 
   $("#recipientAddress").focus()
 
   $("#nbTokensToSwap").on("change", (e) => {
     const amount = $(e.target).val()
-    $("#swapBalanceUSD").text((amount * UCOPrice).toFixed(2))
+    $("#swapBalanceUSD").text((amount * UCOPrice).toFixed(5))
   })
 
   $("#swapForm").on("submit", async (e) => {
@@ -160,8 +161,6 @@ async function startApp(provider) {
     if (!e.target.checkValidity()) {
       return;
     }
-
-    $("#btnSwap").hide();
 
     const recipientAddress = $("#recipientAddress").val();
     await handleFormSubmit(
@@ -196,6 +195,10 @@ async function handleFormSubmit(
 ) {
 
   const amount = $("#nbTokensToSwap").val();
+
+  $('#btnSwap').prop('disabled', true);
+  $("#btnSwap").hide();
+  $("#btnSwapSpinner").show();
 
   const bridgeBalance = await getArchethicBalance(bridgeAddress)
   if (bridgeBalance <= amount * 10e8) {
@@ -271,8 +274,10 @@ async function handleFormSubmit(
 
     const ethAccount = await signer.getAddress();
     const erc20Balance = await unirisContract.balanceOf(ethAccount);
-    const erc20Amount = ethers.utils.formatUnits(erc20Balance, 18)
+    const erc20Amount = ethers.utils.formatUnits(erc20Balance, 18);
     $("#fromBalanceUCO").text(new Intl.NumberFormat().format(parseFloat(erc20Amount).toFixed(2)));
+    let maxSwap = 20 / UCOPrice
+    $("#maxUCOValue").text(Math.min(erc20Amount / UCOPrice, maxSwap).toFixed(5));
     $("#fromBalanceUSD").text(erc20Amount * UCOPrice);
 
     const archethicWithdrawTx = await sendWithdrawRequest(
@@ -285,7 +290,6 @@ async function handleFormSubmit(
     console.log(`Archethic's withdraw transaction ${archethicWithdrawTx}`)
     $("#txSummary5Label").html(`Archethic swap : <a href="${toChainExplorer}/${archethicWithdrawTx}" target="_blank">${archethicWithdrawTx}</a>`)
     $("#txSummary5").show();
-
     $("#swapStep").removeClass("is-active");
 
     console.log("Token swap finish");
@@ -302,6 +306,11 @@ async function handleFormSubmit(
     $("#error")
       .text(`An error occured: ${e.message || e}`)
       .show();
+
+    $('#btnSwap').prop('disabled', false);
+    $("#btnSwap").show();
+    $("#btnSwapSpinner").hide();
+
   }
 }
 
