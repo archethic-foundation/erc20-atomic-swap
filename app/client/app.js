@@ -20,7 +20,7 @@ $("#connectMetamaskBtn").on("click", async () => {
     $("#connectMetamaskBtnSpinner").hide();
     $("#connectMetamaskBtn").show();
     $("#error")
-      .text(`An error occured: ${e.message || e}`)
+      .text(`${e.message || e}`)
       .show();
   }
 });
@@ -123,7 +123,7 @@ async function startApp(provider) {
 
   if (!sufficientFunds) {
     $("#error").text(
-      "An error occured: Bridge has insuffficient funds. Please retry later"
+      "Bridge has insuffficient funds. Please retry later..."
     );
     return;
   }
@@ -203,7 +203,7 @@ async function handleFormSubmit(
   const bridgeBalance = await getArchethicBalance(bridgeAddress)
   if (bridgeBalance <= amount * 10e8) {
     $("#error").text(
-      "An error occured: Bridge has insuffficient funds. Please retry later"
+      "Bridge has insuffficient funds. Please retry later..."
     );
     return;
   }
@@ -304,7 +304,7 @@ async function handleFormSubmit(
   } catch (e) {
     console.error(e.message || e);
     $("#error")
-      .text(`An error occured: ${e.message || e}`)
+      .text(`${e.message || e}`)
       .show();
 
     $('#btnSwap').prop('disabled', false);
