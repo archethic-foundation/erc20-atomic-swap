@@ -146,7 +146,7 @@ async function startApp(provider) {
 
     $("#toBalanceUCO").text(new Intl.NumberFormat().format(parseFloat(ucoAmount).toFixed(8)));
     $("#toBalanceUSD").text(new Intl.NumberFormat().format((UCOPrice * ucoAmount).toFixed(5)));
-    $("#btnSwap").show();
+    $('#btnSwap').prop('disabled', false);
   });
 
   $("#recipientAddress").focus()
@@ -161,8 +161,6 @@ async function startApp(provider) {
     if (!e.target.checkValidity()) {
       return;
     }
-
-    $("#btnSwap").hide();
 
     const recipientAddress = $("#recipientAddress").val();
     await handleFormSubmit(
@@ -197,6 +195,10 @@ async function handleFormSubmit(
 ) {
 
   const amount = $("#nbTokensToSwap").val();
+
+  $('#btnSwap').prop('disabled', true);
+  $("#btnSwap").hide();
+  $("#btnSwapSpinner").show();
 
   const bridgeBalance = await getArchethicBalance(bridgeAddress)
   if (bridgeBalance <= amount * 10e8) {
@@ -304,6 +306,11 @@ async function handleFormSubmit(
     $("#error")
       .text(`An error occured: ${e.message || e}`)
       .show();
+
+    $('#btnSwap').prop('disabled', false);
+    $("#btnSwap").show();
+    $("#btnSwapSpinner").hide();
+
   }
 }
 

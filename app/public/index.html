@@ -66,7 +66,7 @@
 												width="20px" />
 										</button>
 										<button id="connectMetamaskBtnSpinner" class="btn sp-btn" disabled
-											style="margin-top: 5%; width: 400px; height: 41px; display: none;">
+											style="margin-top: 5%; width: 400px; display: none;">
 											<span>Connecting...</span>
 											<span class="spinner-border spinner-border-sm" role="status"
 												aria-hidden="true"></span>
@@ -233,14 +233,15 @@
 										<p>Fees will be visible in Metamask.</p>
 										<p>Be careful regarding ETH fees.</p>
 									</div>
-									<div class="para-text" style="padding-top: 10;">
-										<div class="para-text" id="error">
-											<p style="text-overflow: ellipsis;
-										word-wrap: break-word;"><span id="txSummary1Label"></span></p>
-										</div>
-									</div>
-									<div class="btn-area" style="display: none" id="btnSwap">
-										<button class="btn sp-btn">Transfer</button>
+									<div class="btn-area">
+										<button class="btn sp-btn" disabled id="btnSwap"
+											style="width: 200px;">Transfer</button>
+										<button id="btnSwapSpinner" class="btn sp-btn" disabled
+											style="width: 200px; display: none;">
+											<span>Transfering...</span>
+											<span class="spinner-border spinner-border-sm" role="status"
+												aria-hidden="true"></span>
+										</button>
 									</div>
 									<div class="container-fluid" id="steps"
 										style="display: none; padding-top: 30px; padding-bottom: 20px;">
@@ -261,6 +262,12 @@
 											font-size: 12px;font-family: Lato, sans-serif;" id="endStep">
 												Completion</li>
 										</ul>
+									</div>
+									<div class="para-text" style="padding-top: 10;">
+										<div class="para-text" id="error">
+											<p style="text-overflow: ellipsis;
+										word-wrap: break-word;"><span id="txSummary1Label"></span></p>
+										</div>
 									</div>
 									<div class="para-text" style="padding-top: 10;">
 										<div class="para-text" id="txSummary1" style="display: none; padding-top: 30px;"
