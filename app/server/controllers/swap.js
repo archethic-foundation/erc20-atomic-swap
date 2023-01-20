@@ -27,7 +27,7 @@ async function deployContract(req, res, next) {
     const provider = new ethers.providers.JsonRpcProvider(providerEndpoint)
 
     await checkEthereumContract(req.body.ethereumContractAddress, req.body.amount, req.body.secretHash, recipientEthereum, unirisTokenAddress, provider)
-    console.log("Ethereum contract checked")
+    console.log("Ethereum contract checked");
 
     const { blockNumber } = await provider.getTransaction(req.body.ethereumContractTransaction)
     const { timestamp } = await provider.getBlock(blockNumber)
@@ -45,7 +45,7 @@ async function deployContract(req, res, next) {
 
     const contractChainAddress = Crypto.deriveAddress(contractSeed, 0);
 
-    const archethic  = await archethicConnection()
+    const archethic = await archethicConnection()
     console.log("Connected to Archethic")
     const chainSize = await archethic.transaction.getTransactionIndex(contractChainAddress)
     if (chainSize != 0) {
@@ -88,7 +88,7 @@ async function withdraw(req, res, next) {
       throw "Invalid Ethereum withdraw transaction"
     }
 
-    const archethic  = await archethicConnection()
+    const archethic = await archethicConnection()
     const chainSize = await archethic.transaction.getTransactionIndex(req.body.archethicContractAddress)
     if (chainSize == 0) {
       return res.status(400).json({ message: "Archethic's contract not deployed" })
@@ -134,7 +134,7 @@ async function checkEthereumWithdraw(ethereumWithdrawTransaction, contractAddres
   const iface = new ethers.utils.Interface(['function withdraw(bytes32 _secret)'])
   const values = iface.decodeFunctionData('withdraw', tx.data)
 
-  return  receipt.status == 1 && tx.to == contractAddress && values[0] == `0x${secret}`
+  return receipt.status == 1 && tx.to == contractAddress && values[0] == `0x${secret}`
 }
 
 function getEthereumContract(ethereumContractAddress, provider) {
@@ -142,15 +142,15 @@ function getEthereumContract(ethereumContractAddress, provider) {
 }
 
 async function fundContract(archethic, contractSeed, amount) {
-      const index = await archethic.transaction.getTransactionIndex(bridgeAddress);
+  const index = await archethic.transaction.getTransactionIndex(bridgeAddress);
 
-      const contractAddress = Crypto.deriveAddress(contractSeed, 0);
-      return archethic.transaction
-        .new()
-        .setType("transfer")
-        .addUCOTransfer(contractAddress, amount + 50_000_000) // Send 0.5 UCO to the contract to pay the fees
-        .build(bridgeSeed, index)
-        .originSign(originPrivateKey)
+  const contractAddress = Crypto.deriveAddress(contractSeed, 0);
+  return archethic.transaction
+    .new()
+    .setType("transfer")
+    .addUCOTransfer(contractAddress, amount + 50_000_000) // Send 0.5 UCO to the contract to pay the fees
+    .build(bridgeSeed, index)
+    .originSign(originPrivateKey)
 }
 
 async function createContract(archethic, contractSeed, recipientAddress, amount, endTime, secretHash, explorerEthereumContractURL) {

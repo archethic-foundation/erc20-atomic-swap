@@ -173,7 +173,7 @@ async function getBridgeInputs(archethic) {
 }
 
 async function getUCOPrice(timestamp) {
-  const  archethic = new Archethic(archethicEndpoint)
+  const archethic = new Archethic(archethicEndpoint)
   await archethic.connect()
 
   let oracleData
@@ -183,6 +183,7 @@ async function getUCOPrice(timestamp) {
   else {
     oracleData = await archethic.network.getOracleData()
   }
+
   return oracleData.services.uco.usd
 
 }
