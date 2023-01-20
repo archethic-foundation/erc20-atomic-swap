@@ -182,7 +182,7 @@ async function startApp(provider) {
       e.preventDefault();
       changeBtnToTransferInProgress();
       try {
-        await goto(localStorage.getItem("transferStep"), state);
+        await goto(localStorage.getItem("transferStep"), state, UCOPrice);
       }
       catch (e) {
         handleError(e);
@@ -295,28 +295,28 @@ async function handleFormSubmit(
       toChainExplorer: toChainExplorer,
       HTLC_transaction: HTLC_tx
     }
-    await goto("deployedEthContract", state)
+    await goto("deployedEthContract", state, UCOPrice)
 
   } catch (e) {
     handleError(e)
   }
 }
 
-async function goto(step, state) {
+async function goto(step, state, UCOPrice) {
   switch (step) {
     case "deployedEthContract":
       step = 2
       state = await transferERC20(state)
-      return await goto("transferedERC20", state)
+      return await goto("transferedERC20", state, UCOPrice)
     case "transferedERC20":
       step = 3
       state = await deployArchethic(state)
-      return await goto("deployedArchethicContract", state)
+      return await goto("deployedArchethicContract", state, UCOPrice)
     case "deployedArchethicContract":
       step = 4
       $("#swapStep").addClass("is-active");
       state = await withdrawEthereum(state)
-      return await goto("withdrawEthContract", state)
+      return await goto("withdrawEthContract", state, UCOPrice)
     case "withdrawEthContract":
       await withdrawArchethic(state)
 
