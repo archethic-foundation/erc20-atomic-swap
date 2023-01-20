@@ -5,6 +5,9 @@ import { getERC20Contract, getHTLC_Contract, deployHTLC, transferERC20, deployAr
 import { getArchethicBalance } from "./service.js";
 
 window.onload = async function () {
+  localStorage.removeItem("transferStep")
+  localStorage.removeItem("pendingTransfer")
+
   if (typeof window.ethereum !== "undefined") {
     console.log("MetaMask is installed!");
   } else {
@@ -41,6 +44,7 @@ async function startApp(provider) {
   const signer = provider.getSigner();
 
   let fromChainName = initChainContext(ethChainId);
+  console.log(fromChainName);
 
   const {
     archethicEndpoint,
@@ -136,6 +140,7 @@ async function startApp(provider) {
     $("#swapBalanceUSD").text((pendingTransfer.amount * UCOPrice).toFixed(5));
 
     $("#steps").show();
+    console.log(fromChainName);
 
     $("#ethDeploymentStep").removeClass("is-active");
     $("#txSummary1Label").html(`Contract address on ${fromChainName}: <a href="${sourceChainExplorer}/address/${pendingTransfer.HTLC_Address}" target="_blank">${pendingTransfer.HTLC_Address}</a>`)
@@ -336,9 +341,4 @@ async function goto(step, state) {
   }
 }
 
-const byteToHex = [];
-for (let n = 0; n <= 0xff; ++n) {
-  const hexOctet = n.toString(16).padStart(2, "0");
-  byteToHex.push(hexOctet);
-}
 

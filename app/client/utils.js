@@ -13,6 +13,12 @@ export async function handleResponse(response) {
     });
 }
 
+const byteToHex = [];
+for (let n = 0; n <= 0xff; ++n) {
+    const hexOctet = n.toString(16).padStart(2, "0");
+    byteToHex.push(hexOctet);
+}
+
 export function uint8ArrayToHex(bytes) {
     const buff = new Uint8Array(bytes);
     const hexOctets = new Array(buff.length);
