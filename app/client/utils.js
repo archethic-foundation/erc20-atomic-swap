@@ -31,7 +31,7 @@ export function uint8ArrayToHex(bytes) {
 }
 
 
-export function handleError(e) {
+export function handleError(e, step) {
     $('#btnSwap').prop('disabled', false);
     $('#nbTokensToSwap').prop('disabled', false);
     $('#recipientAddress').prop('disabled', false);

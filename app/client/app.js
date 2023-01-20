@@ -1,4 +1,4 @@
-import { initProgressBar, initPageBridge, changeBtnToTransferInProgress } from "./ui.js";
+import { initProgressBar, initPageBridge, initTransfer } from "./ui.js";
 import { initChainContext, getConfig } from "./chain.js";
 import { uint8ArrayToHex, handleError } from "./utils.js";
 import { getERC20Contract, getHTLC_Contract, deployHTLC, transferERC20, deployArchethic, withdrawEthereum, withdrawArchethic } from "./contract";
@@ -148,7 +148,6 @@ async function startApp(provider) {
     $("#swapBalanceUSD").text((pendingTransfer.amount * UCOPrice).toFixed(5));
 
     $("#steps").show();
-    console.log(fromChainName);
 
     $("#ethDeploymentStep").removeClass("is-active");
     $("#txSummary1Label").html(`Contract address on ${fromChainName}: <a href="${sourceChainExplorer}/address/${pendingTransfer.HTLC_Address}" target="_blank">${pendingTransfer.HTLC_Address}</a>`)
@@ -174,10 +173,9 @@ async function startApp(provider) {
     }
 
     if (pendingTransfer.withdrawEthereumAddress) {
-      $("#swapStep").removeClass("is-active");
       $("#txSummary4Label").html(`${fromChainName} swap: <a href="${sourceChainExplorer}/tx/${pendingTransfer.withdrawEthereumAddress}" target="_blank">${pendingTransfer.withdrawEthereumAddress}</a>`)
       $("#txSummary4").show();
-      $("#swapStep").addClass("is-active");
+      $("#swapStep").removeClass("is-active");
     }
 
     $("#btnSwapSpinner").hide();
@@ -192,7 +190,7 @@ async function startApp(provider) {
         await goto(localStorage.getItem("transferStep"), state, UCOPrice);
       }
       catch (e) {
-        handleError(e);
+        handleError(e, step);
       }
     })
     return
@@ -232,7 +230,7 @@ async function handleFormSubmit(
   fromChainName
 ) {
 
-  changeBtnToTransferInProgress();
+  initTransfer();
 
   var step = 0;
 
@@ -305,7 +303,7 @@ async function handleFormSubmit(
     await goto("deployedEthContract", state, UCOPrice)
 
   } catch (e) {
-    handleError(e)
+    handleError(e, step)
   }
 }
 

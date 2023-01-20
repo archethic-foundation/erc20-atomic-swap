@@ -22,7 +22,16 @@ export function initPageBridge() {
     initProgressBar();
 }
 
-export function changeBtnToTransferInProgress() {
+export function initTransfer() {
+    initTxSummary();
+    changeBtnToTransferInProgress();
+    $("#steps").hide();
+    initProgressBar();
+    $("#error").text("");
+
+}
+
+function changeBtnToTransferInProgress() {
     $("#btnSwap").hide();
     $('#btnSwapSpinner').prop('disabled', true);
     $("#btnSwapSpinner").text("Transfering");
