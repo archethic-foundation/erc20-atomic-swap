@@ -185,4 +185,5 @@ async function getUCOPrice(timestamp) {
   }
 
   return oracleData.services.uco.usd
+
 }

@@ -348,4 +348,3 @@ async function goto(step, state, UCOPrice) {
       break
   }
 }
-
