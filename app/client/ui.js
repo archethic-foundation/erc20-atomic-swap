@@ -18,6 +18,7 @@ export function initPageBridge() {
     $("#btnSwap").text("Transfer");
     $("#btnSwap").show();
     $("#btnSwapSpinner").hide();
+    $("#btnSwapSpinnerText").hide();
 
     initProgressBar();
 }
@@ -34,8 +35,8 @@ export function initTransfer() {
 function changeBtnToTransferInProgress() {
     $("#btnSwap").hide();
     $('#btnSwapSpinner').prop('disabled', true);
-    $("#btnSwapSpinner").text("Transfering");
     $("#btnSwapSpinner").show();
+    $("#btnSwapSpinnerText").show();
 }
 
 function initTxSummary() {
