@@ -344,7 +344,7 @@ async function goto(step, state, UCOPrice) {
         $("#toBalanceUCO").text(parseFloat(newUCOBalance).toFixed(2));
         $("#toBalanceUSD").text(UCOPrice * newUCOBalance)
 
-      }, 1000)
+      }, 2000)
       break
   }
 }
