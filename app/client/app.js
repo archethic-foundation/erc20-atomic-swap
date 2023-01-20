@@ -81,7 +81,7 @@ async function startApp(provider) {
   const balance = await unirisContract.balanceOf(account);
   const erc20Amount = ethers.utils.formatUnits(balance, 18);
   $("#fromBalanceUCO").text(new Intl.NumberFormat().format(parseFloat(erc20Amount).toFixed(8)));
-  $("#maxUCOValue").text(Math.min(erc20Amount / UCOPrice, maxSwap).toFixed(5));
+  $("#maxUCOValue").attr("value", Math.min(erc20Amount / UCOPrice, maxSwap).toFixed(5));
   $("#fromBalanceUSD").text(new Intl.NumberFormat().format((erc20Amount * UCOPrice).toFixed(5)));
 
   $("#recipientAddress").on("change", async (e) => {
@@ -96,10 +96,17 @@ async function startApp(provider) {
 
   $("#recipientAddress").focus();
 
-  $("#nbTokensToSwap").on("change", (e) => {
-    const amount = $(e.target).val()
-    $("#swapBalanceUSD").text((amount * UCOPrice).toFixed(5))
+  $("#nbTokensToSwap").on("input", (e) => {
+    const amount = $(e.target).val();
+    $("#swapBalanceUSD").text((amount * UCOPrice).toFixed(5));
   })
+
+
+  $("#maxButton").on("click", () => {
+    const amount = $("#maxUCOValue").val();
+    $("#nbTokensToSwap").val(amount);
+    $("#swapBalanceUSD").text((amount * UCOPrice).toFixed(5));
+  });
 
   let pendingTransferJSON = localStorage.getItem("pendingTransfer");
   if (pendingTransferJSON) {
@@ -343,5 +350,4 @@ async function goto(step, state, UCOPrice) {
       break
   }
 }
-
 
