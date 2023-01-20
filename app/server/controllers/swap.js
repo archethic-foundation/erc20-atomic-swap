@@ -23,18 +23,21 @@ export default { deployContract, withdraw }
 async function deployContract(req, res, next) {
   try {
 
-    const ucoPrice = await getUCOPrice()
-    const maxDollar = 20
-    const maxSwap = (maxDollar / ucoPrice) * 1e8
-    if (req.body.amount > maxSwap) {
-      return res.status(400).json({ message: `You cannot swap more than ${maxSwap} UCO - ($${maxDollar})` })
-    }
-
     const { providerEndpoint, unirisTokenAddress, recipientEthereum, sourceChainExplorer } = ethConfig[req.body.ethereumChainId]
     const provider = new ethers.providers.JsonRpcProvider(providerEndpoint)
 
     await checkEthereumContract(req.body.ethereumContractAddress, req.body.amount, req.body.secretHash, recipientEthereum, unirisTokenAddress, provider)
     console.log("Ethereum contract checked")
+
+    const { blockNumber } = await provider.getTransaction(req.body.ethereumContractTransaction)
+    const { timestamp } = await provider.getBlock(blockNumber)
+
+    const ucoPrice = await getUCOPrice(timestamp)
+    const maxDollar = 20
+    const maxSwap = (maxDollar / ucoPrice) * 1e8
+    if (req.body.amount > maxSwap) {
+      return res.status(400).json({ message: `You cannot swap more than ${maxSwap} UCO - ($${maxDollar})` })
+    }
 
     const contractSeed = createHmac("sha512", baseSeedContract)
       .update(req.body.ethereumContractAddress)
