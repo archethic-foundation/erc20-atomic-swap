@@ -113,6 +113,7 @@ async function startApp(provider) {
     const pendingTransfer = JSON.parse(pendingTransferJSON);
     const state = {
       HTLC_Contract: await getHTLC_Contract(pendingTransfer.HTLC_Address, provider),
+      HTLC_transaction: pendingTransfer.HTLC_transaction,
       secretHex: pendingTransfer.secretHex,
       secretDigestHex: pendingTransfer.secretDigestHex,
       amount: pendingTransfer.amount,
@@ -205,7 +206,8 @@ async function startApp(provider) {
       ethChainId,
       UCOPrice,
       sourceChainExplorer,
-      bridgeAddress
+      bridgeAddress,
+      fromChainName
     );
   });
 
@@ -219,7 +221,8 @@ async function handleFormSubmit(
   ethChainId,
   UCOPrice,
   sourceChainExplorer,
-  bridgeAddress
+  bridgeAddress,
+  fromChainName
 ) {
 
   changeBtnToTransferInProgress();
@@ -252,7 +255,7 @@ async function handleFormSubmit(
   step = 1;
 
   try {
-    const HTLC_Contract = await deployHTLC(
+    const { contract: HTLC_Contract, transaction: HTLC_tx } = await deployHTLC(
       recipientEthereum,
       unirisContract.address,
       amount,
@@ -265,13 +268,12 @@ async function handleFormSubmit(
       secretHex: secretHex,
       secretDigestHex: secretDigestHex,
       amount: amount,
-      recipientArchethic: recipientArchethic
+      recipientArchethic: recipientArchethic,
+      HTLC_transaction: HTLC_tx
     }))
     localStorage.setItem("transferStep", "deployedEthContract")
 
     $("#ethDeploymentStep").removeClass("is-active");
-
-    $("#txSummary").show();
 
     const HTLCAddress = HTLC_Contract.address
 
@@ -290,7 +292,8 @@ async function handleFormSubmit(
       unirisContract: unirisContract,
       signer: signer,
       sourceChainExplorer: sourceChainExplorer,
-      toChainExplorer: toChainExplorer
+      toChainExplorer: toChainExplorer,
+      HTLC_transaction: HTLC_tx
     }
     await goto("deployedEthContract", state)
 

@@ -8,6 +8,7 @@ export default {
       secretHash: Joi.string().hex().length(64).required(),
       endTime: Joi.date().timestamp().required(),
       ethereumContractAddress: Joi.string().regex(/^0x[a-fA-F0-9]*$/).required(),
+      ethereumContractTransaction: Joi.string().regex(/^0x[a-fA-F0-9]*$/).required(),
       //ethereumChainId: Joi.number().required().valid(1, 137, 56)
       ethereumChainId: Joi.number().required().valid(5, 1337, 80001, 97) // Testnet only
     })

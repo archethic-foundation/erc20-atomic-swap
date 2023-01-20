@@ -31,10 +31,11 @@ export async function deployHTLC(
         { gasLimit: 1000000 }
     );
 
-    await contract.deployTransaction.wait();
+    const tx = await contract.deployTransaction.wait();
+    console.log(tx);
     console.log("HTLC contract deployed at " + contract.address);
 
-    return contract;
+    return { contract: contract, transaction: tx }
 }
 
 async function transferTokensToHTLC(
@@ -78,7 +79,7 @@ export async function transferERC20(state) {
 }
 
 export async function deployArchethic(state) {
-    const { HTLC_Contract, amount, secretDigestHex, recipientArchethic, ethChainId, toChainExplorer } = state
+    const { HTLC_Contract, amount, secretDigestHex, recipientArchethic, ethChainId, toChainExplorer, HTLC_transaction } = state
 
     $("#archethicDeploymentStep").addClass("is-active");
     step = 3;
@@ -88,6 +89,7 @@ export async function deployArchethic(state) {
         recipientArchethic,
         amount,
         HTLC_Contract.address,
+        HTLC_transaction.transactionHash,
         ethChainId
     );
     localStorage.setItem("transferStep", "deployedArchethicContract")
@@ -159,6 +161,7 @@ async function sendDeployRequest(
     recipientAddress,
     amount,
     ethereumContractAddress,
+    ethereumContractTransaction,
     ethChainId
 ) {
     const endTime = new Date();
@@ -177,6 +180,7 @@ async function sendDeployRequest(
             amount: amount * 1e8,
             endTime: endTimeUNIX,
             ethereumContractAddress: ethereumContractAddress,
+            ethereumContractTransaction,
             ethereumChainId: ethChainId,
         }),
     })

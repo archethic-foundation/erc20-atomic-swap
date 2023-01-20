@@ -536,7 +536,7 @@ body {
   content: '\2718';
   font-family: inherit;
   font-weight: 700;
-  color: red!important
+  color: red !important
 }
 
 .multi-steps>li.is-failed~li:after,
@@ -639,14 +639,6 @@ body {
 #maxButton {
   letter-spacing: 2px;
   color: #FFFFFF;
-}
-
-#txSummary {
-  background: linear-gradient(135deg, rgba(0, 164, 219, 0.3) -10%, rgba(204, 0, 255, 0.3) 100%);
-  border-radius: 20px;
-  line-height: 20px;
-  padding: 10px 10px 10px 10px;
-  display: none;
 }
 
 #error {
