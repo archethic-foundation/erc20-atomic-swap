@@ -1,8 +1,8 @@
 import { initProgressBar, initPageBridge, initTransfer } from "./ui.js";
-import { initChainContext, getConfig } from "./chain.js";
+import { initChainContext } from "./chain.js";
 import { uint8ArrayToHex, handleError } from "./utils.js";
 import { getERC20Contract, getHTLC_Contract, deployHTLC, transferERC20, deployArchethic, withdrawEthereum, withdrawArchethic } from "./contract";
-import { getArchethicBalance } from "./service.js";
+import { getArchethicBalance, getConfig } from "./service.js";
 
 window.onload = async function () {
   localStorage.removeItem("transferStep")
