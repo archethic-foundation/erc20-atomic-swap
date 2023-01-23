@@ -42,11 +42,12 @@ export function handleError(e, step) {
     $("#error")
         .text(`${e.message || e}`)
         .show();
-
+    console.log(step);
     switch (step) {
         case 1:
             $("#ethDeploymentStep").removeClass("is-active");
             $("#ethDeploymentStep").addClass("is-failed");
+            $("#ethTransferStep").addClass("is-failed");
             break;
         case 2:
             $("#ethTransferStep").removeClass("is-active");

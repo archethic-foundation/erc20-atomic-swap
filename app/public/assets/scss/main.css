@@ -510,26 +510,6 @@ body {
   }
 }
 
-
-#footer2 {
-  padding: 12px 0 0;
-}
-
-#footer2 p {
-  font-weight: 700;
-  font-size: 10px;
-  line-height: 12px;
-  text-align: justify;
-  letter-spacing: 1.83023px;
-  color: #FFFFFF;
-  text-align: right;
-}
-
-#footer2 p a {
-  margin: 0 0 0 5px;
-}
-
-
 /*# sourceMappingURL=main.css.map */
 .multi-steps>li.is-failed~li:before,
 .multi-steps>li.is-failed:before {
