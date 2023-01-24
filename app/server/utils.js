@@ -71,7 +71,8 @@ export {
   hasSufficientFunds,
   getUCOPrice,
   archethicConnection,
-  archethicEndpoint
+  archethicEndpoint,
+  getLastTransaction
 };
 
 let archethic
@@ -99,7 +100,6 @@ async function getBridgeBalance() {
 }
 
 async function getLastTransactionBalance(archethic) {
-  console.log(bridgeAddress)
   return archethic.requestNode(async (endpoint) => {
     const url = new URL("/api", endpoint);
     const r = await fetch(url, {
@@ -186,4 +186,45 @@ async function getUCOPrice(timestamp) {
 
   return oracleData.services.uco.usd
 
+}
+
+async function getLastTransaction(archethic, address) {
+  console.log(`
+            query {
+              lastTransaction(address: "${address}") {
+                 address
+              }
+            }
+          `)
+
+  return archethic.requestNode(async (endpoint) => {
+    const url = new URL("/api", endpoint);
+    const r = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        query: `
+            query {
+              lastTransaction(address: "${address}") {
+                 address
+              }
+            }
+          `
+      })
+    });
+
+    if (r.status != 200) {
+      throw "Node not unavailable. Switch to another"
+    }
+    const res = await r.json();
+
+    if (res.data.lastTransaction && res.data.lastTransaction.address) {
+      return res.data.lastTransaction.address;
+    }
+
+    throw "Network issue";
+  })
 }

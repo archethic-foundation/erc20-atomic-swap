@@ -50,6 +50,8 @@ function initTxSummary() {
     $("#txSummary4").hide();
     $("#txSummary5Label").text("");
     $("#txSummary5").hide();
+    $("#txSummary6Label").text("");
+    $("#txSummary6").hide();
 }
 
 export function initProgressBar() {

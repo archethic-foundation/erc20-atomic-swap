@@ -16,7 +16,7 @@ import { Crypto, Utils } from "archethic";
 import { createHmac } from "crypto";
 const { originPrivateKey } = Utils;
 
-import { archethicConnection, ethConfig, baseSeedContract, bridgeAddress, bridgeSeed, getUCOPrice } from "../utils.js";
+import { archethicConnection, ethConfig, baseSeedContract, bridgeAddress, bridgeSeed, getUCOPrice, getLastTransaction } from "../utils.js";
 
 export default { deployContract, withdraw }
 
@@ -95,10 +95,17 @@ async function withdraw(req, res, next) {
     }
 
     const revealTx = await createRevealSecretTransaction(archethic, req.body.archethicContractAddress, req.body.secret)
+
     await sendTransaction(revealTx)
     console.log(`Reveal transaction created - ${Utils.uint8ArrayToHex(revealTx.address)}`);
 
-    res.json({ status: "ok", archethicWithdrawTransaction: Utils.uint8ArrayToHex(revealTx.address) })
+    await new Promise(r => setTimeout(r, 2000));
+
+    const transferTxAddress = await getLastTransaction(archethic, req.body.archethicContractAddress)
+
+    console.log(`Transfer transaction - ${transferTxAddress}`)
+
+    res.json({ status: "ok", archethicWithdrawTransaction: Utils.uint8ArrayToHex(revealTx.address), archethicTransferTransaction: transferTxAddress })
   }
   catch (error) {
     console.log(error)
@@ -214,7 +221,7 @@ function sendTransaction(tx) {
     tx
       .on("requiredConfirmation", () => resolve())
       .on("error", (_context, reason) => reject(reason))
-      .send(60)
+      .send()
   })
 }
 

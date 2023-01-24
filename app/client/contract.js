@@ -141,7 +141,7 @@ export async function withdrawEthereum(state) {
 
 export async function withdrawArchethic({ archethicContractAddress, HTLC_Contract, withdrawEthereumAddress, secretHex, ethChainId, toChainExplorer }) {
     console.log(archethicContractAddress)
-    const archethicWithdrawTx = await sendWithdrawRequest(
+    const { archethicWithdrawTransaction, archethicTransferTransaction } = await sendWithdrawRequest(
         archethicContractAddress,
         HTLC_Contract.address,
         withdrawEthereumAddress,
@@ -150,9 +150,13 @@ export async function withdrawArchethic({ archethicContractAddress, HTLC_Contrac
     );
     localStorage.setItem("transferStep", "withdrawArchethicContract")
 
-    console.log(`Archethic's withdraw transaction ${archethicWithdrawTx}`)
-    $("#txSummary5Label").html(`Archethic swap : <a href="${toChainExplorer}/${archethicWithdrawTx}" target="_blank">${archethicWithdrawTx}</a>`)
+    console.log(`Archethic's withdraw transaction ${archethicWithdrawTransaction}`)
+    console.log(`Archethic's transfer transaction ${archethicTransferTransaction}`)
+    $("#txSummary5Label").html(`Archethic swap : <a href="${toChainExplorer}/${archethicWithdrawTransaction}" target="_blank">${archethicWithdrawTransaction}</a>`)
     $("#txSummary5").show();
+
+    $("#txSummary6Label").html(`Archethic transfer : <a href="${toChainExplorer}/${archethicTransferTransaction}" target="_blank">${archethicTransferTransaction}</a>`)
+    $("#txSummary6").show()
 }
 
 
@@ -216,8 +220,8 @@ async function sendWithdrawRequest(
         }),
     }).then(handleResponse)
         .then(r => {
-            const { archethicWithdrawTransaction } = r
-            return archethicWithdrawTransaction
+            const { archethicWithdrawTransaction, archethicTransferTransaction } = r
+            return { archethicWithdrawTransaction, archethicTransferTransaction }
         })
 }
 
