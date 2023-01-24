@@ -1,5 +1,7 @@
 .vscode/settings.json
 truffle/node_modules
 truffle/build
-app/node_modules
+node_modules
 app/public/app.js.map
+package-lock.json
+package.json
