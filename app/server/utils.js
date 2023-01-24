@@ -189,14 +189,6 @@ async function getUCOPrice(timestamp) {
 }
 
 async function getLastTransaction(archethic, address) {
-  console.log(`
-            query {
-              lastTransaction(address: "${address}") {
-                 address
-              }
-            }
-          `)
-
   return archethic.requestNode(async (endpoint) => {
     const url = new URL("/api", endpoint);
     const r = await fetch(url, {
