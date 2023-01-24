@@ -108,6 +108,25 @@ async function startApp(provider) {
     $("#swapBalanceUSD").text((amount * UCOPrice).toFixed(5));
   });
 
+  $(document).ready(function () {
+    $('#email-form').submit(function (e) {
+      e.preventDefault();
+      var message = $('#message').val();
+      $.ajax({
+        type: 'POST',
+        url: '/send-email',
+        data: { message: message },
+        success: function (response) {
+          alert('Email envoyé avec succès !');
+        },
+        error: function (error) {
+          console.log(error);
+        }
+      });
+    });
+  });
+
+
   let pendingTransferJSON = localStorage.getItem("pendingTransfer");
   if (pendingTransferJSON) {
 

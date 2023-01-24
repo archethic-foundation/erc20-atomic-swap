@@ -310,6 +310,69 @@
 				</div>
 		</div>
 		</form>
+
+		<form role="form" id="email-form" class="main" data-toggle="validator">
+			<div class="container-fluid px-0">
+				<div class="row align-items-start">
+					<div class="col-lg-7 col-md-7">
+						<div class="icon-block">
+							<div class="box">
+								<div class="row">
+									<div class="col-md-6">
+										<div class="icon-block">
+											<div class="in-box">
+												<input type="text" id="name" class="form-control" placeholder="Name"
+													required data-error="Please enter your name"
+													data-i18n-placeholder="contact_form_name_placeholder">
+												<div class="help-block with-errors"></div>
+											</div>
+										</div>
+
+									</div>
+
+									<div class="col-md-6">
+										<div class="icon-block">
+											<div class="in-box">
+												<input type="email" class="email form-control" id="email"
+													placeholder="Email" required data-error="Please enter your email"
+													data-i18n-placeholder="contact_form_email_placeholder">
+												<div class="help-block with-errors"></div>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="icon-block">
+										<div class="in-box">
+											<input type="text" id="msg_subject" class="form-control"
+												placeholder="Subject" required
+												data-error="Please enter your message subject"
+												data-i18n-placeholder="contact_form_subject_placeholder">
+											<div class="help-block with-errors"></div>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="icon-block">
+										<div class="in-box">
+											<textarea id="message" rows="4" placeholder="Message" class="form-control"
+												required data-error="Write your message"
+												data-i18n-placeholder="contact_form_message_placeholder"></textarea>
+											<div class="help-block with-errors"></div>
+										</div>
+									</div>
+								</div>
+								<div class="btn-area">
+									<button id="sendMail" class="btn sp-btn" style="margin-top: 5%; width: 400px;">
+										Report an issue
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</form>
 		<footer class="mastfoot">
 			<div class="inner">
 				<a class="none-decoration" target="_blank" href="https://twitter.com/archethic">

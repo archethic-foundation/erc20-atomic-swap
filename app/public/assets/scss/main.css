@@ -627,3 +627,63 @@ body {
   letter-spacing: 2px;
   color: #ff0000;
 }
+
+.email-form .icon-block .box .in-box {
+  position: relative;
+  background-clip: padding-box;
+  border: solid 1px transparent;
+  border-radius: 10px;
+  z-index: 1;
+}
+
+.email-form .in-box::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: -1;
+  margin: -1px;
+  border-radius: inherit;
+  background: rgb(0, 164, 219);
+  /* Old browsers */
+  /* FF3.6-15 */
+  /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(to right, rgb(0, 164, 219) 0%, rgb(204, 0, 255) 100%);
+  /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#00a4db", endColorstr="#cc00ff", GradientType=1);
+  /* IE6-9 */
+}
+
+.main .in-box input {
+  background: #000000;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 17px;
+  text-align: justify;
+  letter-spacing: 2.56232px;
+  color: #FFFFFF;
+  border: none;
+}
+
+.main .in-box input:focus {
+  box-shadow: none;
+}
+
+.main .in-box textarea {
+  background: #000000;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 17px;
+  text-align: justify;
+  letter-spacing: 2.56232px;
+  color: #FFFFFF;
+  border: none;
+}
+
+.main .in-box textarea:focus {
+  box-shadow: none;
+}
