@@ -202,6 +202,7 @@ async function startApp(provider) {
       return;
     }
 
+
     const recipientAddress = $("#recipientAddress").val();
     await handleFormSubmit(
       signer,
@@ -212,7 +213,8 @@ async function startApp(provider) {
       UCOPrice,
       sourceChainExplorer,
       bridgeAddress,
-      fromChainName
+      fromChainName,
+      erc20Amount
     );
   });
 
@@ -227,7 +229,8 @@ async function handleFormSubmit(
   UCOPrice,
   sourceChainExplorer,
   bridgeAddress,
-  fromChainName
+  fromChainName,
+  erc20Amount
 ) {
 
   initTransfer();
@@ -235,6 +238,14 @@ async function handleFormSubmit(
   var step = 0;
 
   const amount = $("#nbTokensToSwap").val();
+  if (erc20Amount < amount) {
+    $("#btnSwapSpinner").hide();
+    $("#btnSwap").show();
+    $("#btnSwap").prop("disabled", false);
+
+    $("#error").text(`Insufficient UCO on ${fromChainName}`)
+    return
+  } 
 
   const bridgeBalance = await getArchethicBalance(bridgeAddress)
   if (bridgeBalance <= amount * 10e8) {
