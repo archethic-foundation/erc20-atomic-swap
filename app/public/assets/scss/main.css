@@ -516,7 +516,9 @@ body {
   content: '\2718';
   font-family: inherit;
   font-weight: 700;
-  color: red !important
+  color: red !important;
+  border-color: red;
+  animation: pulse 0s infinite;
 }
 
 .multi-steps>li.is-failed~li:after,
