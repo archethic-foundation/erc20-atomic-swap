@@ -166,7 +166,7 @@ async function startApp(provider) {
 
     if (pendingTransfer.archethicContractAddress) {
       step = 4
-      $("#txSummary3Label").html(`Contract address on Archethic : <a href="${toChainExplorer}/${pendingTransfer.archethicContractAddress}" target="_blank">${pendingTransfer.archethicContractAddress}</a>`)
+      $("#txSummary3Label").html(`Contract address on Archethic: <a href="${toChainExplorer}/${pendingTransfer.archethicContractAddress}" target="_blank">${pendingTransfer.archethicContractAddress}</a>`)
       $("#txSummary3").show();
       $("#archethicDeploymentStep").removeClass("is-active");
       $("#swapStep").addClass("is-active");
@@ -245,7 +245,7 @@ async function handleFormSubmit(
 
     $("#error").text(`Insufficient UCO on ${fromChainName}`)
     return
-  } 
+  }
 
   const bridgeBalance = await getArchethicBalance(bridgeAddress)
   if (bridgeBalance <= amount * 10e8) {

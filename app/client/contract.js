@@ -101,7 +101,7 @@ export async function deployArchethic(state) {
     localStorage.setItem("pendingTransfer", JSON.stringify(pendingTransfer))
 
     console.log("Contract address on Archethic", contractAddress);
-    $("#txSummary3Label").html(`Contract address on Archethic : <a href="${toChainExplorer}/${contractAddress}" target="_blank">${contractAddress}</a>`)
+    $("#txSummary3Label").html(`Contract address on Archethic: <a href="${toChainExplorer}/${contractAddress}" target="_blank">${contractAddress}</a>`)
     $("#txSummary3").show();
 
     $("#archethicDeploymentStep").removeClass("is-active");
@@ -152,10 +152,10 @@ export async function withdrawArchethic({ archethicContractAddress, HTLC_Contrac
 
     console.log(`Archethic's withdraw transaction ${archethicWithdrawTransaction}`)
     console.log(`Archethic's transfer transaction ${archethicTransferTransaction}`)
-    $("#txSummary5Label").html(`Archethic swap : <a href="${toChainExplorer}/${archethicWithdrawTransaction}" target="_blank">${archethicWithdrawTransaction}</a>`)
+    $("#txSummary5Label").html(`Archethic swap: <a href="${toChainExplorer}/${archethicWithdrawTransaction}" target="_blank">${archethicWithdrawTransaction}</a>`)
     $("#txSummary5").show();
 
-    $("#txSummary6Label").html(`Archethic transfer : <a href="${toChainExplorer}/${archethicTransferTransaction}" target="_blank">${archethicTransferTransaction}</a>`)
+    $("#txSummary6Label").html(`Archethic transfer: <a href="${toChainExplorer}/${archethicTransferTransaction}" target="_blank">${archethicTransferTransaction}</a>`)
     $("#txSummary6").show()
 }
 
