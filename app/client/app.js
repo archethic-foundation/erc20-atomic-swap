@@ -5,9 +5,6 @@ import { getERC20Contract, getHTLC_Contract, deployHTLC, transferERC20, deployAr
 import { getArchethicBalance, getConfig } from "./service.js";
 
 window.onload = async function () {
-  localStorage.removeItem("transferStep")
-  localStorage.removeItem("pendingTransfer")
-
   if (typeof window.ethereum !== "undefined") {
     console.log("MetaMask is installed!");
   } else {
