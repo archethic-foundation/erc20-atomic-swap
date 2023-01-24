@@ -58,7 +58,7 @@ async function startApp(provider) {
 
   initPageBridge();
 
-  let maxSwap = 20 / UCOPrice;
+  let maxSwap = (20 / UCOPrice).toFixed(5);
   $("#nbTokensToSwap").attr("max", maxSwap);
 
   toChainExplorer = `${archethicEndpoint}/explorer/transaction`;
@@ -81,7 +81,7 @@ async function startApp(provider) {
   const balance = await unirisContract.balanceOf(account);
   const erc20Amount = ethers.utils.formatUnits(balance, 18);
   $("#fromBalanceUCO").text(new Intl.NumberFormat().format(parseFloat(erc20Amount).toFixed(8)));
-  $("#maxUCOValue").attr("value", Math.min(erc20Amount / UCOPrice, maxSwap).toFixed(5));
+  $("#maxUCOValue").attr("value", Math.min(erc20Amount, maxSwap).toFixed(5));
   $("#fromBalanceUSD").text(new Intl.NumberFormat().format((erc20Amount * UCOPrice).toFixed(5)));
 
   $("#recipientAddress").on("change", async (e) => {
