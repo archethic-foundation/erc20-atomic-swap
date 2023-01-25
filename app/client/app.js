@@ -125,10 +125,14 @@ async function startApp(provider) {
     $("#swapBalanceUSD").text((amount * ucoPrice).toFixed(5));
   });
 
+  $("#close").on("click", () => {
+    $("#workflow").hide();
+  });
+
   let pendingTransferJSON = localStorage.getItem("pendingTransfer");
   let state
   if (pendingTransferJSON) {
-   state = await initState(pendingTransferJSON, ethChainId, unirisContract, sourceChainExplorer, toChainExplorer, recipientEthereum, signer, fromChainName)
+    state = await initState(pendingTransferJSON, ethChainId, unirisContract, sourceChainExplorer, toChainExplorer, recipientEthereum, signer, fromChainName)
   }
 
   $("#swapForm").on("submit", async (e) => {
@@ -190,7 +194,8 @@ async function handleFormSubmit(
     $("#btnSwap").show();
     $("#btnSwap").prop("disabled", false);
 
-    $("#error").text(`Insufficient UCO on ${fromChainName}`)
+    $("#error").text(`Insufficient UCO on ${fromChainName}`);
+    $("#close").show();
     return
   }
 
@@ -199,6 +204,7 @@ async function handleFormSubmit(
     $("#error").text(
       "Bridge has insuffficient funds. Please retry later..."
     );
+    $("#close").show();
     return;
   }
 
@@ -288,6 +294,7 @@ async function goto(step, state) {
       $('#btnSwap').show()
       $('#nbTokensToSwap').prop('disabled', false);
       $('#recipientAddress').prop('disabled', false);
+      $("#close").show();
 
       console.log("Token swap finish");
       localStorage.removeItem("transferStep")
@@ -373,26 +380,26 @@ async function initState(pendingTransferJSON, ethChainId, unirisContract, source
 
   // Reset error steps
   switch (step) {
-      case 2:
-          $("#ethTransferStep").addClass("is-active");
-          $("#ethTransferStep").removeClass("is-failed");
-          $("#ethDeploymentStep").removeClass("is-active is-failed");
-          break;
-      case 3:
-          $("#archethicDeploymentStep").addClass("is-active");
-          $("#archethicDeploymentStep").removeClass("is-failed");
-          $("#ethDeploymentStep").removeClass("is-failed is-active");
-          $("#ethTransferStep").removeClass("is-failed is-active");
-          break;
-      case 4:
-          $("#swapStep").addClass("is-active");
-          $("#swapStep").removeClass("is-failed");
-          $("#archethicDeploymentStep").removeClass("is-active is-failed");
-          $("#ethTransferStep").removeClass("is-active is-failed");
-          $("#ethDeploymentStep").removeClass("is-active is-failed");
-          break;
-      default:
-          break;
+    case 2:
+      $("#ethTransferStep").addClass("is-active");
+      $("#ethTransferStep").removeClass("is-failed");
+      $("#ethDeploymentStep").removeClass("is-active is-failed");
+      break;
+    case 3:
+      $("#archethicDeploymentStep").addClass("is-active");
+      $("#archethicDeploymentStep").removeClass("is-failed");
+      $("#ethDeploymentStep").removeClass("is-failed is-active");
+      $("#ethTransferStep").removeClass("is-failed is-active");
+      break;
+    case 4:
+      $("#swapStep").addClass("is-active");
+      $("#swapStep").removeClass("is-failed");
+      $("#archethicDeploymentStep").removeClass("is-active is-failed");
+      $("#ethTransferStep").removeClass("is-active is-failed");
+      $("#ethDeploymentStep").removeClass("is-active is-failed");
+      break;
+    default:
+      break;
   }
 
   $("#steps").show();

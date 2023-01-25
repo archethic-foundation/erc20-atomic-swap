@@ -37,6 +37,8 @@ export function changeBtnToTransferInProgress() {
     $('#btnSwapSpinner').prop('disabled', true);
     $("#btnSwapSpinner").show();
     $("#btnSwapSpinnerText").show();
+    $("#workflow").show();
+    $("#close").hide();
 }
 
 function initTxSummary() {

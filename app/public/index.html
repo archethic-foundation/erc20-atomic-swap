@@ -15,6 +15,7 @@
 	<!-- Main css -->
 	<link rel="stylesheet" href="assets/scss/main.css" />
 	<link rel="icon" href="assets/images/Archethic Logo alone - Gradient.svg">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 
 <body>
@@ -240,81 +241,88 @@
 												aria-hidden="true"></span>
 										</button>
 									</div>
-									<div class="container-fluid" id="steps"
-										style="display: none; padding-top: 30px; padding-bottom: 20px;">
-										<ul class="list-unstyled multi-steps">
-											<li style="letter-spacing: 2px; font-weight: 300;
-											font-size: 12px; font-family: Lato, sans-serif;" id="ethDeploymentStep">Setup on <span
-													id="fromChain">Ethereum</span>
-											</li>
-											<li style="letter-spacing: 2px; font-weight: 300;
-											font-size: 12px; font-family: Lato, sans-serif;" id="ethTransferStep">Transfer</br>UCOs</li>
-											<li style="letter-spacing: 2px; font-weight: 300;
-											font-size: 12px; font-family: Lato, sans-serif;" id="archethicDeploymentStep">Setup on
-												Archethic</li>
-											<li style="letter-spacing: 2px; font-weight: 300;
-											font-size: 12px; font-family: Lato, sans-serif;" id="swapStep">
-												Transfer</li>
-											<li style="letter-spacing: 2px; font-weight: 300;
-											font-size: 12px;font-family: Lato, sans-serif;" id="endStep">
-												Completion</li>
-										</ul>
-									</div>
-									<div class="para-text" style="padding-top: 10;">
-										<div class="para-text">
-											<p style="text-overflow: ellipsis;
-										word-wrap: break-word;"><span id="error"></span></p>
-										</div>
-									</div>
-									<div class="para-text" style="padding-top: 10;">
-										<div class="para-text" id="txSummary1"
-											style="display: none; padding-top: 10px;">
-											<p style="text-overflow: ellipsis;
-										word-wrap: break-word;"> <img src="assets/images/icons/contract.png" height="20" alt=""
-													style="padding-right: 5px; padding-bottom: 5px;" /><span
-													id="txSummary1Label"></span></p>
-										</div>
-										<div class="para-text" id="txSummary2"
-											style="display: none; padding-top: 10px;">
-											<p style="text-overflow: ellipsis;
-										word-wrap: break-word;"> <img src="assets/images/icons/contract.png" height="20" alt=""
-													style="padding-right: 5px; padding-bottom: 5px;" /><span
-													id="txSummary2Label"></span></p>
-										</div>
-										<div class="para-text" id="txSummary3"
-											style="display: none; padding-top: 10px;">
-											<p style="text-overflow: ellipsis;
-										word-wrap: break-word;"> <img src="assets/images/icons/contract.png" height="20" alt=""
-													style="padding-right: 5px; padding-bottom: 5px;" /><span
-													id="txSummary3Label"></span></p>
-										</div>
-										<div class="para-text" id="txSummary4"
-											style="display: none; padding-top: 10px;">
-											<p style="text-overflow: ellipsis;
-										word-wrap: break-word;"> <img src="assets/images/icons/contract.png" height="20" alt=""
-													style="padding-right: 5px; padding-bottom: 5px;" /><span
-													id="txSummary4Label"></span></p>
-										</div>
-										<div class="para-text" id="txSummary5"
-											style="display: none; padding-top: 10px;">
-											<p style="text-overflow: ellipsis;
-										word-wrap: break-word;"> <img src="assets/images/icons/contract.png" height="20" alt=""
-													style="padding-right: 5px; padding-bottom: 5px;" /><span
-													id="txSummary5Label"></span></p>
-										</div>
-										<div class="para-text" id="txSummary6"
-											style="display: none; padding-top: 10px;">
-											<p style="text-overflow: ellipsis;
-										word-wrap: break-word;"> <img src="assets/images/icons/contract.png" height="20" alt=""
-													style="padding-right: 5px; padding-bottom: 5px;" /><span
-													id="txSummary6Label"></span></p>
-										</div>
-									</div>
 								</div>
 							</div>
 						</div>
 					</div>
 				</div>
+		</div>
+		<div id="workflow" class="modal">
+			<div class="modal-background">
+				<div class="modal-content">
+					<span id="close" class="close">&times;</span>
+					<div class="container-fluid" id="steps"
+						style="display: none; padding-top: 30px; padding-bottom: 30px;">
+						<ul class="list-unstyled multi-steps">
+							<li style="letter-spacing: 2px; font-weight: 300;
+					font-size: 12px; font-family: Lato, sans-serif;" id="ethDeploymentStep">Setup on <span
+									id="fromChain">Ethereum</span>
+							</li>
+							<li style="letter-spacing: 2px; font-weight: 300;
+					font-size: 12px; font-family: Lato, sans-serif;" id="ethTransferStep">Transfer</br>UCOs</li>
+							<li style="letter-spacing: 2px; font-weight: 300;
+					font-size: 12px; font-family: Lato, sans-serif;" id="archethicDeploymentStep">Setup on
+								Archethic</li>
+							<li style="letter-spacing: 2px; font-weight: 300;
+					font-size: 12px; font-family: Lato, sans-serif;" id="swapStep">
+								Transfer</li>
+							<li style="letter-spacing: 2px; font-weight: 300;
+					font-size: 12px;font-family: Lato, sans-serif;" id="endStep">
+								Completion</li>
+						</ul>
+					</div>
+					<div class="para-text" style="padding-top: 10;">
+						<div class="para-text">
+							<p style="text-overflow: ellipsis;
+				word-wrap: break-word;"><span id="error"></span></p>
+						</div>
+					</div>
+					<div class="para-text" style="padding-top: 10;">
+						<div class="para-text" id="txSummary1" style="display: none;">
+							<p style="text-overflow: ellipsis;
+				word-wrap: break-word;"> <img src="assets/images/icons/contract.png" height="20" alt=""
+									style="padding-right: 5px; padding-bottom: 5px;" /><span
+									id="txSummary1Label"></span>
+							</p>
+						</div>
+						<div class="para-text" id="txSummary2" style="display: none;">
+							<p style="text-overflow: ellipsis;
+				word-wrap: break-word;"> <img src="assets/images/icons/contract.png" height="20" alt=""
+									style="padding-right: 5px; padding-bottom: 5px;" /><span
+									id="txSummary2Label"></span>
+							</p>
+						</div>
+						<div class="para-text" id="txSummary3" style="display: none;">
+							<p style="text-overflow: ellipsis;
+				word-wrap: break-word;"> <img src="assets/images/icons/contract.png" height="20" alt=""
+									style="padding-right: 5px; padding-bottom: 5px;" /><span
+									id="txSummary3Label"></span>
+							</p>
+						</div>
+						<div class="para-text" id="txSummary4" style="display: none;">
+							<p style="text-overflow: ellipsis;
+				word-wrap: break-word;"> <img src="assets/images/icons/contract.png" height="20" alt=""
+									style="padding-right: 5px; padding-bottom: 5px;" /><span
+									id="txSummary4Label"></span>
+							</p>
+						</div>
+						<div class="para-text" id="txSummary5" style="display: none;">
+							<p style="text-overflow: ellipsis;
+				word-wrap: break-word;"> <img src="assets/images/icons/contract.png" height="20" alt=""
+									style="padding-right: 5px; padding-bottom: 5px;" /><span
+									id="txSummary5Label"></span>
+							</p>
+						</div>
+						<div class="para-text" id="txSummary6" style="display: none;">
+							<p style="text-overflow: ellipsis;
+				word-wrap: break-word;"> <img src="assets/images/icons/contract.png" height="20" alt=""
+									style="padding-right: 5px; padding-bottom: 5px;" /><span
+									id="txSummary6Label"></span>
+							</p>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
 		</form>
 		<footer class="mastfoot">
@@ -368,7 +376,6 @@
 				</div>
 			</div>
 		</footer>
-	</div>
 	</div>
 </body>
 
