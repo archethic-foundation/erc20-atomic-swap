@@ -1,4 +1,4 @@
-import { initProgressBar, initPageBridge, initTransfer } from "./ui.js";
+import { initProgressBar, initPageBridge, initTransfer, changeBtnToTransferInProgress } from "./ui.js";
 import { initChainContext } from "./chain.js";
 import { uint8ArrayToHex, handleError } from "./utils.js";
 import { getERC20Contract, getHTLC_Contract, deployHTLC, transferERC20, deployArchethic, withdrawEthereum, withdrawArchethic } from "./contract";
@@ -34,6 +34,7 @@ $("#connectMetamaskBtn").on("click", async () => {
 let toChainExplorer;
 let fromChainName;
 let step;
+let ucoPrice;
 
 async function startApp(provider) {
 
@@ -52,6 +53,8 @@ async function startApp(provider) {
     sourceChainExplorer,
     bridgeAddress
   } = await getConfig(ethChainId);
+
+  ucoPrice = UCOPrice
 
   initPageBridge();
 
@@ -81,13 +84,30 @@ async function startApp(provider) {
   $("#maxUCOValue").attr("value", Math.min(erc20Amount, maxSwap).toFixed(5));
   $("#fromBalanceUSD").text(new Intl.NumberFormat().format((erc20Amount * UCOPrice).toFixed(5)));
 
+  // Update the UCO price
+  setInterval(async () => {
+    const { UCOPrice } = await getConfig(ethChainId)
+    if (UCOPrice != ucoPrice) {
+      $("#ucoPrice").text(`1 UCO = ${UCOPrice.toFixed(5)}$`).show();
+      let maxSwap = (20 / UCOPrice).toFixed(5);
+      $("#nbTokensToSwap").attr("max", maxSwap);
+
+      const balance = await unirisContract.balanceOf(account);
+      const erc20Amount = ethers.utils.formatUnits(balance, 18);
+      $("#fromBalanceUSD").text(new Intl.NumberFormat().format((erc20Amount * UCOPrice).toFixed(5)));
+      $("#maxUCOValue").attr("value", Math.min(erc20Amount, maxSwap).toFixed(5));
+
+      ucoPrice = UCOPrice
+    }
+  }, 5000)
+
   $("#recipientAddress").on("change", async (e) => {
     const archethicBalance = await getArchethicBalance($(e.target).val());
 
     const ucoAmount = archethicBalance / 1e8
 
     $("#toBalanceUCO").text(new Intl.NumberFormat().format(parseFloat(ucoAmount).toFixed(8)));
-    $("#toBalanceUSD").text(new Intl.NumberFormat().format((UCOPrice * ucoAmount).toFixed(5)));
+    $("#toBalanceUSD").text(new Intl.NumberFormat().format((ucoPrice * ucoAmount).toFixed(5)));
     $('#btnSwap').prop('disabled', false);
   });
 
@@ -95,102 +115,20 @@ async function startApp(provider) {
 
   $("#nbTokensToSwap").on("input", (e) => {
     const amount = $(e.target).val();
-    $("#swapBalanceUSD").text((amount * UCOPrice).toFixed(5));
+    $("#swapBalanceUSD").text((amount * ucoPrice).toFixed(5));
   })
 
 
   $("#maxButton").on("click", () => {
     const amount = $("#maxUCOValue").val();
     $("#nbTokensToSwap").val(amount);
-    $("#swapBalanceUSD").text((amount * UCOPrice).toFixed(5));
+    $("#swapBalanceUSD").text((amount * ucoPrice).toFixed(5));
   });
 
   let pendingTransferJSON = localStorage.getItem("pendingTransfer");
+  let state
   if (pendingTransferJSON) {
-
-    initProgressBar();
-
-    $("#btnSwapSpinnerText").text("Loading previous transfer");
-    $("#btnSwapSpinner").show();
-    $("#btnSwap").hide();
-
-    const pendingTransfer = JSON.parse(pendingTransferJSON);
-    const state = {
-      HTLC_Contract: await getHTLC_Contract(pendingTransfer.HTLC_Address, provider),
-      HTLC_transaction: pendingTransfer.HTLC_transaction,
-      secretHex: pendingTransfer.secretHex,
-      secretDigestHex: pendingTransfer.secretDigestHex,
-      amount: pendingTransfer.amount,
-      UCOPrice: UCOPrice,
-      ethChainId: ethChainId,
-      recipientEthereum: recipientEthereum,
-      recipientArchethic: pendingTransfer.recipientArchethic,
-      unirisContract: unirisContract,
-      signer: signer,
-      erc20transferAddress: pendingTransfer.erc20transferAddress,
-      archethicContractAddress: pendingTransfer.archethicContractAddress,
-      withdrawEthereumAddress: pendingTransfer.withdrawEthereumAddress,
-      sourceChainExplorer: sourceChainExplorer,
-      toChainExplorer: toChainExplorer
-    }
-
-    $("#recipientAddress").val(pendingTransfer.recipientArchethic);
-    $("#nbTokensToSwap").val(pendingTransfer.amount);
-    const archethicBalance = await getArchethicBalance(pendingTransfer.recipientArchethic);
-
-    const ucoAmount = archethicBalance / 1e8
-
-    $("#toBalanceUCO").text(new Intl.NumberFormat().format(parseFloat(ucoAmount).toFixed(8)));
-    $("#toBalanceUSD").text(new Intl.NumberFormat().format((UCOPrice * ucoAmount).toFixed(5)));
-    $("#swapBalanceUSD").text((pendingTransfer.amount * UCOPrice).toFixed(5));
-
-    $("#steps").show();
-
-    $("#ethDeploymentStep").removeClass("is-active");
-    $("#txSummary1Label").html(`Contract address on ${fromChainName}: <a href="${sourceChainExplorer}/address/${pendingTransfer.HTLC_Address}" target="_blank">${pendingTransfer.HTLC_Address}</a>`)
-    $("#txSummary1").show();
-    $("#ethTransferStep").addClass("is-active");
-
-    step = 2
-
-    if (pendingTransfer.erc20transferAddress) {
-      step = 3
-      $("#txSummary2Label").html(`Provision UCO: <a href="${sourceChainExplorer}/tx/${pendingTransfer.erc20transferAddress}" target="_blank">${pendingTransfer.erc20transferAddress}</a>`)
-      $("#txSummary2").show();
-      $("#ethTransferStep").removeClass("is-active");
-      $("#archethicDeploymentStep").addClass("is-active");
-    }
-
-    if (pendingTransfer.archethicContractAddress) {
-      step = 4
-      $("#txSummary3Label").html(`Contract address on Archethic: <a href="${toChainExplorer}/${pendingTransfer.archethicContractAddress}" target="_blank">${pendingTransfer.archethicContractAddress}</a>`)
-      $("#txSummary3").show();
-      $("#archethicDeploymentStep").removeClass("is-active");
-      $("#swapStep").addClass("is-active");
-    }
-
-    if (pendingTransfer.withdrawEthereumAddress) {
-      $("#txSummary4Label").html(`${fromChainName} swap: <a href="${sourceChainExplorer}/tx/${pendingTransfer.withdrawEthereumAddress}" target="_blank">${pendingTransfer.withdrawEthereumAddress}</a>`)
-      $("#txSummary4").show();
-      $("#swapStep").removeClass("is-active");
-    }
-
-    $("#btnSwapSpinner").hide();
-    $("#btnSwap").show();
-    $("#btnSwap").prop("disabled", false);
-
-    $("#swapForm").off();
-    $("#swapForm").on("submit", async (e) => {
-      e.preventDefault();
-      changeBtnToTransferInProgress();
-      try {
-        await goto(localStorage.getItem("transferStep"), state, UCOPrice);
-      }
-      catch (e) {
-        handleError(e, step);
-      }
-    })
-    return
+   state = await initState(pendingTransferJSON, ethChainId, unirisContract, sourceChainExplorer, toChainExplorer, recipientEthereum, signer, fromChainName)
   }
 
   $("#swapForm").on("submit", async (e) => {
@@ -199,6 +137,18 @@ async function startApp(provider) {
       return;
     }
 
+    $("#error").text("")
+
+    if (state) {
+      changeBtnToTransferInProgress();
+      try {
+        await goto(localStorage.getItem("transferStep"), state);
+      }
+      catch (e) {
+        handleError(e, step);
+      }
+      return
+    }
 
     const recipientAddress = $("#recipientAddress").val();
     await handleFormSubmit(
@@ -232,7 +182,7 @@ async function handleFormSubmit(
 
   initTransfer();
 
-  var step = 0;
+  step = 0;
 
   const amount = $("#nbTokensToSwap").val();
   if (erc20Amount < amount) {
@@ -298,7 +248,6 @@ async function handleFormSubmit(
       secretHex: secretHex,
       secretDigestHex: secretDigestHex,
       amount: amount,
-      UCOPrice: UCOPrice,
       ethChainId: ethChainId,
       recipientEthereum: recipientEthereum,
       recipientArchethic: recipientArchethic,
@@ -308,28 +257,28 @@ async function handleFormSubmit(
       toChainExplorer: toChainExplorer,
       HTLC_transaction: HTLC_tx
     }
-    await goto("deployedEthContract", state, UCOPrice)
+    await goto("deployedEthContract", state)
 
   } catch (e) {
     handleError(e, step)
   }
 }
 
-async function goto(step, state, UCOPrice) {
+async function goto(step, state) {
   switch (step) {
     case "deployedEthContract":
       step = 2
       state = await transferERC20(state)
-      return await goto("transferedERC20", state, UCOPrice)
+      return await goto("transferedERC20", state)
     case "transferedERC20":
       step = 3
       state = await deployArchethic(state)
-      return await goto("deployedArchethicContract", state, UCOPrice)
+      return await goto("deployedArchethicContract", state)
     case "deployedArchethicContract":
       step = 4
       $("#swapStep").addClass("is-active");
       state = await withdrawEthereum(state)
-      return await goto("withdrawEthContract", state, UCOPrice)
+      return await goto("withdrawEthContract", state)
     case "withdrawEthContract":
       await withdrawArchethic(state)
 
@@ -350,9 +299,102 @@ async function goto(step, state, UCOPrice) {
         const newUCOBalance = archethicBalance / 1e8
 
         $("#toBalanceUCO").text(parseFloat(newUCOBalance).toFixed(2));
-        $("#toBalanceUSD").text(UCOPrice * newUCOBalance)
+        $("#toBalanceUSD").text(ucoPrice * newUCOBalance)
 
       }, 2000)
       break
   }
+}
+
+async function initState(pendingTransferJSON, ethChainId, unirisContract, sourceChainExplorer, toChainExplorer, recipientEthereum, signer, fromChainName) {
+  //initProgressBar();
+
+  $("#btnSwapSpinnerText").text("Loading previous transfer");
+  $("#btnSwapSpinner").show();
+  $("#btnSwap").hide();
+
+  const pendingTransfer = JSON.parse(pendingTransferJSON);
+  const state = {
+    HTLC_Contract: await getHTLC_Contract(pendingTransfer.HTLC_Address, provider),
+    HTLC_transaction: pendingTransfer.HTLC_transaction,
+    secretHex: pendingTransfer.secretHex,
+    secretDigestHex: pendingTransfer.secretDigestHex,
+    amount: pendingTransfer.amount,
+    ethChainId: ethChainId,
+    recipientEthereum: recipientEthereum,
+    recipientArchethic: pendingTransfer.recipientArchethic,
+    unirisContract: unirisContract,
+    signer: signer,
+    erc20transferAddress: pendingTransfer.erc20transferAddress,
+    archethicContractAddress: pendingTransfer.archethicContractAddress,
+    withdrawEthereumAddress: pendingTransfer.withdrawEthereumAddress,
+    sourceChainExplorer: sourceChainExplorer,
+    toChainExplorer: toChainExplorer
+  }
+
+  $("#recipientAddress").val(pendingTransfer.recipientArchethic);
+  $("#nbTokensToSwap").val(pendingTransfer.amount);
+  const archethicBalance = await getArchethicBalance(pendingTransfer.recipientArchethic);
+
+  const ucoAmount = archethicBalance / 1e8
+
+  $("#toBalanceUCO").text(new Intl.NumberFormat().format(parseFloat(ucoAmount).toFixed(8)));
+  $("#toBalanceUSD").text(new Intl.NumberFormat().format((ucoPrice * ucoAmount).toFixed(5)));
+  $("#swapBalanceUSD").text((pendingTransfer.amount * ucoPrice).toFixed(5));
+
+
+  $("#ethDeploymentStep").removeClass("is-active is-failed");
+  $("#txSummary1Label").html(`Contract address on ${fromChainName}: <a href="${sourceChainExplorer}/address/${pendingTransfer.HTLC_Address}" target="_blank">${pendingTransfer.HTLC_Address}</a>`)
+  $("#txSummary1").show();
+  $("#ethTransferStep").addClass("is-active");
+
+  step = 2
+
+  if (pendingTransfer.erc20transferAddress) {
+    step = 3
+    $("#txSummary2Label").html(`Provision UCO: <a href="${sourceChainExplorer}/tx/${pendingTransfer.erc20transferAddress}" target="_blank">${pendingTransfer.erc20transferAddress}</a>`)
+    $("#txSummary2").show();
+  }
+
+  if (pendingTransfer.archethicContractAddress) {
+    step = 4
+    $("#txSummary3Label").html(`Contract address on Archethic: <a href="${toChainExplorer}/${pendingTransfer.archethicContractAddress}" target="_blank">${pendingTransfer.archethicContractAddress}</a>`)
+    $("#txSummary3").show();
+  }
+
+  if (pendingTransfer.withdrawEthereumAddress) {
+    $("#txSummary4Label").html(`${fromChainName} swap: <a href="${sourceChainExplorer}/tx/${pendingTransfer.withdrawEthereumAddress}" target="_blank">${pendingTransfer.withdrawEthereumAddress}</a>`)
+    $("#txSummary4").show();
+  }
+
+  $("#btnSwapSpinner").hide();
+  $("#btnSwap").show();
+  $("#btnSwap").prop("disabled", false);
+
+  // Reset error steps
+  switch (step) {
+      case 2:
+          $("#ethTransferStep").addClass("is-active");
+          $("#ethTransferStep").removeClass("is-failed");
+          $("#ethDeploymentStep").removeClass("is-active is-failed");
+          break;
+      case 3:
+          $("#archethicDeploymentStep").addClass("is-active");
+          $("#archethicDeploymentStep").removeClass("is-failed");
+          $("#ethDeploymentStep").removeClass("is-failed is-active");
+          $("#ethTransferStep").removeClass("is-failed is-active");
+          break;
+      case 4:
+          $("#swapStep").addClass("is-active");
+          $("#swapStep").removeClass("is-failed");
+          $("#archethicDeploymentStep").removeClass("is-active is-failed");
+          $("#ethTransferStep").removeClass("is-active is-failed");
+          $("#ethDeploymentStep").removeClass("is-active is-failed");
+          break;
+      default:
+          break;
+  }
+
+  $("#steps").show();
+  return state
 }

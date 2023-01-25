@@ -45,21 +45,29 @@ export function handleError(e, step) {
     console.log(step);
     switch (step) {
         case 1:
-            $("#ethDeploymentStep").removeClass("is-active");
-            $("#ethDeploymentStep").addClass("is-failed");
+            $("#ethDeploymentStep").removeClass("is-active is-failed");
+            $("#ethTransferStep").removeClass("is-active")
             $("#ethTransferStep").addClass("is-failed");
+            $("#archethicDeploymentStep").addClass("is-failed");
+            $("#swapStep").addClass("is-failed");
             break;
         case 2:
-            $("#ethTransferStep").removeClass("is-active");
             $("#ethTransferStep").addClass("is-failed");
+            $("#ethTransferStep").removeClass("is-active");
+            $("#ethDeploymentStep").removeClass("is-active is-failed")
             break;
         case 3:
-            $("#archethicDeploymentStep").removeClass("is-active");
             $("#archethicDeploymentStep").addClass("is-failed");
+            $("#archethicDeploymentStep").removeClass("is-active");
+            $("#ethDeploymentStep").removeClass("is-active is-failed")
+            $("#ethTransferStep").removeClass("is-active is-failed")
             break;
         case 4:
-            $("#swapStep").removeClass("is-active");
+            $("#ethDeploymentStep").removeClass("is-active is-failed")
+            $("#ethTransferStep").removeClass("is-active is-failed")
+            $("#archethicDeploymentStep").removeClass("is-active is-failed");
             $("#swapStep").addClass("is-failed");
+            $("#swapStep").removeClass("is-active");
             break;
         default:
             break;

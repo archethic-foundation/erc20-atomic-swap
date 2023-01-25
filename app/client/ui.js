@@ -32,7 +32,7 @@ export function initTransfer() {
 
 }
 
-function changeBtnToTransferInProgress() {
+export function changeBtnToTransferInProgress() {
     $("#btnSwap").hide();
     $('#btnSwapSpinner').prop('disabled', true);
     $("#btnSwapSpinner").show();
