@@ -16,7 +16,7 @@ import { Crypto, Utils } from "archethic";
 import { createHmac } from "crypto";
 const { originPrivateKey } = Utils;
 
-import { archethicConnection, ethConfig, baseSeedContract, bridgeAddress, bridgeSeed, getUCOPrice, getLastTransaction } from "../utils.js";
+import { archethicConnection, ethConfig, baseSeedContract, bridgeAddress, bridgeSeed, getUCOPrice, getLastTransaction, getStandardDeviation } from "../utils.js";
 
 export default { deployContract, withdraw }
 
@@ -36,7 +36,10 @@ async function deployContract(req, res, next) {
     const maxDollar = 20
     const maxSwap = (maxDollar / ucoPrice) * 1e8
     if (req.body.amount > maxSwap) {
-      return res.status(400).json({ message: `You cannot swap more than ${maxSwap} UCO - ($${maxDollar})` })
+      const deviationInUCO = getStandardDeviation([req.body.amount, maxSwap])
+      if (((deviationInUCO / 1e8)* ucoPrice) > 0.1) {
+        return res.status(400).json({ message: `You cannot swap more than $${maxDollar}` })
+      }
     }
 
     const contractSeed = createHmac("sha512", baseSeedContract)
