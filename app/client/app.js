@@ -306,7 +306,7 @@ async function goto(step, state) {
         const newUCOBalance = archethicBalance / 1e8
 
         $("#toBalanceUCO").text(parseFloat(newUCOBalance).toFixed(2));
-        $("#toBalanceUSD").text(ucoPrice * newUCOBalance)
+        $("#toBalanceUSD").text((ucoPrice * newUCOBalance).toFixed(5));
 
       }, 2000)
       break

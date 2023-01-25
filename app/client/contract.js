@@ -133,7 +133,7 @@ export async function withdrawEthereum(state) {
     $("#fromBalanceUCO").text(new Intl.NumberFormat().format(parseFloat(erc20Amount).toFixed(2)));
     let maxSwap = 20 / UCOPrice
     $("#maxUCOValue").text(Math.min(erc20Amount / UCOPrice, maxSwap).toFixed(5));
-    $("#fromBalanceUSD").text(erc20Amount * UCOPrice);
+    $("#fromBalanceUSD").text((erc20Amount * UCOPrice).toFixed(5));
 
     state.withdrawEthereumAddress = withdrawTx.transactionHash
     return state
