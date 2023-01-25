@@ -40,7 +40,7 @@ async function deployContract(req, res, next) {
     }
 
     const contractSeed = createHmac("sha512", baseSeedContract)
-      .update(req.body.ethereumContractAddress)
+      .update(`${req.body.ethereumContractAddress}${req.body.secretHash}`)
       .digest();
 
     const contractChainAddress = Crypto.deriveAddress(contractSeed, 0);
