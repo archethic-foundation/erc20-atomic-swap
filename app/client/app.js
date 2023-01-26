@@ -76,6 +76,13 @@ async function startApp(provider) {
   console.log("Archethic endpoint: ", archethicEndpoint);
 
   const account = await signer.getAddress();
+  if (account.length > 4) {
+    accountStr = account.substring(0, 5) + "..." + account.substring(account.length - 3);
+  } else {
+    accountStr = account;
+  }
+  $("#accountName").html(`Account<br><a href="${sourceChainExplorer}/address/${account}" target="_blank">${accountStr}</a>`)
+
   const unirisContract = await getERC20Contract(unirisTokenAddress, provider);
 
   const balance = await unirisContract.balanceOf(account);

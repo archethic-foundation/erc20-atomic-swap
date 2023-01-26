@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="32px" height="32px" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>circle-right</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="circle-right" fill="#FFFFFF" fill-rule="nonzero">
+            <path d="M16,0 C7.163,0 0,7.163 0,16 C0,24.837 7.163,32 16,32 C24.837,32 32,24.837 32,16 C32,7.163 24.837,0 16,0 Z M16,29 C8.82,29 3,23.18 3,16 C3,8.82 8.82,3 16,3 C23.18,3 29,8.82 29,16 C29,23.18 23.18,29 16,29 Z" id="Shape"></path>
+            <polygon id="Path" points="11.086 22.086 13.915 24.915 22.829 16.001 13.915 7.087 11.087 9.915 17.173 16.001"></polygon>
+        </g>
+    </g>
+</svg>
