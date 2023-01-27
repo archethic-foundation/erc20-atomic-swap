@@ -99,8 +99,6 @@ async function startApp(provider) {
       let maxSwap = (20 / UCOPrice).toFixed(5);
       $("#nbTokensToSwap").attr("max", maxSwap);
 
-      const balance = await unirisContract.balanceOf(account);
-      const erc20Amount = ethers.utils.formatUnits(balance, 18);
       $("#fromBalanceUSD").text(new Intl.NumberFormat().format((erc20Amount * UCOPrice).toFixed(5)));
       $("#maxUCOValue").attr("value", Math.min(erc20Amount, maxSwap).toFixed(5));
 
@@ -196,7 +194,12 @@ async function handleFormSubmit(
   step = 0;
 
   const amount = $("#nbTokensToSwap").val();
-  if (erc20Amount < amount) {
+  //console.log(erc20Amount)
+  //console.log(amount)
+  //console.log(erc20Amount < amount)
+  
+
+  if (erc20Amount * 1e18 < amount * 1e18) {
     $("#btnSwapSpinner").hide();
     $("#btnSwap").show();
     $("#btnSwap").prop("disabled", false);
@@ -207,7 +210,7 @@ async function handleFormSubmit(
   }
 
   const bridgeBalance = await getArchethicBalance(bridgeAddress)
-  if (bridgeBalance <= amount * 10e8) {
+  if (bridgeBalance <= amount * 1e8) {
     $("#error").text(
       "Bridge has insuffficient funds. Please retry later..."
     );
