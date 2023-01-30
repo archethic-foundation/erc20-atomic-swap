@@ -4,16 +4,30 @@ import { uint8ArrayToHex, handleError } from "./utils.js";
 import { getERC20Contract, getHTLC_Contract, deployHTLC, transferERC20, deployArchethic, withdrawEthereum, withdrawArchethic } from "./contract";
 import { getArchethicBalance, getConfig } from "./service.js";
 
+let provider;
+
 window.onload = async function() {
-  if (typeof window.ethereum !== "undefined") {
-    console.log("MetaMask is installed!");
-  } else {
-    const error = "No ethereum provider is installed";
-
+  try {
+    if (typeof window.ethereum !== "undefined") {
+      console.log("MetaMask is installed!");
+      // Check if metamask is alredy connected
+      provider = new ethers.providers.Web3Provider(window.ethereum);
+      if (localStorage.getItem("walletInjected?")) {
+        // Already connected, start app
+        $("#connectMetamaskBtn").hide();
+        $("#connectMetamaskBtnSpinner").show();
+        await provider.send("eth_requestAccounts", []);
+        startApp()
+      }
+    } else {
+      throw "No ethereum provider is installed"
+    }
+  } catch (e) {
+    localStorage.setItem("walletInjected?", false)
+    $("#connectMetamaskBtnSpinner").hide();
+    $("#connectMetamaskBtn").show();
     $('#connectMetamaskBtn').prop('disabled', true);
-    $("#connectionError").text(error).show();
-
-    throw error
+    $("#connectionError").text(e.message || e).show();
   }
 };
 
@@ -21,11 +35,10 @@ $("#connectMetamaskBtn").on("click", async () => {
   try {
     $("#connectMetamaskBtn").hide();
     $("#connectMetamaskBtnSpinner").show();
-    provider = new ethers.providers.Web3Provider(window.ethereum);
-
     // MetaMask requires requesting permission to connect users accounts
     await provider.send("eth_requestAccounts", []);
-    await startApp(provider);
+    localStorage.setItem("walletInjected?", true)
+    await startApp();
   }
   catch (e) {
     $("#connectMetamaskBtnSpinner").hide();
@@ -40,8 +53,7 @@ let toChainExplorer;
 let step;
 let ucoPrice;
 
-async function startApp(provider) {
-
+async function startApp() {
   const { chainId: ethChainId } = await provider.getNetwork();
   const signer = provider.getSigner();
 
@@ -201,7 +213,7 @@ async function handleFormSubmit(
   //console.log(erc20Amount)
   //console.log(amount)
   //console.log(erc20Amount < amount)
-  
+
 
   if (erc20Amount * 1e18 < amount * 1e18) {
     $("#btnSwapSpinner").hide();
