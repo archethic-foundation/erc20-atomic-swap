@@ -5,6 +5,7 @@ import { getERC20Contract, getHTLC_Contract, deployHTLC, transferERC20, deployAr
 import { getArchethicBalance, getConfig } from "./service.js";
 
 let provider;
+let interval;
 
 window.onload = async function() {
   try {
@@ -49,6 +50,7 @@ function handleNetworkChange() {
   provider.provider.on("chainChanged", _chainId => {
     provider = new ethers.providers.Web3Provider(window.ethereum);
     initReConnectionScreen()
+    clearInterval(interval)
     startApp().catch(e => displayConnectionError(e.message || e))
   })
 }
@@ -107,7 +109,7 @@ async function startApp() {
   })
 
   // Update the UCO price
-  setInterval(async () => {
+  interval = setInterval(async () => {
     const { UCOPrice } = await getConfig(ethChainId)
     if (UCOPrice != ucoPrice) {
       $("#ucoPrice").text(`1 UCO = ${UCOPrice.toFixed(5)}$`).show();
