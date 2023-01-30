@@ -25,14 +25,13 @@ $("#connectMetamaskBtn").on("click", async () => {
   catch (e) {
     $("#connectMetamaskBtnSpinner").hide();
     $("#connectMetamaskBtn").show();
-    $("#error")
+    $("#connectionError")
       .text(`${e.message || e}`)
       .show();
   }
 });
 
 let toChainExplorer;
-let fromChainName;
 let step;
 let ucoPrice;
 
