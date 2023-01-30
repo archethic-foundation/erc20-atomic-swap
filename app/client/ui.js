@@ -1,9 +1,5 @@
 
 export function initPageBridge() {
-
-    $("#connectMetamaskBtnSpinner").hide();
-    $("#connectMetamaskBtn").show();
-
     $("#main").hide();
     $("#swapForm").show();
 
@@ -21,6 +17,20 @@ export function initPageBridge() {
     $("#btnSwapSpinnerText").hide();
 
     initProgressBar();
+}
+
+export function initReConnectionScreen() {
+    $("#connectionError").text('').hide();
+    $("#connectMetamaskBtn").hide();
+    $("#connectMetamaskBtnSpinner").show();
+    $("#swapForm").hide();
+    $("#main").show();
+}
+
+export function displayConnectionError(error) {
+    $("#connectMetamaskBtnSpinner").hide();
+    $("#connectMetamaskBtn").show();
+    $("#connectionError").text(error).show();
 }
 
 export function initTransfer() {
@@ -56,7 +66,7 @@ function initTxSummary() {
     $("#txSummary6").hide();
 }
 
-export function initProgressBar() {
+function initProgressBar() {
 
     $("#ethDeploymentStep").removeClass("is-active");
     $("#ethDeploymentStep").removeClass("is-failed");

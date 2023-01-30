@@ -1,4 +1,4 @@
-import { initProgressBar, initPageBridge, initTransfer, changeBtnToTransferInProgress } from "./ui.js";
+import { initPageBridge, initTransfer, changeBtnToTransferInProgress, displayConnectionError, initReConnectionScreen } from "./ui.js";
 import { initChainContext } from "./chain.js";
 import { uint8ArrayToHex, handleError } from "./utils.js";
 import { getERC20Contract, getHTLC_Contract, deployHTLC, transferERC20, deployArchethic, withdrawEthereum, withdrawArchethic } from "./contract";
@@ -17,17 +17,15 @@ window.onload = async function() {
         $("#connectMetamaskBtn").hide();
         $("#connectMetamaskBtnSpinner").show();
         await provider.send("eth_requestAccounts", []);
-        startApp()
+        handleNetworkChange()
+        await startApp()
       }
     } else {
       throw "No ethereum provider is installed"
     }
   } catch (e) {
     localStorage.setItem("walletInjected?", false)
-    $("#connectMetamaskBtnSpinner").hide();
-    $("#connectMetamaskBtn").show();
-    $('#connectMetamaskBtn').prop('disabled', true);
-    $("#connectionError").text(e.message || e).show();
+    displayConnectionError(e.message || e)
   }
 };
 
@@ -38,16 +36,22 @@ $("#connectMetamaskBtn").on("click", async () => {
     // MetaMask requires requesting permission to connect users accounts
     await provider.send("eth_requestAccounts", []);
     localStorage.setItem("walletInjected?", true)
+    handleNetworkChange()
     await startApp();
   }
   catch (e) {
-    $("#connectMetamaskBtnSpinner").hide();
-    $("#connectMetamaskBtn").show();
-    $("#connectionError")
-      .text(`${e.message || e}`)
-      .show();
+    displayConnectionError(e.message || e)
   }
 });
+
+function handleNetworkChange() {
+  // Handle chain changement
+  provider.provider.on("chainChanged", _chainId => {
+    provider = new ethers.providers.Web3Provider(window.ethereum);
+    initReConnectionScreen()
+    startApp().catch(e => displayConnectionError(e.message || e))
+  })
+}
 
 let toChainExplorer;
 let step;
@@ -58,7 +62,6 @@ async function startApp() {
   const signer = provider.getSigner();
 
   let fromChainName = initChainContext(ethChainId);
-  console.log(fromChainName);
 
   const {
     archethicEndpoint,
@@ -84,7 +87,7 @@ async function startApp() {
 
   if (!sufficientFunds) {
     $("#error").text(
-      "Bridge has insuffficient funds. Please retry later..."
+      "Bridge has insufficient funds. Please retry later..."
     );
     return;
   }
