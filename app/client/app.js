@@ -74,7 +74,7 @@ async function startApp() {
 
   initPageBridge();
 
-  let maxSwap = (20 / UCOPrice).toFixed(5);
+  const maxSwap = (20 / UCOPrice).toFixed(5);
   $("#nbTokensToSwap").attr("max", maxSwap);
 
   toChainExplorer = `${archethicEndpoint}/explorer/transaction`;
@@ -91,29 +91,27 @@ async function startApp() {
 
   console.log("Archethic endpoint: ", archethicEndpoint);
 
-  const account = await signer.getAddress();
-  if (account.length > 4) {
-    accountStr = account.substring(0, 5) + "..." + account.substring(account.length - 3);
-  } else {
-    accountStr = account;
-  }
-  $("#accountName").html(`Account<br><a href="${sourceChainExplorer}/address/${account}" target="_blank">${accountStr}</a>`)
-
   const unirisContract = await getERC20Contract(unirisTokenAddress, provider);
 
-  const balance = await unirisContract.balanceOf(account);
-  const erc20Amount = ethers.utils.formatUnits(balance, 18);
-  $("#fromBalanceUCO").text(new Intl.NumberFormat().format(parseFloat(erc20Amount).toFixed(8)));
-  $("#maxUCOValue").attr("value", Math.min(erc20Amount, maxSwap).toFixed(5));
-  $("#fromBalanceUSD").text(new Intl.NumberFormat().format((erc20Amount * UCOPrice).toFixed(5)));
+  // Display signer account
+  const account = await signer.getAddress();
+  await setupEthAccount(account, unirisContract, sourceChainExplorer, ucoPrice)
+
+  // Handle account change
+  provider.provider.on('accountsChanged', accounts => {
+    const account = accounts[0]
+    setupEthAccount(account, unirisContract, sourceChainExplorer, ucoPrice)
+  })
 
   // Update the UCO price
   setInterval(async () => {
     const { UCOPrice } = await getConfig(ethChainId)
     if (UCOPrice != ucoPrice) {
       $("#ucoPrice").text(`1 UCO = ${UCOPrice.toFixed(5)}$`).show();
-      let maxSwap = (20 / UCOPrice).toFixed(5);
+      const maxSwap = (20 / UCOPrice).toFixed(5);
       $("#nbTokensToSwap").attr("max", maxSwap);
+
+      const erc20Amount = parseFloat($("#fromBalanceUCO").text())
 
       $("#fromBalanceUSD").text(new Intl.NumberFormat().format((erc20Amount * UCOPrice).toFixed(5)));
       $("#maxUCOValue").attr("value", Math.min(erc20Amount, maxSwap).toFixed(5));
@@ -190,6 +188,22 @@ async function startApp() {
     );
   });
 
+}
+
+async function setupEthAccount(account, unirisContract, sourceChainExplorer, ucoPrice) {
+  let accountStr = account
+  if (account.length > 4) {
+    accountStr = account.substring(0, 5) + "..." + account.substring(account.length - 3);
+  }
+  $("#accountName").html(`Account<br><a href="${sourceChainExplorer}/address/${account}" target="_blank">${accountStr}</a>`)
+
+  const maxSwap = (20 / ucoPrice).toFixed(5);
+
+  const balance = await unirisContract.balanceOf(account);
+  const erc20Amount = ethers.utils.formatUnits(balance, 18);
+  $("#fromBalanceUCO").text(new Intl.NumberFormat().format(parseFloat(erc20Amount).toFixed(8)));
+  $("#maxUCOValue").attr("value", Math.min(erc20Amount, maxSwap).toFixed(5));
+  $("#fromBalanceUSD").text(new Intl.NumberFormat().format((erc20Amount * ucoPrice).toFixed(5)));
 }
 
 async function handleFormSubmit(
