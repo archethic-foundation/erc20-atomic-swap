@@ -4,11 +4,16 @@ import { uint8ArrayToHex, handleError } from "./utils.js";
 import { getERC20Contract, getHTLC_Contract, deployHTLC, transferERC20, deployArchethic, withdrawEthereum, withdrawArchethic } from "./contract";
 import { getArchethicBalance, getConfig } from "./service.js";
 
-window.onload = async function () {
+window.onload = async function() {
   if (typeof window.ethereum !== "undefined") {
     console.log("MetaMask is installed!");
   } else {
-    throw "No ethereum provider is installed";
+    const error = "No ethereum provider is installed";
+
+    $('#connectMetamaskBtn').prop('disabled', true);
+    $("#connectionError").text(error).show();
+
+    throw error
   }
 };
 
