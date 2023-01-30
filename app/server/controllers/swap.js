@@ -16,7 +16,7 @@ import { Crypto, Utils } from "archethic";
 import { createHmac } from "crypto";
 const { originPrivateKey } = Utils;
 
-import { archethicConnection, ethConfig, baseSeedContract, bridgeAddress, bridgeSeed, getUCOPrice, getLastTransaction, getStandardDeviation } from "../utils.js";
+import { archethicConnection, ethConfig, baseSeedContract, bridgeAddress, bridgeSeed, getUCOPrice, getLastTransaction, getStandardDeviation, getTransactionChain } from "../utils.js";
 
 export default { deployContract, withdraw }
 
@@ -97,14 +97,19 @@ async function withdraw(req, res, next) {
       return res.status(400).json({ message: "Archethic's contract not deployed" })
     }
 
+    if (chainSize == 2) {
+      const transferTxAddress = await getLastAddressContract(archethic, req.body.archethicContractAddress)
+      const chain = await getTransactionChain(contractAddress)
+      const archethicWithdrawTransaction = chain[1].address
+      return res.status(200).json({ status: "ok", archethicWithdrawTransaction: archethicWithdrawTransaction, archethicTransferTransaction: transferTxAddress })
+    }
+
     const revealTx = await createRevealSecretTransaction(archethic, req.body.archethicContractAddress, req.body.secret)
 
     await sendTransaction(revealTx)
     console.log(`Reveal transaction created - ${Utils.uint8ArrayToHex(revealTx.address)}`);
 
-    await new Promise(r => setTimeout(r, 2000));
-
-    const transferTxAddress = await getLastTransaction(archethic, req.body.archethicContractAddress)
+    const transferTxAddress = await getLastAddressContract(archethic, req.body.archethicContractAddress)
 
     console.log(`Transfer transaction - ${transferTxAddress}`)
 
@@ -238,4 +243,14 @@ async function createRevealSecretTransaction(archethic, contractAddress, secret)
     .addRecipient(contractAddress)
     .build(bridgeSeed, index)
     .originSign(originPrivateKey)
+}
+
+async function getLastAddressContract(archethic, contractAddress) {
+    const transferTxAddress = await getLastTransaction(archethic, contractAddress)
+    if (transferTxAddress.toUpperCase() == contractAddress.toUpperCase()) {
+      await new Promise(r => setTimeout(r, 1000));
+      return await getLastAddressContract(archethic, contractAddress)
+    }
+
+    return transferTxAddress
 }

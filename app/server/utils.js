@@ -72,7 +72,8 @@ export {
   getUCOPrice,
   archethicConnection,
   archethicEndpoint,
-  getLastTransaction
+  getLastTransaction,
+  getTransactionChain
 };
 
 let archethic
@@ -219,6 +220,43 @@ async function getLastTransaction(archethic, address) {
 
     throw "Network issue";
   })
+}
+
+async function getTransactionChain(archethic, address) {
+  return archethic.requestNode(async (endpoint) => {
+    const url = new URL("/api", endpoint);
+    const r = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        query: `
+            query {
+              transactionChain(address: "${address}", order: DESC) {
+                 address,
+                 validationStamp {
+                  timestamp
+                 }
+              }
+            }
+          `
+      })
+    });
+
+    if (r.status != 200) {
+      throw "Node not unavailable. Switch to another"
+    }
+    const res = await r.json();
+
+    if (res.data.transactionChain) {
+      return res.data.transactionChain;
+    }
+
+    throw "Network issue";
+  })
+
 }
 
 export function getStandardDeviation(array) {
