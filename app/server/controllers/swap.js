@@ -47,29 +47,33 @@ async function deployContract(req, res, next) {
       .digest();
 
     const contractChainAddress = Crypto.deriveAddress(contractSeed, 0);
+    const contractTxAddress = Crypto.deriveAddress(contractSeed, 1);
+    const contractTxAddressHex = Utils.uint8ArrayToHex(contractTxAddress);
 
     const archethic = await archethicConnection()
     console.log("Connected to Archethic")
     const chainSize = await archethic.transaction.getTransactionIndex(contractChainAddress)
-    if (chainSize != 0) {
-      console.log(req.body.ethereumContractAddress)
-      return res.status(400).json({ message: "Contract already deployed" })
+    switch (chainSize) {
+      case 0:
+        const fundingTx = await fundContract(archethic, contractSeed, req.body.amount);
+        console.log(`Funding tx ${Utils.uint8ArrayToHex(fundingTx.address)}`)
+        await sendTransaction(fundingTx)
+        console.log(`Contract ${Utils.uint8ArrayToHex(contractChainAddress)} funded`);
+
+        const explorerEthereumContractURL = `${sourceChainExplorer}/address/${req.body.ethereumContractAddress}`
+
+        console.log("Create contract")
+        const contractTx = await createContract(archethic, contractSeed, req.body.recipientAddress, req.body.amount, req.body.endTime, req.body.secretHash, explorerEthereumContractURL);
+        await sendTransaction(contractTx);
+        console.log(`Contract transaction created - ${contractTxAddressHex}`);
+
+        return res.json({ status: "ok", contractAddress: contractTxAddressHex });
+      case 1:
+        return res.json({ status: "ok", contractAddress: contractTxAddressHex });
+      case 2:
+        console.log(req.body.ethereumContractAddress)
+        return res.status(400).json({ message: "Contract already deployed" })
     }
-
-    const fundingTx = await fundContract(archethic, contractSeed, req.body.amount);
-    console.log(`Funding tx ${Utils.uint8ArrayToHex(fundingTx.address)}`)
-    await sendTransaction(fundingTx)
-    console.log(`Contract ${Utils.uint8ArrayToHex(contractChainAddress)} funded`);
-
-    const explorerEthereumContractURL = `${sourceChainExplorer}/address/${req.body.ethereumContractAddress}`
-
-    console.log("Create contract")
-    const contractTx = await createContract(archethic, contractSeed, req.body.recipientAddress, req.body.amount, req.body.endTime, req.body.secretHash, explorerEthereumContractURL);
-    await sendTransaction(contractTx)
-    console.log(`Contract transaction created - ${Utils.uint8ArrayToHex(contractTx.address)}`);
-
-    const contractAddressHex = Utils.uint8ArrayToHex(contractTx.address);
-    res.json({ status: "ok", contractAddress: contractAddressHex });
   }
   catch (error) {
     next(error.message || error)
