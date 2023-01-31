@@ -346,6 +346,8 @@ async function goto(step, state) {
       console.log("Token swap finish");
       localStorage.removeItem("transferStep")
       localStorage.removeItem("pendingTransfer")
+      $("#recipientAddress").prop('disabled', false)
+      $("#nbTokensToSwap").prop('disabled', false)
 
       setTimeout(async () => {
         const archethicBalance = await getArchethicBalance(state.recipientArchethic);
@@ -387,7 +389,10 @@ async function initState(pendingTransferJSON, ethChainId, unirisContract, source
   }
 
   $("#recipientAddress").val(pendingTransfer.recipientArchethic);
+  $("#recipientAddress").prop('disabled', true)
   $("#nbTokensToSwap").val(pendingTransfer.amount);
+  $("#nbTokensToSwap").prop('disabled', true)
+
   const archethicBalance = await getArchethicBalance(pendingTransfer.recipientArchethic);
 
   const ucoAmount = archethicBalance / 1e8
