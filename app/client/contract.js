@@ -157,6 +157,7 @@ export async function withdrawArchethic({ archethicContractAddress, HTLC_Contrac
 
     $("#txSummary6Label").html(`Archethic transfer: <a href="${toChainExplorer}/${archethicTransferTransaction}" target="_blank">${archethicTransferTransaction}</a>`)
     $("#txSummary6").show();
+    $("#txSummaryFinished").show();
 }
 
 
