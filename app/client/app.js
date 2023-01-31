@@ -100,12 +100,12 @@ async function startApp() {
 
   // Display signer account
   const account = await signer.getAddress();
-  await setupEthAccount(account, unirisContract, sourceChainExplorer, ucoPrice)
+  let erc20Amount = await setupEthAccount(account, unirisContract, sourceChainExplorer, ucoPrice)
 
   // Handle account change
-  provider.provider.on('accountsChanged', accounts => {
+  provider.provider.on('accountsChanged', async (accounts) => {
     const account = accounts[0]
-    setupEthAccount(account, unirisContract, sourceChainExplorer, ucoPrice)
+    erc20Amount = await setupEthAccount(account, unirisContract, sourceChainExplorer, ucoPrice)
   })
 
   // Update the UCO price
@@ -209,6 +209,8 @@ async function setupEthAccount(account, unirisContract, sourceChainExplorer, uco
   $("#fromBalanceUCO").text(new Intl.NumberFormat().format(parseFloat(erc20Amount).toFixed(8)));
   $("#maxUCOValue").attr("value", Math.min(erc20Amount, maxSwap).toFixed(5));
   $("#fromBalanceUSD").text(new Intl.NumberFormat().format((erc20Amount * ucoPrice).toFixed(5)));
+
+  return erc20Amount;
 }
 
 async function handleFormSubmit(
