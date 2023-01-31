@@ -70,7 +70,7 @@ export async function transferERC20(state) {
 
     console.log(`${amount} UCO transfered`);
 
-    $("#txSummary2Label").html(`Provision UCO: <a href="${sourceChainExplorer}/tx/${transferTokenTx.transactionHash}" target="_blank">${transferTokenTx.transactionHash}</a>`)
+    $("#txSummary2Label").html(`Provision UCOs: <a href="${sourceChainExplorer}/tx/${transferTokenTx.transactionHash}" target="_blank">${transferTokenTx.transactionHash}</a>`)
     $("#txSummary2").show();
     $("#ethTransferStep").removeClass("is-active")
 

@@ -7,7 +7,7 @@ import { getArchethicBalance, getConfig } from "./service.js";
 let provider;
 let interval;
 
-window.onload = async function() {
+window.onload = async function () {
   try {
     if (typeof window.ethereum !== "undefined") {
       console.log("MetaMask is installed!");
@@ -406,7 +406,7 @@ async function initState(pendingTransferJSON, ethChainId, unirisContract, source
 
   if (pendingTransfer.erc20transferAddress) {
     step = 3
-    $("#txSummary2Label").html(`Provision UCO: <a href="${sourceChainExplorer}/tx/${pendingTransfer.erc20transferAddress}" target="_blank">${pendingTransfer.erc20transferAddress}</a>`)
+    $("#txSummary2Label").html(`Provision UCOs: <a href="${sourceChainExplorer}/tx/${pendingTransfer.erc20transferAddress}" target="_blank">${pendingTransfer.erc20transferAddress}</a>`)
     $("#txSummary2").show();
   }
 
