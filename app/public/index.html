@@ -34,17 +34,20 @@
 									Archethic Bridge gives you the power<br>
 									to transfer your $UCO to the<br>
 									Archethic Blockchain without the need<br>
-									of a trusted third.
+									of a trusted third party.
 								</p>
-								<p style="padding-top: 20px; font-weight: 400;"><a target="_blank" href="#">Tutorial</a>
+								<p style="padding-top: 20px; font-weight: 400;"><a target="_blank"
+										href="https://blog.archethic.net/bridge-launch/">Tutorial</a>
 								</p>
-								<p style="padding-top: 10px; font-weight: 400;"><a target="_blank" href="#">Vidéo</a>
+								<p style="padding-top: 10px; font-weight: 400;"><a target="_blank"
+										href="https://youtu.be/z8bjPbwqybw">Vidéo</a>
 								</p>
 								<p style="padding-top: 10px; font-weight: 400;"><a target="_blank"
 										href="https://archethic-foundation.github.io/archethic-docs/FAQ/bridge/">FAQ</a>
 								</p>
 								</p>
-								<p style="padding-top: 10px; font-weight: 400;"><a target="_blank" href="#">Bug
+								<p style="padding-top: 10px; font-weight: 400;"><a target="_blank"
+										href="https://blog.archethic.net/bugbounty/">Bug
 										bounty</a></p>
 							</div>
 						</div>
@@ -62,18 +65,23 @@
 										</div>
 									</div>
 									<div class="btn-area">
-										<button id="connectMetamaskBtn" class="btn sp-btn" style="margin-top: 5%; width: 400px;">
+										<button id="connectMetamaskBtn" class="btn sp-btn"
+											style="margin-top: 5%; width: 400px;">
 											Connect to Metamask
-											<img class="metamask-icon" src="assets/images/icons/metamask.png" width="20px" />
+											<img class="metamask-icon" src="assets/images/icons/metamask.png"
+												width="20px" />
 										</button>
 										<button id="connectMetamaskBtnSpinner" class="btn sp-btn" disabled
 											style="margin-top: 5%; width: 400px; display: none;">
 											<span>Connecting</span>
-											<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+											<span class="spinner-border spinner-border-sm" role="status"
+												aria-hidden="true"></span>
 										</button>
 									</div>
-									<p style="text-overflow: ellipsis; word-wrap: break-word; color: red; text-align: center"><span
-											id="connectionError"></span></p>
+									<p
+										style="text-overflow: ellipsis; word-wrap: break-word; color: red; text-align: center">
+										<span id="connectionError"></span>
+									</p>
 								</div>
 							</div>
 						</div>
@@ -90,20 +98,20 @@
 									<a href="#"><img src="assets/images/logo.svg" alt=""></a>
 								</div>
 								<p>
-									Archethic Bridge gives you the power to transfer your $UCO to the Archethic
-									Blockchain without the need of a trusted third.</br></br>
-								</p>
-								<p>During the bridge launch phase, for security reasons and to protect your funds, we
-									have limited each
-									transfer to <u>20$</u> per transaction (fees excluded).</br></br>
+									Archethic Bridge gives you the power<br>
+									to transfer your $UCO to the<br>
+									Archethic Blockchain without the need<br>
+									of a trusted third party.
 								</p>
 								<p style="padding-top: 20px; font-weight: 400;"><a target="_blank"
 										href="https://blog.archethic.net/bridge-launch/">Tutorial</a>
 								</p>
-								<p style="padding-top: 10px; font-weight: 400;"><a target="_blank" href="#">Vidéo</a>
+								<p style="padding-top: 10px; font-weight: 400;"><a target="_blank"
+										href="https://youtu.be/z8bjPbwqybw">Vidéo</a>
 								</p>
 								<p style="padding-top: 10px; font-weight: 400;"><a target="_blank"
 										href="https://archethic-foundation.github.io/archethic-docs/FAQ/bridge/">FAQ</a>
+								</p>
 								</p>
 								<p style="padding-top: 10px; font-weight: 400;"><a target="_blank"
 										href="https://blog.archethic.net/bugbounty/">Bug
@@ -142,13 +150,17 @@
 													<ul>
 														<li>
 															<div class="col">
-																<img src="assets/images/bc-logos/Ethereum-logo.svg" alt="" id="sourceChainImg">
-																<h4 style="padding-top: 10px;"><span id="accountName"></span></h4>
+																<img src="assets/images/bc-logos/Ethereum-logo.svg"
+																	alt="" id="sourceChainImg">
+																<h4 style="padding-top: 10px;"><span
+																		id="accountName"></span></h4>
 															</div>
 														</li>
 														<li>
-															<div class="col" style="text-align: center; padding-bottom:40px;">
-																<img src="assets/images/icons/circle-right.svg" style="width: 30px;" alt="">
+															<div class="col"
+																style="text-align: center; padding-bottom:40px;">
+																<img src="assets/images/icons/circle-right.svg"
+																	style="width: 30px;" alt="">
 															</div>
 														</li>
 														<li>
@@ -182,8 +194,9 @@
 										<div class="row">
 											<div class="col-12">
 												<div class="in-box">
-													<input type="text" class="form-control" id="recipientAddress" required
-														pattern="^([0-9A-Fa-f]){68}$" placeholder="Enter your Archethic's address"
+													<input type="text" class="form-control" id="recipientAddress"
+														required pattern="^([0-9A-Fa-f]){68}$"
+														placeholder="Enter your Archethic's address"
 														oninput="this.value = this.value.trim()">
 												</div>
 											</div>
@@ -198,8 +211,9 @@
 										<div class="row mb-3">
 											<div class="col-12">
 												<div class="in-box">
-													<input type="number" min="0.00000001" max="100" step=".00000001" class="form-control" required
-														id="nbTokensToSwap" placeholder="Enter the nb of tokens to transfer in UCO">
+													<input type="number" min="0.00000001" max="100" step=".00000001"
+														class="form-control" required id="nbTokensToSwap"
+														placeholder="Enter the nb of tokens to transfer in UCO">
 												</div>
 												<div class="three-block">
 													<div class="row">
@@ -208,8 +222,10 @@
 																<li>
 																	<div class="para-text">
 																		<p style="text-align: left;">
-																			<input type="hidden" id="maxUCOValue" value="0" />
-																			<button id="maxButton" type="button">MAX</button>
+																			<input type="hidden" id="maxUCOValue"
+																				value="0" />
+																			<button id="maxButton"
+																				type="button">MAX</button>
 																		</p>
 																	</div>
 																</li>
@@ -217,7 +233,8 @@
 																</li>
 																<li>
 																	<div class="para-text">
-																		<p style="text-align: right;">=<span id="swapBalanceUSD">0</span>$
+																		<p style="text-align: right;">=<span
+																				id="swapBalanceUSD">0</span>$
 																	</div>
 																</li>
 															</ul>
@@ -237,10 +254,13 @@
 										<p>Be careful regarding ETH fees.</p>
 									</div>
 									<div class="btn-area">
-										<button class="btn sp-btn" disabled id="btnSwap" style="width: 300px;">Transfer</button>
-										<button id="btnSwapSpinner" class="btn sp-btn" disabled style="width: 300px; display: none;">
+										<button class="btn sp-btn" disabled id="btnSwap"
+											style="width: 300px;">Transfer</button>
+										<button id="btnSwapSpinner" class="btn sp-btn" disabled
+											style="width: 300px; display: none;">
 											<span id="btnSwapSpinnerText">Transfering</span>
-											<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+											<span class="spinner-border spinner-border-sm" role="status"
+												aria-hidden="true"></span>
 										</button>
 									</div>
 								</div>
@@ -253,7 +273,8 @@
 			<div class="modal-background">
 				<div class="modal-content">
 					<span id="close" class="close">&times;</span>
-					<div class="container-fluid" id="steps" style="display: none; padding-top: 30px; padding-bottom: 30px;">
+					<div class="container-fluid" id="steps"
+						style="display: none; padding-top: 30px; padding-bottom: 30px;">
 						<ul class="list-unstyled multi-steps">
 							<li style="letter-spacing: 2px; font-weight: 300;
 					font-size: 12px; font-family: Lato, sans-serif;" id="ethDeploymentStep">Setup on <span
@@ -282,37 +303,49 @@
 						<div class="para-text" id="txSummary1" style="display: none;">
 							<p style="text-overflow: ellipsis;
 				word-wrap: break-word;"> <img src="assets/images/icons/contract.png" height="20" alt=""
-									style="padding-right: 5px; padding-bottom: 5px;" /><span id="txSummary1Label"></span>
+									style="padding-right: 5px; padding-bottom: 5px;" /><span
+									id="txSummary1Label"></span>
 							</p>
 						</div>
 						<div class="para-text" id="txSummary2" style="display: none;">
 							<p style="text-overflow: ellipsis;
 				word-wrap: break-word;"> <img src="assets/images/icons/contract.png" height="20" alt=""
-									style="padding-right: 5px; padding-bottom: 5px;" /><span id="txSummary2Label"></span>
+									style="padding-right: 5px; padding-bottom: 5px;" /><span
+									id="txSummary2Label"></span>
 							</p>
 						</div>
 						<div class="para-text" id="txSummary3" style="display: none;">
 							<p style="text-overflow: ellipsis;
 				word-wrap: break-word;"> <img src="assets/images/icons/contract.png" height="20" alt=""
-									style="padding-right: 5px; padding-bottom: 5px;" /><span id="txSummary3Label"></span>
+									style="padding-right: 5px; padding-bottom: 5px;" /><span
+									id="txSummary3Label"></span>
 							</p>
 						</div>
 						<div class="para-text" id="txSummary4" style="display: none;">
 							<p style="text-overflow: ellipsis;
 				word-wrap: break-word;"> <img src="assets/images/icons/contract.png" height="20" alt=""
-									style="padding-right: 5px; padding-bottom: 5px;" /><span id="txSummary4Label"></span>
+									style="padding-right: 5px; padding-bottom: 5px;" /><span
+									id="txSummary4Label"></span>
 							</p>
 						</div>
 						<div class="para-text" id="txSummary5" style="display: none;">
 							<p style="text-overflow: ellipsis;
 				word-wrap: break-word;"> <img src="assets/images/icons/contract.png" height="20" alt=""
-									style="padding-right: 5px; padding-bottom: 5px;" /><span id="txSummary5Label"></span>
+									style="padding-right: 5px; padding-bottom: 5px;" /><span
+									id="txSummary5Label"></span>
 							</p>
 						</div>
 						<div class="para-text" id="txSummary6" style="display: none;">
 							<p style="text-overflow: ellipsis;
 				word-wrap: break-word;"> <img src="assets/images/icons/contract.png" height="20" alt=""
-									style="padding-right: 5px; padding-bottom: 5px;" /><span id="txSummary6Label"></span>
+									style="padding-right: 5px; padding-bottom: 5px;" /><span
+									id="txSummary6Label"></span>
+							</p>
+						</div>
+						<div class="para-text" id="txSummaryFinished" style="display: none;">
+							<p style="text-overflow: ellipsis;
+				word-wrap: break-word;">The transfer process has successfully completed.<br>
+								Get ready to unleash the full potential of your UCOs on the Archethic network!
 							</p>
 						</div>
 					</div>
@@ -337,13 +370,15 @@
 				<a class="none-decoration" target="_blank" href="https://www.reddit.com/r/ArchEthic/">
 					<img class="social" src="assets/images/links/reddit.svg" />
 				</a>
-				<a class="none-decoration" target="_blank" href="https://www.youtube.com/channel/UCmP7Sg_TdBfbO1_u4EyIKzg">
+				<a class="none-decoration" target="_blank"
+					href="https://www.youtube.com/channel/UCmP7Sg_TdBfbO1_u4EyIKzg">
 					<img class="social" src="assets/images/links/youtube.svg" />
 				</a>
 				<a class="none-decoration" target="_blank" href="https://github.com/archethic-foundation">
 					<img class="social" src="assets/images/links/github.svg" />
 				</a>
-				<a class="none-decoration" target="_blank" href="https://www.linkedin.com/company/archethic-technologies/">
+				<a class="none-decoration" target="_blank"
+					href="https://www.linkedin.com/company/archethic-technologies/">
 					<img class="social" src="assets/images/links/linkedin.svg" />
 				</a>
 				<a class="none-decoration" target="_blank" href="https://medium.com/archethic">
