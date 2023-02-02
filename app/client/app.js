@@ -7,13 +7,13 @@ import { getArchethicBalance, getConfig } from "./service.js";
 let provider;
 let interval;
 
-window.onload = async function () {
+window.onload = async function() {
   try {
     if (typeof window.ethereum !== "undefined") {
       console.log("MetaMask is installed!");
       // Check if metamask is alredy connected
-      provider = new ethers.providers.Web3Provider(window.ethereum);
       if (localStorage.getItem("walletInjected?")) {
+        provider = new ethers.providers.Web3Provider(window.ethereum);
         // Already connected, start app
         $("#connectMetamaskBtn").hide();
         $("#connectMetamaskBtnSpinner").show();
@@ -31,6 +31,7 @@ window.onload = async function () {
 };
 
 $("#connectMetamaskBtn").on("click", async () => {
+  provider = new ethers.providers.Web3Provider(window.ethereum);
   try {
     $("#connectMetamaskBtn").hide();
     $("#connectMetamaskBtnSpinner").show();
