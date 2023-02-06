@@ -1,13 +1,13 @@
 import { initPageBridge, initTransfer, changeBtnToTransferInProgress, displayConnectionError, initReConnectionScreen } from "./ui.js";
 import { initChainContext } from "./chain.js";
-import { uint8ArrayToHex, handleError } from "./utils.js";
+import { uint8ArrayToHex, handleError, updateClock } from "./utils.js";
 import { getERC20Contract, getHTLC_Contract, deployHTLC, transferERC20, deployArchethic, withdrawEthereum, withdrawArchethic } from "./contract";
 import { getArchethicBalance, getConfig } from "./service.js";
 
 let provider;
 let interval;
 
-window.onload = async function() {
+window.onload = async function () {
   try {
     if (typeof window.ethereum !== "undefined") {
       console.log("MetaMask is installed!");
@@ -414,6 +414,14 @@ async function initState(pendingTransferJSON, ethChainId, unirisContract, source
     step = 3
     $("#txSummary2Label").html(`Provision UCOs: <a href="${sourceChainExplorer}/tx/${pendingTransfer.erc20transferAddress}" target="_blank">${pendingTransfer.erc20transferAddress}</a>`)
     $("#txSummary2").show();
+
+    // TODO: Update with date contract
+    var endDate = new Date("February 6, 2023 23:08:00");
+    updateClock(endDate);
+    var timeinterval = setInterval(function () {
+      updateClock(endDate);
+    }, 1000);
+    $("#txSummary2Timer").show();
   }
 
   if (pendingTransfer.archethicContractAddress) {

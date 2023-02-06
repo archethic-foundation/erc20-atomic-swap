@@ -56,6 +56,7 @@ function initTxSummary() {
     $("#txSummary1").hide();
     $("#txSummary2Label").text("");
     $("#txSummary2").hide();
+    $("#txSummary2Timer").hide();
     $("#txSummary3Label").text("");
     $("#txSummary3").hide();
     $("#txSummary4Label").text("");

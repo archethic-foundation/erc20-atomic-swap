@@ -73,3 +73,30 @@ export function handleError(e, step) {
             break;
     }
 }
+
+export function getTimeRemaining(endtime) {
+    var t = Date.parse(endtime) - Date.parse(new Date());
+    var seconds = Math.floor((t / 1000) % 60);
+    var minutes = Math.floor((t / 1000 / 60) % 60);
+    var hours = Math.floor((t / (1000 * 60 * 60)) % 24);
+    return {
+        'total': t,
+        'hours': hours,
+        'minutes': minutes,
+        'seconds': seconds
+    };
+}
+
+export function updateClock(endtime) {
+    var timeinterval = setInterval(function () {
+        var t = getTimeRemaining(endtime);
+        if (t.total <= 0) {
+            clearInterval(timeinterval);
+            $("#txSummary2Timer").html(`<img src="assets/images/icons/timer.png" height="20" alt="" style="padding-right: 5px; padding-bottom: 5px;" />Time Remaining until HTLC Lock Release: Lock is finished and the content in the HTLC is now available.`);
+        }
+        else {
+            $("#txSummary2Timer").html(`<img src="assets/images/icons/timer.png" height="20" alt="" style="padding-right: 5px; padding-bottom: 5px;" />Time Remaining until HTLC Lock Release: ` + ('0' + t.hours).slice(-2) + ':' + ('0' + t.minutes).slice(-2) + ':' + ('0' + t.seconds).slice(-2));
+        }
+    }, 1000);
+}
+
