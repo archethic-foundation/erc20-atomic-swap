@@ -1,5 +1,5 @@
 
-import { handleResponse, updateClock } from "./utils.js";
+import { handleResponse } from "./utils.js";
 
 export async function getERC20Contract(unirisTokenAddress, provider) {
     const unirisTokenABI = await getUnirisTokenABI();
@@ -72,15 +72,6 @@ export async function transferERC20(state) {
 
     $("#txSummary2Label").html(`Provision UCOs: <a href="${sourceChainExplorer}/tx/${transferTokenTx.transactionHash}" target="_blank">${transferTokenTx.transactionHash}</a>`)
     $("#txSummary2").show();
-
-    // TODO: Update with date contract
-    var endDate = new Date("February 28, 2023 12:00:00");
-    updateClock(endDate);
-    var timeinterval = setInterval(function () {
-        updateClock(endDate);
-    }, 1000);
-    $("#txSummary2Timer").show();
-
     $("#ethTransferStep").removeClass("is-active")
 
     state.erc20transferAddress = transferTokenTx.transactionHash

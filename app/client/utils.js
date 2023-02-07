@@ -43,6 +43,7 @@ export function handleError(e, step) {
         .text(`${e.message || e}`)
         .show();
     $("#close").show();
+
     switch (step) {
         case 1:
             $("#ethDeploymentStep").removeClass("is-active is-failed");
@@ -72,6 +73,15 @@ export function handleError(e, step) {
         default:
             break;
     }
+
+    // TODO @samuelmanzanera: Update with date contract
+    var endDate = new Date("February 7, 2023 15:00:00");
+    updateClock(endDate);
+    var timeinterval = setInterval(function () {
+        updateClock(endDate);
+    }, 1000);
+    $("#txSummary2Timer").show();
+
 }
 
 export function getTimeRemaining(endtime) {
@@ -92,10 +102,10 @@ export function updateClock(endtime) {
         var t = getTimeRemaining(endtime);
         if (t.total <= 0) {
             clearInterval(timeinterval);
-            $("#txSummary2Timer").html(`<img src="assets/images/icons/timer.png" height="20" alt="" style="padding-right: 5px; padding-bottom: 5px;" />Time Remaining until HTLC Lock Release: Lock is finished and the content in the HTLC is now available.`);
+            $("#txSummary2Timer").html(`<img src="assets/images/icons/timer.png" height="20" alt="" style="padding-right: 5px; padding-bottom: 5px;" />As the transfer is not effective, you can retrieve your funds by clicking on the following button (fees not included).<img src="assets/images/refund_btn.svg" height="20" alt="Refund" style="padding-left: 5px; padding-right: 5px; padding-bottom: 5px; cursor: pointer;" onclick="" /><img src="assets/images/icons/help.png" height="20" alt="" style="padding-left: 5px; padding-bottom: 5px; cursor: pointer;" onclick="window.open('https://archethic-foundation.github.io/archethic-docs/FAQ/bridge');" />`);
         }
         else {
-            $("#txSummary2Timer").html(`<img src="assets/images/icons/timer.png" height="20" alt="" style="padding-right: 5px; padding-bottom: 5px;" />Time Remaining until HTLC Lock Release: ` + ('0' + t.hours).slice(-2) + ':' + ('0' + t.minutes).slice(-2) + ':' + ('0' + t.seconds).slice(-2));
+            $("#txSummary2Timer").html(`<img src="assets/images/icons/timer.png" height="20" alt="" style="padding-right: 5px; padding-bottom: 5px;" />As the transfer is not effective, you can retrieve your funds in ` + ('0' + t.hours).slice(-2) + 'h' + ('0' + t.minutes).slice(-2) + 'm' + ('0' + t.seconds).slice(-2) + `.<img src="assets/images/icons/help.png" height="20" alt="" style="padding-left: 5px; padding-bottom: 5px; cursor: pointer;" onclick="window.open('https://archethic-foundation.github.io/archethic-docs/FAQ/bridge');" />`);
         }
     }, 1000);
 }
