@@ -32,7 +32,6 @@ export async function deployHTLC(
   );
 
   const tx = await contract.deployTransaction.wait();
-  console.log(tx);
   console.log("HTLC contract deployed at " + contract.address);
 
   return { contract: contract, transaction: tx }
@@ -247,4 +246,10 @@ export async function getHTLCLockTime(HTLC_Contract) {
   const lockTime = await HTLC_Contract.lockTime()
   const timestampInSec = startTime.toNumber() + lockTime.toNumber()
   return new Date(timestampInSec * 1000)
-} 
+}
+
+export async function refundERC(HTLC_Contract, signer) {
+  const HTLC_ContractSigner = await HTLC_Contract.connect(signer)
+  const tx = await HTLC_ContractSigner.refund()
+  return await tx.wait()
+}

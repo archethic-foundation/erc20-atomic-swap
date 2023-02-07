@@ -174,7 +174,7 @@ async function startApp() {
         await goto(localStorage.getItem("transferStep"), state);
       }
       catch (e) {
-        handleError(e, step, state);
+        handleError(e, step, JSON.parse(pendingTransferJSON));
       }
       return
     }
@@ -276,7 +276,7 @@ async function handleFormSubmit(
       amount,
       secretDigest,
       signer,
-      7200 // 2 hours of locktime
+      10, //7200 // 2 hours of locktime
     );
     localStorage.setItem("pendingTransfer", JSON.stringify({
       HTLC_Address: HTLC_Contract.address,
@@ -305,7 +305,8 @@ async function handleFormSubmit(
       signer: signer,
       sourceChainExplorer: sourceChainExplorer,
       toChainExplorer: toChainExplorer,
-      HTLC_transaction: HTLC_tx
+      HTLC_transaction: HTLC_tx,
+      sourceChainName: fromChainName
     }
     await goto("deployedEthContract", state)
 
@@ -384,7 +385,8 @@ async function initState(pendingTransferJSON, ethChainId, unirisContract, source
     archethicContractAddress: pendingTransfer.archethicContractAddress,
     withdrawEthereumAddress: pendingTransfer.withdrawEthereumAddress,
     sourceChainExplorer: sourceChainExplorer,
-    toChainExplorer: toChainExplorer
+    toChainExplorer: toChainExplorer,
+    sourceChainName: fromChainName
   }
 
   $("#recipientAddress").val(pendingTransfer.recipientArchethic);

@@ -1,4 +1,4 @@
-import { getHTLCLockTime } from "./contract"
+import { getHTLCLockTime, refundERC, getHTLC_Contract } from "./contract"
 
 export async function handleResponse(response) {
   return new Promise(function(resolve, reject) {
@@ -74,9 +74,15 @@ export async function handleError(e, step, state) {
       break;
   }
 
-  if (state && state.HTLC_Contract) {
-    const endDate = await getHTLCLockTime(state.HTLC_Contract)
-    updateClock(endDate);
+  console.log(step)
+  console.log(state)
+  if (step > 2 && state && state.erc20transferAddress) {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner();
+
+    const HTLC_Contract = await getHTLC_Contract(state.HTLC_Address, provider)
+    const endDate = await getHTLCLockTime(HTLC_Contract)
+    updateClock(endDate, HTLC_Contract, signer, state);
     $("#txSummary2Timer").show();
   }
 }
@@ -94,15 +100,43 @@ export function getTimeRemaining(endtime) {
   };
 }
 
-export function updateClock(endtime) {
+export function updateClock(endtime, HTLC_Contract, signer, state) {
   let timeinterval = setInterval(function() {
     var t = getTimeRemaining(endtime);
     if (t.total <= 0) {
       clearInterval(timeinterval);
-      $("#txSummary2Timer").html(`<img src="assets/images/icons/timer.png" height="20" alt="" style="padding-right: 5px; padding-bottom: 5px;" />As the transfer is not effective, you can retrieve your funds by clicking on the following button (fees not included).<img src="assets/images/refund_btn.svg" height="20" alt="Refund" style="padding-left: 5px; padding-right: 5px; padding-bottom: 5px; cursor: pointer;" onclick="" /><img src="assets/images/icons/help.png" height="20" alt="" style="padding-left: 5px; padding-bottom: 5px; cursor: pointer;" onclick="window.open('https://archethic-foundation.github.io/archethic-docs/FAQ/bridge');" />`);
+      $("#txSummary2Timer").html(`
+        <img src="assets/images/icons/timer.png" height="20" alt="" style="padding-right: 5px; padding-bottom: 5px;" />
+        As the transfer is not effective, you can retrieve your funds by clicking on the following button (fees not included).
+        <img src="assets/images/refund_btn.svg" id="refundButton" height="20" alt="Refund" style="padding-left: 5px; padding-right: 5px; padding-bottom: 5px; cursor: pointer;" onclick="" />
+        <img src="assets/images/icons/help.png" height="20" alt="" style="padding-left: 5px; padding-bottom: 5px; cursor: pointer;" onclick="window.open('https://archethic-foundation.github.io/archethic-docs/FAQ/bridge');" />
+      `);
+
+      $("#refundButton").on("click", async () => {
+        refundERC(HTLC_Contract, signer, state)
+          .then(tx => {
+
+            $("#txSummary7Label").text(`${state.sourceChainName} refund: <a href="${state.sourceChainExplorer}/tx/${tx.transactionHash}" target="_blank">${tx.tx.transactionHash}</a>`);
+            $("#txSummary7").show();
+
+            localStorage.removeItem("transferStep")
+            localStorage.removeItem("pendingTransfer")
+          })
+          .catch(err => {
+            if (err.data && err.data.message) {
+              $("#error").text(err.data.message)
+            } else {
+              $("#error").text(err)
+            }
+          })
+      })
     }
     else {
-      $("#txSummary2Timer").html(`<img src="assets/images/icons/timer.png" height="20" alt="" style="padding-right: 5px; padding-bottom: 5px;" />As the transfer is not effective, you can retrieve your funds in ` + ('0' + t.hours).slice(-2) + 'h' + ('0' + t.minutes).slice(-2) + 'm' + ('0' + t.seconds).slice(-2) + `.<img src="assets/images/icons/help.png" height="20" alt="" style="padding-left: 5px; padding-bottom: 5px; cursor: pointer;" onclick="window.open('https://archethic-foundation.github.io/archethic-docs/FAQ/bridge');" />`);
+      $("#txSummary2Timer").html(`
+        <img src="assets/images/icons/timer.png" height="20" alt="" style="padding-right: 5px; padding-bottom: 5px;" />
+        As the transfer is not effective, you can retrieve your funds in ${('0' + t.hours).slice(-2) + 'h' + ('0' + t.minutes).slice(-2) + 'm' + ('0' + t.seconds).slice(-2)}.
+        <img src="assets/images/icons/help.png" height="20" alt="" style="padding-left: 5px; padding-bottom: 5px; cursor: pointer;" onclick="window.open('https://archethic-foundation.github.io/archethic-docs/FAQ/bridge')" />;
+      `);
     }
   }, 1000);
 }
