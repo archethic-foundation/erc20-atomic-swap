@@ -4,7 +4,7 @@
 
  contract HTLC {
    uint public startTime;
-   uint public lockTime = 10000 seconds;
+   uint public lockTime;
    bytes32 public secret;
    bytes32 public hash;
    address public recipient;

@@ -7,7 +7,7 @@ import { getArchethicBalance, getConfig } from "./service.js";
 let provider;
 let interval;
 
-window.onload = async function () {
+window.onload = async function() {
   try {
     if (typeof window.ethereum !== "undefined") {
       console.log("MetaMask is installed!");
@@ -174,7 +174,7 @@ async function startApp() {
         await goto(localStorage.getItem("transferStep"), state);
       }
       catch (e) {
-        handleError(e, step);
+        handleError(e, step, state);
       }
       return
     }
@@ -186,7 +186,6 @@ async function startApp() {
       recipientEthereum,
       recipientAddress,
       ethChainId,
-      UCOPrice,
       sourceChainExplorer,
       bridgeAddress,
       fromChainName,
@@ -220,7 +219,6 @@ async function handleFormSubmit(
   recipientEthereum,
   recipientArchethic,
   ethChainId,
-  UCOPrice,
   sourceChainExplorer,
   bridgeAddress,
   fromChainName,
@@ -292,8 +290,6 @@ async function handleFormSubmit(
 
     $("#ethDeploymentStep").removeClass("is-active");
 
-    const HTLCAddress = HTLC_Contract.address
-
     $("#txSummary1Label").html(`Contract address on ${fromChainName}: <a href="${sourceChainExplorer}/address/${HTLC_Contract.address}" target="_blank">${HTLC_Contract.address}</a>`)
     $("#txSummary1").show();
 
@@ -314,7 +310,9 @@ async function handleFormSubmit(
     await goto("deployedEthContract", state)
 
   } catch (e) {
-    handleError(e, step)
+    let pendingTransferJSON = localStorage.getItem("pendingTransfer");
+    let state = JSON.parse(pendingTransferJSON)
+    handleError(e, step, state)
   }
 }
 
