@@ -157,7 +157,7 @@ async function startApp() {
   let pendingTransferJSON = localStorage.getItem("pendingTransfer");
   let state
   if (pendingTransferJSON) {
-    state = await initState(pendingTransferJSON, ethChainId, unirisContract, sourceChainExplorer, toChainExplorer, recipientEthereum, signer, fromChainName)
+    state = await initState(pendingTransferJSON, ethChainId, unirisContract, toChainExplorer, recipientEthereum, signer)
   }
 
   $("#swapForm").on("submit", async (e) => {
@@ -276,7 +276,7 @@ async function handleFormSubmit(
       amount,
       secretDigest,
       signer,
-      10, //7200 // 2 hours of locktime
+      7200 // 2 hours of locktime
     );
     localStorage.setItem("pendingTransfer", JSON.stringify({
       HTLC_Address: HTLC_Contract.address,
@@ -284,7 +284,9 @@ async function handleFormSubmit(
       secretDigestHex: secretDigestHex,
       amount: amount,
       recipientArchethic: recipientArchethic,
-      HTLC_transaction: HTLC_tx
+      HTLC_transaction: HTLC_tx,
+      sourceChainName: fromChainName,
+      sourceChainExplorer: sourceChainExplorer
     }))
     localStorage.setItem("transferStep", "deployedEthContract")
 
@@ -362,7 +364,7 @@ async function goto(step, state) {
   }
 }
 
-async function initState(pendingTransferJSON, ethChainId, unirisContract, sourceChainExplorer, toChainExplorer, recipientEthereum, signer, fromChainName) {
+async function initState(pendingTransferJSON, ethChainId, unirisContract, toChainExplorer, recipientEthereum, signer) {
   //initProgressBar();
 
   $("#btnSwapSpinnerText").text("Loading previous transfer");
@@ -384,9 +386,9 @@ async function initState(pendingTransferJSON, ethChainId, unirisContract, source
     erc20transferAddress: pendingTransfer.erc20transferAddress,
     archethicContractAddress: pendingTransfer.archethicContractAddress,
     withdrawEthereumAddress: pendingTransfer.withdrawEthereumAddress,
-    sourceChainExplorer: sourceChainExplorer,
+    sourceChainExplorer: pendingTransfer.sourceChainExplorer,
     toChainExplorer: toChainExplorer,
-    sourceChainName: fromChainName
+    sourceChainName: pendingTransfer.sourceChainName
   }
 
   $("#recipientAddress").val(pendingTransfer.recipientArchethic);

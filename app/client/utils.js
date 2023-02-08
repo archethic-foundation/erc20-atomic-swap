@@ -74,9 +74,8 @@ export async function handleError(e, step, state) {
       break;
   }
 
-  console.log(step)
   console.log(state)
-  if (step > 2 && state && state.erc20transferAddress) {
+  if (state && state.erc20transferAddress) {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = provider.getSigner();
 
@@ -116,11 +115,11 @@ export function updateClock(endtime, HTLC_Contract, signer, state) {
         refundERC(HTLC_Contract, signer, state)
           .then(tx => {
 
-            $("#txSummary7Label").text(`${state.sourceChainName} refund: <a href="${state.sourceChainExplorer}/tx/${tx.transactionHash}" target="_blank">${tx.tx.transactionHash}</a>`);
-            $("#txSummary7").show();
-
             localStorage.removeItem("transferStep")
             localStorage.removeItem("pendingTransfer")
+
+            $("#txRefundTransactionLabel").html(`${state.sourceChainName} refund: <a href="${state.sourceChainExplorer}/tx/${tx.transactionHash}" target="_blank">${tx.transactionHash}</a>`);
+            $("#txRefundTransaction").show();
           })
           .catch(err => {
             if (err.data && err.data.message) {
