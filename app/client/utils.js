@@ -1,7 +1,7 @@
 import { getHTLCLockTime, refundERC, getHTLC_Contract } from "./contract"
 
 export async function handleResponse(response) {
-  return new Promise(function(resolve, reject) {
+  return new Promise(function (resolve, reject) {
     if (response.status >= 200 && response.status <= 299) {
       response.json().then(resolve);
     } else {
@@ -100,7 +100,7 @@ export function getTimeRemaining(endtime) {
 }
 
 export function updateClock(endtime, HTLC_Contract, signer, state) {
-  let timeinterval = setInterval(function() {
+  let timeinterval = setInterval(function () {
     var t = getTimeRemaining(endtime);
     if (t.total <= 0) {
       clearInterval(timeinterval);
@@ -134,7 +134,7 @@ export function updateClock(endtime, HTLC_Contract, signer, state) {
       $("#txSummary2Timer").html(`
         <img src="assets/images/icons/timer.png" height="20" alt="" style="padding-right: 5px; padding-bottom: 5px;" />
         As the transfer is not effective, you can retrieve your funds in ${('0' + t.hours).slice(-2) + 'h' + ('0' + t.minutes).slice(-2) + 'm' + ('0' + t.seconds).slice(-2)}.
-        <img src="assets/images/icons/help.png" height="20" alt="" style="padding-left: 5px; padding-bottom: 5px; cursor: pointer;" onclick="window.open('https://archethic-foundation.github.io/archethic-docs/FAQ/bridge')" />;
+        <img src="assets/images/icons/help.png" height="20" alt="" style="padding-left: 5px; padding-bottom: 5px; cursor: pointer;" onclick="window.open('https://archethic-foundation.github.io/archethic-docs/FAQ/bridge')" />
       `);
     }
   }, 1000);
