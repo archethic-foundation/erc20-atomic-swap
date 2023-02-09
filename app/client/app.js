@@ -404,9 +404,8 @@ async function initState(pendingTransferJSON, ethChainId, unirisContract, toChai
   $("#toBalanceUSD").text(new Intl.NumberFormat().format((ucoPrice * ucoAmount).toFixed(5)));
   $("#swapBalanceUSD").text((pendingTransfer.amount * ucoPrice).toFixed(5));
 
-
   $("#ethDeploymentStep").removeClass("is-active is-failed");
-  $("#txSummary1Label").html(`Contract address on ${fromChainName}: <a href="${sourceChainExplorer}/address/${pendingTransfer.HTLC_Address}" target="_blank">${pendingTransfer.HTLC_Address}</a>`)
+  $("#txSummary1Label").html(`Contract address on ${pendingTransfer.sourceChainName}: <a href="${pendingTransfer.sourceChainExplorer}/address/${pendingTransfer.HTLC_Address}" target="_blank">${pendingTransfer.HTLC_Address}</a>`)
   $("#txSummary1").show();
   $("#ethTransferStep").addClass("is-active");
 
@@ -414,7 +413,7 @@ async function initState(pendingTransferJSON, ethChainId, unirisContract, toChai
 
   if (pendingTransfer.erc20transferAddress) {
     step = 3
-    $("#txSummary2Label").html(`Provision UCOs: <a href="${sourceChainExplorer}/tx/${pendingTransfer.erc20transferAddress}" target="_blank">${pendingTransfer.erc20transferAddress}</a>`)
+    $("#txSummary2Label").html(`Provision UCOs: <a href="${pendingTransfer.sourceChainExplorer}/tx/${pendingTransfer.erc20transferAddress}" target="_blank">${pendingTransfer.erc20transferAddress}</a>`)
     $("#txSummary2").show();
   }
 
@@ -425,7 +424,7 @@ async function initState(pendingTransferJSON, ethChainId, unirisContract, toChai
   }
 
   if (pendingTransfer.withdrawEthereumAddress) {
-    $("#txSummary4Label").html(`${fromChainName} swap: <a href="${sourceChainExplorer}/tx/${pendingTransfer.withdrawEthereumAddress}" target="_blank">${pendingTransfer.withdrawEthereumAddress}</a>`)
+    $("#txSummary4Label").html(`${fromChainName} swap: <a href="${pendingTransfer.sourceChainExplorer}/tx/${pendingTransfer.withdrawEthereumAddress}" target="_blank">${pendingTransfer.withdrawEthereumAddress}</a>`)
     $("#txSummary4").show();
   }
 

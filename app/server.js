@@ -11,8 +11,8 @@ import { bridgeAddress } from "./server/utils.js";
 const app = express();
 
 const ddos = new DDos({
-    burst: 3, // Accept only 3 req per sec, after than the expiry time will increase
-    limit: 3 // After 3 attempt, send response with 429 error code(Too Many Requests)
+  burst: 3, // Accept only 3 req per sec, after than the expiry time will increase
+  limit: 3 // After 3 attempt, send response with 429 error code(Too Many Requests)
 })
 
 const __filename = fileURLToPath(import.meta.url);
