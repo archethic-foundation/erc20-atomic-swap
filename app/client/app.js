@@ -204,13 +204,17 @@ async function setupEthAccount(account, unirisContract, sourceChainExplorer, uco
 
   const maxSwap = (20 / ucoPrice).toFixed(5);
 
+  const erc20Amount = await setERC20Amount(account, unirisContract)
+  $("#maxUCOValue").attr("value", Math.min(erc20Amount, maxSwap).toFixed(5));
+  return erc20Amount;
+}
+
+async function setERC20Amount(account, unirisContract) {
   const balance = await unirisContract.balanceOf(account);
   const erc20Amount = ethers.utils.formatUnits(balance, 18);
   $("#fromBalanceUCO").text(new Intl.NumberFormat().format(parseFloat(erc20Amount).toFixed(8)));
-  $("#maxUCOValue").attr("value", Math.min(erc20Amount, maxSwap).toFixed(5));
   $("#fromBalanceUSD").text(new Intl.NumberFormat().format((erc20Amount * ucoPrice).toFixed(5)));
-
-  return erc20Amount;
+  return erc20Amount
 }
 
 async function handleFormSubmit(
@@ -324,6 +328,7 @@ async function goto(step, state) {
     case "deployedEthContract":
       step = 2
       state = await transferERC20(state)
+      setERC20Amount(await state.signer.getAddress(), state.unirisContract)
       return await goto("transferedERC20", state)
     case "transferedERC20":
       step = 3
@@ -350,6 +355,8 @@ async function goto(step, state) {
       localStorage.removeItem("pendingTransfer")
       $("#recipientAddress").prop('disabled', false)
       $("#nbTokensToSwap").prop('disabled', false)
+
+      setERC20Amount(await state.signer.getAddress(), state.unirisContract)
 
       setTimeout(async () => {
         const archethicBalance = await getArchethicBalance(state.recipientArchethic);

@@ -2,7 +2,7 @@ import { getHTLCLockTime, refundERC, getHTLC_Contract } from "./contract"
 import { getArchethicBalance } from "./service.js";
 
 export async function handleResponse(response) {
-  return new Promise(function (resolve, reject) {
+  return new Promise(function(resolve, reject) {
     if (response.status >= 200 && response.status <= 299) {
       response.json().then(resolve);
     } else {
@@ -101,7 +101,7 @@ export function getTimeRemaining(endtime) {
 }
 
 export function updateClock(endtime, HTLC_Contract, signer, state) {
-  let timeinterval = setInterval(function () {
+  let timeinterval = setInterval(function() {
     var t = getTimeRemaining(endtime);
     if (t.total <= 0) {
       clearInterval(timeinterval);
@@ -121,11 +121,11 @@ export function updateClock(endtime, HTLC_Contract, signer, state) {
         $("#refundButton").hide();
         $("#refundButtonSpinner").show();
 
-        setTimeout(function () {
+        setTimeout(function() {
 
         }, 2000);
         refundERC(HTLC_Contract, signer, state)
-          .then(tx => {
+          .then(async tx => {
 
             localStorage.removeItem("transferStep")
             localStorage.removeItem("pendingTransfer")
@@ -136,6 +136,16 @@ export function updateClock(endtime, HTLC_Contract, signer, state) {
             $("#txSummaryRefundFinished").show();
             $("#txSummary2Timer").hide();
             $("#refundButtonSpinner").hide();
+
+            // Update ERC20 amount
+            const { UCOPrice } = await getConfig(ethChainId)
+
+            const account = await state.signer.getAddress()
+            const balance = await state.unirisContract.balanceOf(account);
+            const erc20Amount = ethers.utils.formatUnits(balance, 18);
+
+            $("#fromBalanceUCO").text(new Intl.NumberFormat().format(parseFloat(erc20Amount).toFixed(8)));
+            $("#fromBalanceUSD").text(new Intl.NumberFormat().format((erc20Amount * UCOPrice).toFixed(5)));
           })
           .catch(err => {
             $("#refundButton").show();
