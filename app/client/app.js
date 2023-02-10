@@ -7,7 +7,7 @@ import { getArchethicBalance, getConfig } from "./service.js";
 let provider;
 let interval;
 
-window.onload = async function() {
+window.onload = async function () {
   try {
     if (typeof window.ethereum !== "undefined") {
       console.log("MetaMask is installed!");
@@ -174,7 +174,7 @@ async function startApp() {
         await goto(localStorage.getItem("transferStep"), state);
       }
       catch (e) {
-        handleError(e, step, JSON.parse(pendingTransferJSON));
+        handleError(e, step, JSON.parse(pendingTransferJSON, ethChainId));
       }
       return
     }
@@ -204,12 +204,12 @@ async function setupEthAccount(account, unirisContract, sourceChainExplorer, uco
 
   const maxSwap = (20 / ucoPrice).toFixed(5);
 
-  const erc20Amount = await setERC20Amount(account, unirisContract)
+  const erc20Amount = await setERC20Amount(account, unirisContract, ucoPrice)
   $("#maxUCOValue").attr("value", Math.min(erc20Amount, maxSwap).toFixed(5));
   return erc20Amount;
 }
 
-async function setERC20Amount(account, unirisContract) {
+async function setERC20Amount(account, unirisContract, ucoPrice) {
   const balance = await unirisContract.balanceOf(account);
   const erc20Amount = ethers.utils.formatUnits(balance, 18);
   $("#fromBalanceUCO").text(new Intl.NumberFormat().format(parseFloat(erc20Amount).toFixed(8)));
@@ -280,7 +280,8 @@ async function handleFormSubmit(
       amount,
       secretDigest,
       signer,
-      7200 // 2 hours of locktime
+      70
+      //7200 // 2 hours of locktime
     );
     localStorage.setItem("pendingTransfer", JSON.stringify({
       HTLC_Address: HTLC_Contract.address,
@@ -319,7 +320,7 @@ async function handleFormSubmit(
   } catch (e) {
     let pendingTransferJSON = localStorage.getItem("pendingTransfer");
     let state = JSON.parse(pendingTransferJSON)
-    handleError(e, step, state)
+    handleError(e, step, state, ethChainId)
   }
 }
 

@@ -1,5 +1,5 @@
 import { getHTLCLockTime, refundERC, getHTLC_Contract } from "./contract"
-import { getArchethicBalance } from "./service.js";
+import { getConfig } from "./service.js";
 
 export async function handleResponse(response) {
   return new Promise(function (resolve, reject) {
@@ -32,7 +32,7 @@ export function uint8ArrayToHex(bytes) {
 }
 
 
-export async function handleError(e, step, state) {
+export async function handleError(e, step, state, ethChainId) {
   $('#btnSwap').prop('disabled', false);
   $('#nbTokensToSwap').prop('disabled', false);
   $('#recipientAddress').prop('disabled', false);
@@ -82,7 +82,7 @@ export async function handleError(e, step, state) {
 
     const HTLC_Contract = await getHTLC_Contract(state.HTLC_Address, provider)
     const endDate = await getHTLCLockTime(HTLC_Contract)
-    updateClock(endDate, HTLC_Contract, signer, state);
+    updateClock(endDate, HTLC_Contract, signer, state, ethChainId);
     $("#txSummary2Timer").show();
   }
 }
@@ -100,7 +100,7 @@ export function getTimeRemaining(endtime) {
   };
 }
 
-export function updateClock(endtime, HTLC_Contract, signer, state) {
+export function updateClock(endtime, HTLC_Contract, signer, state, ethChainId) {
   let timeinterval = setInterval(function () {
     var t = getTimeRemaining(endtime);
     if (t.total <= 0) {
@@ -118,6 +118,7 @@ export function updateClock(endtime, HTLC_Contract, signer, state) {
 
       $("#refundButton").on("click", async () => {
 
+        $("#error").text("").show();
         $("#refundButton").hide();
         $("#refundButtonSpinner").show();
 
