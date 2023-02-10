@@ -1,4 +1,5 @@
 import { getHTLCLockTime, refundERC, getHTLC_Contract } from "./contract"
+import { getArchethicBalance } from "./service.js";
 
 export async function handleResponse(response) {
   return new Promise(function (resolve, reject) {
@@ -107,26 +108,41 @@ export function updateClock(endtime, HTLC_Contract, signer, state) {
       $("#txSummary2Timer").html(`
         <img src="assets/images/icons/timer.png" height="20" alt="" style="padding-right: 5px; padding-bottom: 5px;" />
         As the transfer is not effective, you can retrieve your funds by clicking on the following button (fees not included).
-        <img src="assets/images/refund_btn.svg" id="refundButton" height="20" alt="Refund" style="padding-left: 5px; padding-right: 5px; padding-bottom: 5px; cursor: pointer;" onclick="" />
-        <img src="assets/images/icons/help.png" height="20" alt="" style="padding-left: 5px; padding-bottom: 5px; cursor: pointer;" onclick="window.open('https://archethic-foundation.github.io/archethic-docs/FAQ/bridge');" />
+        <button id="refundButton">REFUND</button>
+        <button id="refundButtonSpinner" disabled style="display: none;">
+						<span>REFUND</span>
+						<span class="spinner-border spinner-border-sm" style="width: 8px; height: 8px; padding-bottom: 5px;" role="status" aria-hidden="true"></span>
+				</button>
+        <img src="assets/images/icons/help.png" height="20" alt="" style="padding-top: 3px; padding-left: 5px; padding-bottom: 5px; cursor: pointer;" onclick="window.open('https://archethic-foundation.github.io/archethic-docs/FAQ/bridge');" />
       `);
 
       $("#refundButton").on("click", async () => {
+
+        $("#refundButton").hide();
+        $("#refundButtonSpinner").show();
+
+        setTimeout(function () {
+
+        }, 2000);
         refundERC(HTLC_Contract, signer, state)
           .then(tx => {
 
             localStorage.removeItem("transferStep")
             localStorage.removeItem("pendingTransfer")
 
+            $("#error").text("").show();
             $("#txRefundTransactionLabel").html(`${state.sourceChainName} refund: <a href="${state.sourceChainExplorer}/tx/${tx.transactionHash}" target="_blank">${tx.transactionHash}</a>`);
             $("#txRefundTransaction").show();
+            $("#txSummaryRefundFinished").show();
+            $("#txSummary2Timer").hide();
+            $("#refundButtonSpinner").hide();
           })
           .catch(err => {
-            if (err.data && err.data.message) {
-              $("#error").text(err.data.message)
-            } else {
-              $("#error").text(err)
-            }
+            $("#refundButton").show();
+            $("#refundButtonSpinner").hide();
+            $("#error")
+              .text(`${err.message || e}`)
+              .show();
           })
       })
     }

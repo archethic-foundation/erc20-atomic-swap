@@ -68,6 +68,9 @@ function initTxSummary() {
   $("#txSummary7Label").text("");
   $("#txSummary7").hide();
   $("#txSummaryFinished").hide();
+  $("#txSummaryRefundFinished").hide();
+  $("#txRefundTransactionLabel").text("");
+  $("#txRefundTransaction").hide();
 }
 
 function initProgressBar() {
