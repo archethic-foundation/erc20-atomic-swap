@@ -280,7 +280,7 @@ async function handleFormSubmit(
       amount,
       secretDigest,
       signer,
-      70 // 2 hours of locktime
+      7200 // 2 hours of locktime
     );
     localStorage.setItem("pendingTransfer", JSON.stringify({
       HTLC_Address: HTLC_Contract.address,
