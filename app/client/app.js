@@ -280,7 +280,7 @@ async function handleFormSubmit(
       amount,
       secretDigest,
       signer,
-      7200 // 2 hours of locktime
+      70 // 2 hours of locktime
     );
     localStorage.setItem("pendingTransfer", JSON.stringify({
       HTLC_Address: HTLC_Contract.address,
@@ -328,7 +328,7 @@ async function goto(step, state) {
     case "deployedEthContract":
       step = 2
       state = await transferERC20(state)
-      setERC20Amount(await state.signer.getAddress(), state.unirisContract)
+      setERC20Amount(await state.signer.getAddress(), state.unirisContract, ucoPrice)
       return await goto("transferedERC20", state)
     case "transferedERC20":
       step = 3
@@ -356,7 +356,7 @@ async function goto(step, state) {
       $("#recipientAddress").prop('disabled', false)
       $("#nbTokensToSwap").prop('disabled', false)
 
-      setERC20Amount(await state.signer.getAddress(), state.unirisContract)
+      setERC20Amount(await state.signer.getAddress(), state.unirisContract, ucoPrice)
 
       setTimeout(async () => {
         const archethicBalance = await getArchethicBalance(state.recipientArchethic);
