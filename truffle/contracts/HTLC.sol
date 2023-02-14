@@ -11,6 +11,7 @@
    address public owner;
    uint256 public amount;
    IERC20 public token;
+   bool public finished;
 
    constructor(address _recipient, address _token, uint256 _amount, bytes32 _hash, uint _lockTime) public {
      recipient = _recipient;
@@ -20,18 +21,22 @@
      hash = _hash;
      startTime = block.timestamp;
      lockTime = _lockTime;
+     finished = false;
    }
 
    function withdraw(bytes32 _secret) public {
-     require(block.timestamp < startTime + lockTime, 'too late');
+     require(finished == false, 'Swap already done');
      require(sha256(abi.encodePacked(_secret)) == hash, 'wrong secret');
      require(token.balanceOf(address(this)) > 0, 'not enough funds');
      secret = _secret;
      token.transfer(recipient, amount);
+     finished = true;
    }
 
    function refund() public {
+     require(finished == false, 'Swap already done');
      require(block.timestamp > startTime + lockTime, 'too early');
      token.transfer(owner, amount);
+     finished = true;
    }
  }
