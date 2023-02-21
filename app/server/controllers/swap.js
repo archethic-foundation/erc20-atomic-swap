@@ -37,7 +37,7 @@ async function deployContract(req, res, next) {
     const maxSwap = (maxDollar / ucoPrice) * 1e8
     if (req.body.amount > maxSwap) {
       const deviationInUCO = getStandardDeviation([req.body.amount, maxSwap])
-      if (((deviationInUCO / 1e8)* ucoPrice) > 0.1) {
+      if (((deviationInUCO / 1e8) * ucoPrice) > 0.1) {
         return res.status(400).json({ message: `You cannot swap more than $${maxDollar}` })
       }
     }
@@ -88,11 +88,11 @@ async function withdraw(req, res, next) {
 
     const ethContractInstance = getEthereumContract(req.body.ethereumContractAddress, provider)
     if (ethContractInstance === undefined) {
-      throw "Invalid ethereum contract's address"
+      throw "Invalid contract's address"
     }
 
-    if (!checkEthereumWithdraw(req.body.ethereumWithdrawTransaction, req.body.ethereumContractAddress, req.body.secret, provider)) {
-      throw "Invalid Ethereum withdraw transaction"
+    if (await checkEthereumWithdraw(req.body.ethereumWithdrawTransaction, req.body.ethereumContractAddress, req.body.secret, provider) == false) {
+      throw "Invalid withdraw transaction"
     }
 
     const archethic = await archethicConnection()
@@ -121,7 +121,7 @@ async function withdraw(req, res, next) {
   }
   catch (error) {
     console.log(error)
-    next(error.message)
+    next(error)
   }
 }
 
@@ -148,6 +148,9 @@ function checkEthereumContract(ethereumContractAddress, amount, hash, recipientE
 
 async function checkEthereumWithdraw(ethereumWithdrawTransaction, contractAddress, secret, provider) {
   const tx = await provider.getTransaction(ethereumWithdrawTransaction)
+  if (!tx) {
+    return false;
+  }
   const receipt = await provider.getTransactionReceipt(ethereumWithdrawTransaction)
 
   const iface = new ethers.utils.Interface(['function withdraw(bytes32 _secret)'])
@@ -250,11 +253,11 @@ async function createRevealSecretTransaction(archethic, contractAddress, secret)
 }
 
 async function getLastAddressContract(archethic, contractAddress) {
-    const transferTxAddress = await getLastTransaction(archethic, contractAddress)
-    if (transferTxAddress.toUpperCase() == contractAddress.toUpperCase()) {
-      await new Promise(r => setTimeout(r, 1000));
-      return await getLastAddressContract(archethic, contractAddress)
-    }
+  const transferTxAddress = await getLastTransaction(archethic, contractAddress)
+  if (transferTxAddress.toUpperCase() == contractAddress.toUpperCase()) {
+    await new Promise(r => setTimeout(r, 1000));
+    return await getLastAddressContract(archethic, contractAddress)
+  }
 
-    return transferTxAddress
+  return transferTxAddress
 }
