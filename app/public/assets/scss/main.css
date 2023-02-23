@@ -430,6 +430,32 @@ body {
   padding: 7px 10px 10px 10px;
 }
 
+#refundButton {
+  background: white;
+  border-radius: 13px;
+  font-weight: 700;
+  height: 16px;
+  font-size: 10px;
+  letter-spacing: 2.2px;
+  color: black;
+  width: 100px;
+  text-align: center;
+  padding: 0px 0px 3px 0px;
+}
+
+#refundButtonSpinner {
+  background: white;
+  border-radius: 13px;
+  font-weight: 700;
+  height: 16px;
+  font-size: 10px;
+  letter-spacing: 2.2px;
+  color: black;
+  width: 100px;
+  text-align: center;
+  padding: 0px 0px 3px 0px;
+}
+
 @media (max-width: 767px) {
   .main .left-bar {
     margin: 0 0 30px;
@@ -630,6 +656,10 @@ body {
 }
 
 #txSummaryFinished {
+  color: yellowgreen;
+}
+
+#txSummaryRefundFinished {
   color: yellowgreen;
 }
 

@@ -4,6 +4,7 @@
     "description": "",
     "main": "truffle-config.js",
     "scripts": {
+        "build": "node_modules/.bin/truffle build",
         "test": "truffle test --network development"
     },
     "keywords": [],
@@ -11,6 +12,7 @@
     "license": "ISC",
     "dependencies": {
         "@truffle/hdwallet-provider": "^2.1.1",
-        "openzeppelin-solidity": "2.2.0"
+        "openzeppelin-solidity": "2.2.0",
+        "truffle": "^5.7.6"
     }
 }

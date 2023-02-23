@@ -7,7 +7,7 @@ import { getArchethicBalance, getConfig } from "./service.js";
 let provider;
 let interval;
 
-window.onload = async function() {
+window.onload = async function () {
   try {
     if (typeof window.ethereum !== "undefined") {
       console.log("MetaMask is installed!");
@@ -157,7 +157,7 @@ async function startApp() {
   let pendingTransferJSON = localStorage.getItem("pendingTransfer");
   let state
   if (pendingTransferJSON) {
-    state = await initState(pendingTransferJSON, ethChainId, unirisContract, sourceChainExplorer, toChainExplorer, recipientEthereum, signer, fromChainName)
+    state = await initState(pendingTransferJSON, ethChainId, unirisContract, toChainExplorer, recipientEthereum, signer)
   }
 
   $("#swapForm").on("submit", async (e) => {
@@ -174,7 +174,7 @@ async function startApp() {
         await goto(localStorage.getItem("transferStep"), state);
       }
       catch (e) {
-        handleError(e, step);
+        handleError(e, step, JSON.parse(pendingTransferJSON, ethChainId));
       }
       return
     }
@@ -186,7 +186,6 @@ async function startApp() {
       recipientEthereum,
       recipientAddress,
       ethChainId,
-      UCOPrice,
       sourceChainExplorer,
       bridgeAddress,
       fromChainName,
@@ -205,13 +204,17 @@ async function setupEthAccount(account, unirisContract, sourceChainExplorer, uco
 
   const maxSwap = (20 / ucoPrice).toFixed(5);
 
+  const erc20Amount = await setERC20Amount(account, unirisContract, ucoPrice)
+  $("#maxUCOValue").attr("value", Math.min(erc20Amount, maxSwap).toFixed(5));
+  return erc20Amount;
+}
+
+async function setERC20Amount(account, unirisContract, ucoPrice) {
   const balance = await unirisContract.balanceOf(account);
   const erc20Amount = ethers.utils.formatUnits(balance, 18);
   $("#fromBalanceUCO").text(new Intl.NumberFormat().format(parseFloat(erc20Amount).toFixed(8)));
-  $("#maxUCOValue").attr("value", Math.min(erc20Amount, maxSwap).toFixed(5));
   $("#fromBalanceUSD").text(new Intl.NumberFormat().format((erc20Amount * ucoPrice).toFixed(5)));
-
-  return erc20Amount;
+  return erc20Amount
 }
 
 async function handleFormSubmit(
@@ -220,7 +223,6 @@ async function handleFormSubmit(
   recipientEthereum,
   recipientArchethic,
   ethChainId,
-  UCOPrice,
   sourceChainExplorer,
   bridgeAddress,
   fromChainName,
@@ -286,13 +288,13 @@ async function handleFormSubmit(
       secretDigestHex: secretDigestHex,
       amount: amount,
       recipientArchethic: recipientArchethic,
-      HTLC_transaction: HTLC_tx
+      HTLC_transaction: HTLC_tx,
+      sourceChainName: fromChainName,
+      sourceChainExplorer: sourceChainExplorer
     }))
     localStorage.setItem("transferStep", "deployedEthContract")
 
     $("#ethDeploymentStep").removeClass("is-active");
-
-    const HTLCAddress = HTLC_Contract.address
 
     $("#txSummary1Label").html(`Contract address on ${fromChainName}: <a href="${sourceChainExplorer}/address/${HTLC_Contract.address}" target="_blank">${HTLC_Contract.address}</a>`)
     $("#txSummary1").show();
@@ -309,12 +311,15 @@ async function handleFormSubmit(
       signer: signer,
       sourceChainExplorer: sourceChainExplorer,
       toChainExplorer: toChainExplorer,
-      HTLC_transaction: HTLC_tx
+      HTLC_transaction: HTLC_tx,
+      sourceChainName: fromChainName
     }
     await goto("deployedEthContract", state)
 
   } catch (e) {
-    handleError(e, step)
+    let pendingTransferJSON = localStorage.getItem("pendingTransfer");
+    let state = JSON.parse(pendingTransferJSON)
+    handleError(e, step, state, ethChainId)
   }
 }
 
@@ -323,6 +328,7 @@ async function goto(step, state) {
     case "deployedEthContract":
       step = 2
       state = await transferERC20(state)
+      setERC20Amount(await state.signer.getAddress(), state.unirisContract, ucoPrice)
       return await goto("transferedERC20", state)
     case "transferedERC20":
       step = 3
@@ -350,6 +356,8 @@ async function goto(step, state) {
       $("#recipientAddress").prop('disabled', false)
       $("#nbTokensToSwap").prop('disabled', false)
 
+      setERC20Amount(await state.signer.getAddress(), state.unirisContract, ucoPrice)
+
       setTimeout(async () => {
         const archethicBalance = await getArchethicBalance(state.recipientArchethic);
 
@@ -363,7 +371,7 @@ async function goto(step, state) {
   }
 }
 
-async function initState(pendingTransferJSON, ethChainId, unirisContract, sourceChainExplorer, toChainExplorer, recipientEthereum, signer, fromChainName) {
+async function initState(pendingTransferJSON, ethChainId, unirisContract, toChainExplorer, recipientEthereum, signer) {
   //initProgressBar();
 
   $("#btnSwapSpinnerText").text("Loading previous transfer");
@@ -385,8 +393,9 @@ async function initState(pendingTransferJSON, ethChainId, unirisContract, source
     erc20transferAddress: pendingTransfer.erc20transferAddress,
     archethicContractAddress: pendingTransfer.archethicContractAddress,
     withdrawEthereumAddress: pendingTransfer.withdrawEthereumAddress,
-    sourceChainExplorer: sourceChainExplorer,
-    toChainExplorer: toChainExplorer
+    sourceChainExplorer: pendingTransfer.sourceChainExplorer,
+    toChainExplorer: toChainExplorer,
+    sourceChainName: pendingTransfer.sourceChainName
   }
 
   $("#recipientAddress").val(pendingTransfer.recipientArchethic);
@@ -402,9 +411,8 @@ async function initState(pendingTransferJSON, ethChainId, unirisContract, source
   $("#toBalanceUSD").text(new Intl.NumberFormat().format((ucoPrice * ucoAmount).toFixed(5)));
   $("#swapBalanceUSD").text((pendingTransfer.amount * ucoPrice).toFixed(5));
 
-
   $("#ethDeploymentStep").removeClass("is-active is-failed");
-  $("#txSummary1Label").html(`Contract address on ${fromChainName}: <a href="${sourceChainExplorer}/address/${pendingTransfer.HTLC_Address}" target="_blank">${pendingTransfer.HTLC_Address}</a>`)
+  $("#txSummary1Label").html(`Contract address on ${pendingTransfer.sourceChainName}: <a href="${pendingTransfer.sourceChainExplorer}/address/${pendingTransfer.HTLC_Address}" target="_blank">${pendingTransfer.HTLC_Address}</a>`)
   $("#txSummary1").show();
   $("#ethTransferStep").addClass("is-active");
 
@@ -412,7 +420,7 @@ async function initState(pendingTransferJSON, ethChainId, unirisContract, source
 
   if (pendingTransfer.erc20transferAddress) {
     step = 3
-    $("#txSummary2Label").html(`Provision UCOs: <a href="${sourceChainExplorer}/tx/${pendingTransfer.erc20transferAddress}" target="_blank">${pendingTransfer.erc20transferAddress}</a>`)
+    $("#txSummary2Label").html(`Provision UCOs: <a href="${pendingTransfer.sourceChainExplorer}/tx/${pendingTransfer.erc20transferAddress}" target="_blank">${pendingTransfer.erc20transferAddress}</a>`)
     $("#txSummary2").show();
   }
 
@@ -423,7 +431,7 @@ async function initState(pendingTransferJSON, ethChainId, unirisContract, source
   }
 
   if (pendingTransfer.withdrawEthereumAddress) {
-    $("#txSummary4Label").html(`${fromChainName} swap: <a href="${sourceChainExplorer}/tx/${pendingTransfer.withdrawEthereumAddress}" target="_blank">${pendingTransfer.withdrawEthereumAddress}</a>`)
+    $("#txSummary4Label").html(`${fromChainName} swap: <a href="${pendingTransfer.sourceChainExplorer}/tx/${pendingTransfer.withdrawEthereumAddress}" target="_blank">${pendingTransfer.withdrawEthereumAddress}</a>`)
     $("#txSummary4").show();
   }
 

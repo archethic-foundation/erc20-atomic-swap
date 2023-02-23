@@ -37,7 +37,7 @@ async function deployContract(req, res, next) {
     const maxSwap = (maxDollar / ucoPrice) * 1e8
     if (req.body.amount > maxSwap) {
       const deviationInUCO = getStandardDeviation([req.body.amount, maxSwap])
-      if (((deviationInUCO / 1e8)* ucoPrice) > 0.1) {
+      if (((deviationInUCO / 1e8) * ucoPrice) > 0.1) {
         return res.status(400).json({ message: `You cannot swap more than $${maxDollar}` })
       }
     }
@@ -50,114 +50,206 @@ async function deployContract(req, res, next) {
     const contractTxAddress = Crypto.deriveAddress(contractSeed, 1);
     const contractTxAddressHex = Utils.uint8ArrayToHex(contractTxAddress);
 
-    const archethic = await archethicConnection()
-    console.log("Connected to Archethic")
-    const chainSize = await archethic.transaction.getTransactionIndex(contractChainAddress)
+    const archethic = await archethicConnection();
+    console.log("Connected to Archethic");
+    const chainSize = await archethic.transaction.getTransactionIndex(
+      contractChainAddress
+    );
     switch (chainSize) {
       case 0:
-        const fundingTx = await fundContract(archethic, contractSeed, req.body.amount);
-        console.log(`Funding tx ${Utils.uint8ArrayToHex(fundingTx.address)}`)
-        await sendTransaction(fundingTx)
-        console.log(`Contract ${Utils.uint8ArrayToHex(contractChainAddress)} funded`);
+        const fundingTx = await fundContract(
+          archethic,
+          contractSeed,
+          req.body.amount
+        );
+        console.log(`Funding tx ${Utils.uint8ArrayToHex(fundingTx.address)}`);
+        await sendTransaction(fundingTx);
+        console.log(
+          `Contract ${Utils.uint8ArrayToHex(contractChainAddress)} funded`
+        );
 
-        const explorerEthereumContractURL = `${sourceChainExplorer}/address/${req.body.ethereumContractAddress}`
+        const explorerEthereumContractURL = `${sourceChainExplorer}/address/${req.body.ethereumContractAddress}`;
 
-        console.log("Create contract")
-        const contractTx = await createContract(archethic, contractSeed, req.body.recipientAddress, req.body.amount, req.body.endTime, req.body.secretHash, explorerEthereumContractURL);
+        console.log("Create contract");
+        const contractTx = await createContract(
+          archethic,
+          contractSeed,
+          req.body.recipientAddress,
+          req.body.amount,
+          req.body.endTime,
+          req.body.secretHash,
+          explorerEthereumContractURL
+        );
         await sendTransaction(contractTx);
         console.log(`Contract transaction created - ${contractTxAddressHex}`);
 
-        return res.json({ status: "ok", contractAddress: contractTxAddressHex });
+        return res.json({
+          status: "ok",
+          contractAddress: contractTxAddressHex,
+        });
       case 1:
-        return res.json({ status: "ok", contractAddress: contractTxAddressHex });
+        return res.json({
+          status: "ok",
+          contractAddress: contractTxAddressHex,
+        });
       case 2:
-        console.log(req.body.ethereumContractAddress)
-        return res.status(400).json({ message: "Contract already deployed" })
+        console.log(req.body.ethereumContractAddress);
+        return res.status(400).json({ message: "Contract already deployed" });
     }
-  }
-  catch (error) {
-    next(error.message || error)
+  } catch (error) {
+    next(error.message || error);
   }
 }
 
 async function withdraw(req, res, next) {
   try {
+    const { providerEndpoint } = ethConfig[req.body.ethereumChainId];
+    const provider = new ethers.providers.JsonRpcProvider(providerEndpoint);
 
-    const { providerEndpoint } = ethConfig[req.body.ethereumChainId]
-    const provider = new ethers.providers.JsonRpcProvider(providerEndpoint)
+    const ethContractInstance = await getEthereumContract(
+      req.body.ethereumContractAddress,
+      provider
+    );
 
-    const ethContractInstance = getEthereumContract(req.body.ethereumContractAddress, provider)
-    if (ethContractInstance === undefined) {
-      throw "Invalid ethereum contract's address"
+    if (
+      (await checkEthereumWithdraw(
+        req.body.ethereumWithdrawTransaction,
+        req.body.ethereumContractAddress,
+        req.body.secret,
+        provider
+      )) == false
+    ) {
+      throw "Invalid withdraw transaction";
     }
 
-    if (!checkEthereumWithdraw(req.body.ethereumWithdrawTransaction, req.body.ethereumContractAddress, req.body.secret, provider)) {
-      throw "Invalid Ethereum withdraw transaction"
-    }
-
-    const archethic = await archethicConnection()
-    const chainSize = await archethic.transaction.getTransactionIndex(req.body.archethicContractAddress)
+    const archethic = await archethicConnection();
+    const chainSize = await archethic.transaction.getTransactionIndex(
+      req.body.archethicContractAddress
+    );
     if (chainSize == 0) {
-      return res.status(400).json({ message: "Archethic's contract not deployed" })
+      return res
+        .status(400)
+        .json({ message: "Archethic's contract not deployed" });
     }
 
     if (chainSize == 2) {
-      const transferTxAddress = await getLastAddressContract(archethic, req.body.archethicContractAddress)
-      const chain = await getTransactionChain(contractAddress)
-      const archethicWithdrawTransaction = chain[1].address
-      return res.status(200).json({ status: "ok", archethicWithdrawTransaction: archethicWithdrawTransaction, archethicTransferTransaction: transferTxAddress })
+      const transferTxAddress = await getLastAddressContract(
+        archethic,
+        req.body.archethicContractAddress
+      );
+      const chain = await getTransactionChain(contractAddress);
+      const archethicWithdrawTransaction = chain[1].address;
+      return res
+        .status(200)
+        .json({
+          status: "ok",
+          archethicWithdrawTransaction: archethicWithdrawTransaction,
+          archethicTransferTransaction: transferTxAddress,
+        });
     }
 
-    const revealTx = await createRevealSecretTransaction(archethic, req.body.archethicContractAddress, req.body.secret)
+    const revealTx = await createRevealSecretTransaction(
+      archethic,
+      req.body.archethicContractAddress,
+      req.body.secret
+    );
 
-    await sendTransaction(revealTx)
-    console.log(`Reveal transaction created - ${Utils.uint8ArrayToHex(revealTx.address)}`);
+    await sendTransaction(revealTx);
+    console.log(
+      `Reveal transaction created - ${Utils.uint8ArrayToHex(revealTx.address)}`
+    );
 
-    const transferTxAddress = await getLastAddressContract(archethic, req.body.archethicContractAddress)
+    const transferTxAddress = await getLastAddressContract(
+      archethic,
+      req.body.archethicContractAddress
+    );
 
-    console.log(`Transfer transaction - ${transferTxAddress}`)
+    console.log(`Transfer transaction - ${transferTxAddress}`);
 
-    res.json({ status: "ok", archethicWithdrawTransaction: Utils.uint8ArrayToHex(revealTx.address), archethicTransferTransaction: transferTxAddress })
-  }
-  catch (error) {
-    console.log(error)
-    next(error.message)
+    res.json({
+      status: "ok",
+      archethicWithdrawTransaction: Utils.uint8ArrayToHex(revealTx.address),
+      archethicTransferTransaction: transferTxAddress,
+    });
+  } catch (error) {
+    console.log(error);
+    next(error);
   }
 }
 
-function checkEthereumContract(ethereumContractAddress, amount, hash, recipientEthereum, unirisTokenAddress, provider) {
+function checkEthereumContract(
+  ethereumContractAddress,
+  amount,
+  hash,
+  recipientEthereum,
+  unirisTokenAddress,
+  provider
+) {
   return new Promise(async (resolve, reject) => {
+    try {
+      const contractInstance = await getEthereumContract(
+        ethereumContractAddress,
+        provider
+      );
 
-    const contractInstance = getEthereumContract(ethereumContractAddress, provider)
-    if (contractInstance === undefined) {
-      return reject("Invalid ethereum contract's address")
+      const contractAmount = await contractInstance.amount();
+      const contractToken = await contractInstance.token();
+      const contractHash = await contractInstance.hash();
+      const contractRecipient = await contractInstance.recipient();
+
+      // We check with the amount * 1e10, because the amount on Archethic will be 1e8, we need to reach Ethereum decimals
+      if (
+        contractToken == unirisTokenAddress &&
+        contractHash == `0x${hash}` &&
+        contractAmount == amount * 1e10 &&
+        contractRecipient == recipientEthereum
+      ) {
+        return resolve();
+      }
+      return reject("invalid contract");
+    } catch (e) {
+      return reject(e);
     }
-
-    const contractAmount = await contractInstance.amount()
-    const contractToken = await contractInstance.token()
-    const contractHash = await contractInstance.hash()
-    const contractRecipient = await contractInstance.recipient()
-
-    // We check with the amount * 1e10, because the amount on Archethic will be 1e8, we need to reach Ethereum decimals
-    if (contractToken == unirisTokenAddress && contractHash == `0x${hash}` && contractAmount == (amount * 1e10) && contractRecipient == recipientEthereum) {
-      return resolve()
-    }
-    return reject("invalid contract")
-  })
+  });
 }
 
-async function checkEthereumWithdraw(ethereumWithdrawTransaction, contractAddress, secret, provider) {
-  const tx = await provider.getTransaction(ethereumWithdrawTransaction)
-  const receipt = await provider.getTransactionReceipt(ethereumWithdrawTransaction)
+async function checkEthereumWithdraw(
+  ethereumWithdrawTransaction,
+  contractAddress,
+  secret,
+  provider
+) {
+  const tx = await provider.getTransaction(ethereumWithdrawTransaction);
+  if (!tx) {
+    return false;
+  }
+  const receipt = await provider.getTransactionReceipt(
+    ethereumWithdrawTransaction
+  );
 
-  const iface = new ethers.utils.Interface(['function withdraw(bytes32 _secret)'])
-  const values = iface.decodeFunctionData('withdraw', tx.data)
+  const iface = new ethers.utils.Interface([
+    "function withdraw(bytes32 _secret)",
+  ]);
+  const values = iface.decodeFunctionData("withdraw", tx.data);
 
-  return receipt.status == 1 && tx.to == contractAddress && values[0] == `0x${secret}`
+  return (
+    receipt.status == 1 &&
+    tx.to == contractAddress &&
+    values[0] == `0x${secret}`
+  );
 }
 
-function getEthereumContract(ethereumContractAddress, provider) {
-  return new ethers.Contract(ethereumContractAddress, contractABI, provider)
+async function getEthereumContract(ethereumContractAddress, provider) {
+  try {
+    const contractInstance = new ethers.Contract(ethereumContractAddress, contractABI, provider);
+    // Try to the call the contract to check its existence
+    await contractInstance.startTime()
+    return contractInstance
+  }
+  catch (e) {
+    console.log(e)
+    throw("Invalid contract address")
+  }
 }
 
 async function fundContract(archethic, contractSeed, amount) {
@@ -250,11 +342,11 @@ async function createRevealSecretTransaction(archethic, contractAddress, secret)
 }
 
 async function getLastAddressContract(archethic, contractAddress) {
-    const transferTxAddress = await getLastTransaction(archethic, contractAddress)
-    if (transferTxAddress.toUpperCase() == contractAddress.toUpperCase()) {
-      await new Promise(r => setTimeout(r, 1000));
-      return await getLastAddressContract(archethic, contractAddress)
-    }
+  const transferTxAddress = await getLastTransaction(archethic, contractAddress)
+  if (transferTxAddress.toUpperCase() == contractAddress.toUpperCase()) {
+    await new Promise(r => setTimeout(r, 1000));
+    return await getLastAddressContract(archethic, contractAddress)
+  }
 
-    return transferTxAddress
+  return transferTxAddress
 }
