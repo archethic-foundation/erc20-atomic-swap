@@ -84,3 +84,68 @@ function initProgressBar() {
   $("#swapStep").removeClass("is-active");
   $("#swapStep").removeClass("is-failed");
 }
+
+export function showConfirmationDialog(title, message, callback) {
+  var dialog = $('<div></div>').html(message)
+    .dialog({
+      title: title,
+      resizable: false,
+      modal: true,
+      buttons: {
+        "Yes": function () {
+          callback(true);
+          $(this).dialog("close");
+        },
+        "No": function () {
+          callback(false);
+          $(this).dialog("close");
+        }
+      },
+      open: function (event, ui) {
+        $(this).parent().css({
+          'background': 'linear-gradient(135deg, rgba(0, 164, 219, 0.9) -10%, rgba(204, 0, 255, 0.9) 100%)'
+        });
+        $(this).css({
+          'color': 'white',
+          'font-family': 'Lato',
+          'font-size': '12px',
+          'border': 'none',
+          'border-radius': '10px',
+          'letter-spacing': '2.56232px'
+        });
+        $(this).prev('.ui-widget-content').css({
+          'background': 'transparent',
+          'border': 'none',
+        });
+        $(this).prev('.ui-dialog-titlebar').css({
+          'background': 'transparent',
+          'color': 'white',
+          'font-family': 'Lato',
+          'font-size': '14px',
+          'border': 'none',
+          'border-radius': '10px 10px 0 0',
+          'letter-spacing': '2.56232px'
+        });
+        $(this).find('.ui-dialog-buttonset').css({
+          'background': 'transparent',
+          'font-family': 'Lato',
+          'font-size': '14px',
+          'letter-spacing': '2.56232px'
+        });
+        $(this).find('.ui-dialog-buttonpane button').css({
+          'background': 'transparent',
+          'color': 'black',
+          'font-family': 'Lato',
+          'font-size': '14px',
+          'border': 'none',
+          'border-radius': '10px',
+          'letter-spacing': '2.56232px'
+        });
+        $(this).closest('.ui-dialog').find('.my-button-class').css({
+          'margin-right': '20px',
+          'font-family': 'Lato, sans-serif',
+          'background-color': 'transparent'
+        });
+      }
+    });
+}
