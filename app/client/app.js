@@ -50,6 +50,8 @@ $('#clearLocalStorage').click(function () {
   showConfirmationDialog("WARNING", "Are you sure you want to clear the local data about the bridge?<br/><br/>If you have a transfer in progress, it will be lost and cannot be completed or refunded.", function (result) {
     if (result) {
       clearLocalStorage();
+      $("#recipientAddress").val('');
+      $("#nbTokensToSwap").val('');
     }
   });
   return false;
