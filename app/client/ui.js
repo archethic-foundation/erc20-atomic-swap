@@ -84,3 +84,81 @@ function initProgressBar() {
   $("#swapStep").removeClass("is-active");
   $("#swapStep").removeClass("is-failed");
 }
+
+export function showConfirmationDialog(title, message, callback) {
+  var dialog = $('<div></div>').html(message)
+    .dialog({
+      title: title,
+      resizable: false,
+      modal: true,
+      buttons: {
+        "Yes": function () {
+          callback(true);
+          $(this).dialog("close");
+        },
+        "No": function () {
+          callback(false);
+          $(this).dialog("close");
+        }
+      },
+      open: function (event, ui) {
+        $(this).css({
+          'color': 'white',
+          'font-family': 'Lato',
+          'font-size': '12px',
+          'border': 'none',
+          'border-radius': '10px',
+          'letter-spacing': '2.56232px'
+        });
+        $('.ui-dialog').css({
+          'border-radius': '20px',
+        });
+        $('.ui-dialog-titlebar').css({
+          'background': 'transparent',
+          'color': 'white',
+          'font-family': 'Lato',
+          'font-size': '14px',
+          'border': 'none',
+          'border-radius': '10px 10px 0 0',
+          'letter-spacing': '2.56232px'
+        });
+        $('.ui-widget-content').css({
+          'background': ' linear-gradient(135deg, rgba(0, 164, 219, 0.9) -10%, rgba(204, 0, 255, 0.9) 100%)',
+
+        });
+        $('.ui-dialog .ui-dialog-content').css({
+          'background': 'transparent',
+        });
+        $('.ui-dialog-buttonpane .ui-widget-content .ui-helper-clearfix').css({
+          'background': 'transparent',
+        });
+        $('.ui-dialog-buttonpane').css({
+          'background': 'transparent'
+        });
+        $(this).parent().find('.ui-dialog-buttonset button:first-child').css({
+          'margin-right': '30px'
+        });
+        $(this).parent().find('.ui-dialog-buttonset button').hover(
+          function () {
+            $(this).css({
+              'color': '#222'
+            });
+          }, function () {
+            $(this).css({
+              'color': 'white'
+            });
+          }
+        );
+        $('.ui-dialog-buttonpane button').css({
+          'background': 'transparent',
+          'color': 'white',
+          'font-family': 'Lato',
+          'font-weight': '400',
+          'font-size': '14px',
+          'border': 'none',
+          'border-radius': '10px',
+          'letter-spacing': '2.56232px'
+        });
+      }
+    });
+}

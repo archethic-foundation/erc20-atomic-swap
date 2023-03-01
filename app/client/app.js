@@ -1,4 +1,4 @@
-import { initPageBridge, initTransfer, changeBtnToTransferInProgress, displayConnectionError, initReConnectionScreen } from "./ui.js";
+import { initPageBridge, initTransfer, changeBtnToTransferInProgress, displayConnectionError, initReConnectionScreen, showConfirmationDialog } from "./ui.js";
 import { initChainContext } from "./chain.js";
 import { uint8ArrayToHex, handleError } from "./utils.js";
 import { getERC20Contract, getHTLC_Contract, deployHTLC, transferERC20, deployArchethic, withdrawEthereum, withdrawArchethic } from "./contract";
@@ -45,6 +45,21 @@ $("#connectMetamaskBtn").on("click", async () => {
     displayConnectionError(e.message || e)
   }
 });
+
+$('#clearLocalStorage').click(function () {
+  showConfirmationDialog("WARNING", "Are you sure you want to clear the local data about the bridge?<br/><br/>If you have a transfer in progress, it will be lost and cannot be completed or refunded.", function (result) {
+    if (result) {
+      clearLocalStorage();
+      $("#recipientAddress").val('');
+      $("#nbTokensToSwap").val('');
+    }
+  });
+  return false;
+});
+
+function clearLocalStorage() {
+  localStorage.clear();
+}
 
 function handleNetworkChange() {
   // Handle chain changement
