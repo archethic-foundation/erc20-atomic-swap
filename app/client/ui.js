@@ -123,7 +123,7 @@ export function showConfirmationDialog(title, message, callback) {
           'letter-spacing': '2.56232px'
         });
         $('.ui-widget-content').css({
-          'background': ' linear-gradient(135deg, rgba(0, 164, 219, 0.9) -10%, rgba(204, 0, 255, 0.9) 100%)',
+          'background': '#1a1a1a',
 
         });
         $('.ui-dialog .ui-dialog-content').css({
@@ -141,7 +141,7 @@ export function showConfirmationDialog(title, message, callback) {
         $(this).parent().find('.ui-dialog-buttonset button').hover(
           function () {
             $(this).css({
-              'color': '#222'
+              'color': '#b0b0b0'
             });
           }, function () {
             $(this).css({

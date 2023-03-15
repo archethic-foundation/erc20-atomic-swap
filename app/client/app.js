@@ -52,6 +52,7 @@ $('#clearLocalStorage').click(function () {
       clearLocalStorage();
       $("#recipientAddress").val('');
       $("#nbTokensToSwap").val('');
+      location.reload();
     }
   });
   return false;
