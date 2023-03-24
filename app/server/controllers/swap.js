@@ -26,7 +26,7 @@ async function deployContract(req, res, next) {
     const { providerEndpoint, unirisTokenAddress, recipientEthereum, sourceChainExplorer } = ethConfig[req.body.ethereumChainId]
     const provider = new ethers.providers.JsonRpcProvider(providerEndpoint)
 
-    await checkEthereumContract(req.body.ethereumContractAddress, req.body.amount, req.body.secretHash, recipientEthereum, unirisTokenAddress, provider)
+    const ercContractEndTime = await checkEthereumContract(req.body.ethereumContractAddress, req.body.amount, req.body.secretHash, recipientEthereum, unirisTokenAddress, provider)
     console.log("Ethereum contract checked");
 
     const { blockNumber } = await provider.getTransaction(req.body.ethereumContractTransaction)
@@ -76,7 +76,7 @@ async function deployContract(req, res, next) {
           contractSeed,
           req.body.recipientAddress,
           req.body.amount,
-          req.body.endTime,
+          ercContractEndTime,
           req.body.secretHash,
           explorerEthereumContractURL
         );
@@ -137,7 +137,7 @@ async function withdraw(req, res, next) {
         archethic,
         req.body.archethicContractAddress
       );
-      const chain = await getTransactionChain(contractAddress);
+      const chain = await getTransactionChain(req.body.archethicContractAddress);
       const archethicWithdrawTransaction = chain[1].address;
       return res
         .status(200)
@@ -204,7 +204,10 @@ function checkEthereumContract(
         contractAmount == amount * 1e10 &&
         contractRecipient == recipientEthereum
       ) {
-        return resolve();
+        // These functions return a BigNumber object
+        const startTime = await contractInstance.startTime();
+        const lockTime = await contractInstance.lockTime();
+        return resolve(startTime.toNumber() + lockTime.toNumber());
       }
       return reject("invalid contract");
     } catch (e) {

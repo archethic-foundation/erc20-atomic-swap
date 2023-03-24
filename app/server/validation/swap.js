@@ -6,7 +6,6 @@ export default {
       amount: Joi.number().required().min(1),
       recipientAddress: Joi.string().hex().length(68).required(),
       secretHash: Joi.string().hex().length(64).required(),
-      endTime: Joi.date().timestamp().required(),
       ethereumContractAddress: Joi.string().regex(/^0x[a-fA-F0-9]*$/).required(),
       ethereumContractTransaction: Joi.string().regex(/^0x[a-fA-F0-9]*$/).required(),
       //ethereumChainId: Joi.number().required().valid(1, 137, 56)
