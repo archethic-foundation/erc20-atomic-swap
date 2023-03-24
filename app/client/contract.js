@@ -170,10 +170,6 @@ async function sendDeployRequest(
   ethereumContractTransaction,
   ethChainId
 ) {
-  const endTime = new Date();
-  endTime.setSeconds(endTime.getSeconds() + 10000);
-  const endTimeUNIX = Math.floor(endTime / 1000);
-
   return fetch("/swap/deployContract", {
     method: "POST",
     headers: {
@@ -184,7 +180,6 @@ async function sendDeployRequest(
       secretHash: secretDigestHex,
       recipientAddress: recipientAddress,
       amount: amount * 1e8,
-      endTime: endTimeUNIX,
       ethereumContractAddress: ethereumContractAddress,
       ethereumContractTransaction,
       ethereumChainId: ethChainId,
