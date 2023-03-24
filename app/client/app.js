@@ -480,5 +480,13 @@ async function initState(pendingTransferJSON, ethChainId, unirisContract, toChai
   }
 
   $("#steps").show();
+  changeBtnToTransferInProgress()
+  try {
+    await goto(localStorage.getItem("transferStep"), state);
+  }
+  catch (e) {
+    handleError(e, step, JSON.parse(pendingTransferJSON, ethChainId));
+  }
+
   return state
 }
