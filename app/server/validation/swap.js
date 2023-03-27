@@ -1,5 +1,14 @@
 import Joi from 'joi'
 
+import { enabledNetworks } from '../utils.js'
+
+function networkIdValidator(value) {
+  if (!(value in enabledNetworks)) {
+    throw new Error(`ethereumChainId must be in ${enabledNetworks}`)
+  }
+  return value
+}
+
 export default {
   deployContract: {
     body: Joi.object({
@@ -8,8 +17,7 @@ export default {
       secretHash: Joi.string().hex().length(64).required(),
       ethereumContractAddress: Joi.string().regex(/^0x[a-fA-F0-9]*$/).required(),
       ethereumContractTransaction: Joi.string().regex(/^0x[a-fA-F0-9]*$/).required(),
-      //ethereumChainId: Joi.number().required().valid(1, 137, 56)
-      ethereumChainId: Joi.number().required().valid(5, 1337, 80001, 97) // Testnet only
+      ethereumChainId: Joi.number().required().custom(networkIdValidator)
     })
   },
   withdraw: {
@@ -18,8 +26,7 @@ export default {
       ethereumContractAddress: Joi.string().regex(/^0x[a-fA-F0-9]*$/).required(),
       ethereumWithdrawTransaction: Joi.string().regex(/^0x[a-fA-F0-9]*$/).required(),
       secret: Joi.string().hex().required(),
-      //ethereumChainId: Joi.number().required().valid(1, 137, 56)
-      ethereumChainId: Joi.number().required().valid(5, 1337, 80001, 97) // Testnet only
+      ethereumChainId: Joi.number().required().custom(networkIdValidator)
     })
   }
 }

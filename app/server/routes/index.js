@@ -3,7 +3,7 @@ import express from "express";
 import swapRoutes from "./swap.js";
 import balanceRoutes from "./balance.js";
 
-import { bridgeAddress, ethConfig, hasSufficientFunds, getUCOPrice, archethicEndpoint } from "../utils.js"
+import { enabledNetworks, bridgeAddress, ethConfig, hasSufficientFunds, getUCOPrice, archethicEndpoint } from "../utils.js"
 const router = express.Router();
 
 router.post("/status", async (req, res) => {
@@ -16,8 +16,7 @@ router.post("/status", async (req, res) => {
         })
     }
 
-    const supportedNetworks = [5, 1337, 80001, 97]
-    if (!supportedNetworks.includes(ethChainId)) {
+    if (!enabledNetworks.includes(ethChainId)) {
         return res.json({
             status: `Network not supported`
         })

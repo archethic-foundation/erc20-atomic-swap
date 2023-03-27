@@ -16,7 +16,7 @@ export function initChainContext(ethChainId) {
             fromChainName = "Polygon";
 
             $("#fromChain").text(fromChainName);
-            $("#fromNetworkLabel").text("Polygon");
+            $("#fromNetworkLabel").text("Polygon Mainnet");
             $("#toNetworkLabel").text("Archethic");
             break;
         case 97:
@@ -32,7 +32,7 @@ export function initChainContext(ethChainId) {
             fromChainName = "Binance";
 
             $("#fromChain").text(fromChainName);
-            $("#fromNetworkLabel").text("BSC");
+            $("#fromNetworkLabel").text("BSC Mainnet");
             $("#toNetworkLabel").text("Archethic");
             break;
         case 5:
@@ -56,7 +56,7 @@ export function initChainContext(ethChainId) {
             fromChainName = "Ethereum";
 
             $("#fromChain").text(fromChainName);
-            $("#fromNetworkLabel").text("Ethereum");
+            $("#fromNetworkLabel").text("Ethereum Mainnet");
             $("#toNetworkLabel").text("Archethic");
             break;
     }
