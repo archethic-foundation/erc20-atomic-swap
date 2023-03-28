@@ -199,9 +199,9 @@ function checkEthereumContract(
 
       // We check with the amount * 1e10, because the amount on Archethic will be 1e8, we need to reach Ethereum decimals
       if (
-        contractToken == unirisTokenAddress &&
+        contractToken.toUpperCase() == unirisTokenAddress.toUpperCase() &&
         contractHash == `0x${hash}` &&
-        contractAmount == amount * 1e10 &&
+        contractAmount.toString() == (amount * 1e10).toString() &&
         contractRecipient == recipientEthereum
       ) {
         // These functions return a BigNumber object
