@@ -328,7 +328,7 @@ function sendTransaction(tx) {
     tx
       .on("requiredConfirmation", () => resolve())
       .on("error", (_context, reason) => reject(reason))
-      .send()
+      .send(60)
   })
 }
 
