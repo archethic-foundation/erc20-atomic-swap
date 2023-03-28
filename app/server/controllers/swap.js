@@ -148,17 +148,20 @@ async function withdraw(req, res, next) {
         });
     }
 
+
     const revealTx = await createRevealSecretTransaction(
       archethic,
       req.body.archethicContractAddress,
       req.body.secret
     );
 
+    console.log("Sending withdraw transaction")
     await sendTransaction(revealTx);
     console.log(
       `Reveal transaction created - ${Utils.uint8ArrayToHex(revealTx.address)}`
     );
 
+    console.log("Getting transfer address")
     const transferTxAddress = await getLastAddressContract(
       archethic,
       req.body.archethicContractAddress
