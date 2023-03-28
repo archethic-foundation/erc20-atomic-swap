@@ -3,7 +3,7 @@ import Joi from 'joi'
 import { enabledNetworks } from '../utils.js'
 
 function networkIdValidator(value) {
-  if (!(value in enabledNetworks)) {
+  if (!enabledNetworks.includes(value)) {
     throw new Error(`ethereumChainId must be in ${enabledNetworks}`)
   }
   return value
