@@ -195,12 +195,12 @@ async function withdrawERC20Token(HTLC_Contract, signer, secret) {
   try {
     // Try to the call the contract to check its existence
     await HTLC_ContractSigner.startTime()
-    const tx = await HTLC_ContractSigner.withdraw(`0x${secret}`, { gasLimit: 10000000 })
+    const tx = await HTLC_ContractSigner.withdraw(`0x${secret}`, { gasLimit: 1000000 })
     return await tx.wait()
   }
   catch (e) {
     console.log(e)
-    throw "Invalid HTLC contract's address"
+    throw e
   }
 
 }

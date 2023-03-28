@@ -136,8 +136,9 @@ async function startApp() {
       $("#nbTokensToSwap").attr("max", maxSwap);
 
       const erc20Amount = parseFloat($("#fromBalanceUCO").text())
+      const usd = (erc20Amount * UCOPrice).toFixed(5)
 
-      $("#fromBalanceUSD").text(new Intl.NumberFormat().format((erc20Amount * UCOPrice).toFixed(5)));
+      $("#fromBalanceUSD").text(new Intl.NumberFormat(usd));
       $("#maxUCOValue").attr("value", Math.min(erc20Amount, maxSwap).toFixed(5));
 
       ucoPrice = UCOPrice
