@@ -137,7 +137,7 @@ async function withdraw(req, res, next) {
         archethic,
         req.body.archethicContractAddress
       );
-      const chain = await getTransactionChain(req.body.archethicContractAddress);
+      const chain = await getTransactionChain(archethic, req.body.archethicContractAddress);
       const archethicWithdrawTransaction = chain[1].address;
       return res
         .status(200)
