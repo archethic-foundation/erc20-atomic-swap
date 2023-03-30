@@ -265,7 +265,7 @@ async function fundContract(archethic, contractSeed, amount) {
   return archethic.transaction
     .new()
     .setType("transfer")
-    .addUCOTransfer(contractAddress, amount + 50_000_000) // Send 0.5 UCO to the contract to pay the fees
+    .addUCOTransfer(contractAddress, amount + 30_000_000) // Send 0.3 UCO to the contract to pay the fees
     .build(bridgeSeed, index)
     .originSign(originPrivateKey)
 }
