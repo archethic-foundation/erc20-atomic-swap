@@ -65,6 +65,8 @@ const ethConfig = {
   }
 }
 
+const maxSwapDollar = 100
+
 export {
   bridgeSeed,
   bridgeAddress,
@@ -75,7 +77,8 @@ export {
   archethicConnection,
   archethicEndpoint,
   getLastTransaction,
-  getTransactionChain
+  getTransactionChain,
+  maxSwapDollar
 };
 
 let archethic

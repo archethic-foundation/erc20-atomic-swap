@@ -33,7 +33,8 @@ export async function getConfig(ethChainId) {
                 sufficientFunds: r.sufficientFunds,
                 UCOPrice: r.UCOPrice,
                 sourceChainExplorer: r.sourceChainExplorer,
-                bridgeAddress: r.bridgeAddress
+                bridgeAddress: r.bridgeAddress,
+                maxSwapDollar: r.maxSwapDollar
             };
         });
 }

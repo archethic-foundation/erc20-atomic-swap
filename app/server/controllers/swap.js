@@ -16,7 +16,7 @@ import { Crypto, Utils } from "archethic";
 import { createHmac } from "crypto";
 const { originPrivateKey } = Utils;
 
-import { archethicConnection, ethConfig, baseSeedContract, bridgeAddress, bridgeSeed, getUCOPrice, getLastTransaction, getStandardDeviation, getTransactionChain } from "../utils.js";
+import { archethicConnection, ethConfig, baseSeedContract, bridgeAddress, bridgeSeed, getUCOPrice, getLastTransaction, getStandardDeviation, getTransactionChain, maxSwapDollar } from "../utils.js";
 
 export default { deployContract, withdraw }
 
@@ -33,12 +33,11 @@ async function deployContract(req, res, next) {
     const { timestamp } = await provider.getBlock(blockNumber)
 
     const ucoPrice = await getUCOPrice(timestamp)
-    const maxDollar = 20
-    const maxSwap = (maxDollar / ucoPrice) * 1e8
+    const maxSwap = (maxSwapDollar / ucoPrice) * 1e8
     if (req.body.amount > maxSwap) {
       const deviationInUCO = getStandardDeviation([req.body.amount, maxSwap])
       if (((deviationInUCO / 1e8) * ucoPrice) > 0.1) {
-        return res.status(400).json({ message: `You cannot swap more than $${maxDollar}` })
+        return res.status(400).json({ message: `You cannot swap more than $${maxSwapDollar}` })
       }
     }
 
@@ -254,7 +253,7 @@ async function getEthereumContract(ethereumContractAddress, provider) {
   }
   catch (e) {
     console.log(e)
-    throw("Invalid contract address")
+    throw ("Invalid contract address")
   }
 }
 
