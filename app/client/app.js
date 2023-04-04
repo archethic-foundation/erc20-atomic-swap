@@ -7,7 +7,7 @@ import { getArchethicBalance, getConfig } from "./service.js";
 let provider;
 let interval;
 
-window.onload = async function() {
+window.onload = async function () {
   try {
     if (typeof window.ethereum !== "undefined") {
       console.log("MetaMask is installed!");
@@ -46,8 +46,8 @@ $("#connectMetamaskBtn").on("click", async () => {
   }
 });
 
-$('#clearLocalStorage').click(function() {
-  showConfirmationDialog("WARNING", "Are you sure you want to clear the local data about the bridge?<br/><br/>If you have a transfer in progress, it will be lost and cannot be completed or refunded.", function(result) {
+$('#clearLocalStorage').click(function () {
+  showConfirmationDialog("WARNING", "Are you sure you want to clear the local data about the bridge?<br/><br/>If you have a transfer in progress, it will be lost and cannot be completed or refunded.", function (result) {
     if (result) {
       clearLocalStorage();
       $("#recipientAddress").val('');
@@ -98,6 +98,7 @@ async function startApp() {
   initPageBridge();
 
   const maxSwap = (maxSwapDollar / UCOPrice).toFixed(5);
+  $("#maxSwap").text(maxSwapDollar);
   $("#nbTokensToSwap").attr("max", maxSwap);
 
   toChainExplorer = `${archethicEndpoint}/explorer/transaction`;
