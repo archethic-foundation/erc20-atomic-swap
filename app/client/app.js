@@ -7,7 +7,7 @@ import { getArchethicBalance, getConfig } from "./service.js";
 let provider;
 let interval;
 
-window.onload = async function() {
+window.onload = async function () {
   try {
     if (typeof window.ethereum !== "undefined") {
       console.log("MetaMask is installed!");
@@ -46,8 +46,8 @@ $("#connectMetamaskBtn").on("click", async () => {
   }
 });
 
-$('#clearLocalStorage').click(function() {
-  showConfirmationDialog("WARNING", "Are you sure you want to clear the local data about the bridge?<br/><br/>If you have a transfer in progress, it will be lost and cannot be completed or refunded.", function(result) {
+$('#clearLocalStorage').click(function () {
+  showConfirmationDialog("WARNING", "Are you sure you want to clear the local data about the bridge?<br/><br/>If you have a transfer in progress, it will be lost and cannot be completed or refunded.", function (result) {
     if (result) {
       clearLocalStorage();
       $("#recipientAddress").val('');
@@ -89,14 +89,16 @@ async function startApp() {
     sufficientFunds,
     UCOPrice,
     sourceChainExplorer,
-    bridgeAddress
+    bridgeAddress,
+    maxSwapDollar
   } = await getConfig(ethChainId);
 
   ucoPrice = UCOPrice
 
   initPageBridge();
 
-  const maxSwap = (20 / UCOPrice).toFixed(5);
+  const maxSwap = (maxSwapDollar / UCOPrice).toFixed(5);
+  $("#maxSwap").text(maxSwapDollar);
   $("#nbTokensToSwap").attr("max", maxSwap);
 
   toChainExplorer = `${archethicEndpoint}/explorer/transaction`;
@@ -119,12 +121,12 @@ async function startApp() {
 
   // Display signer account
   const account = await signer.getAddress();
-  let erc20Amount = await setupEthAccount(account, unirisContract, sourceChainExplorer, ucoPrice)
+  let erc20Amount = await setupEthAccount(account, unirisContract, sourceChainExplorer, ucoPrice, maxSwapDollar)
 
   // Handle account change
   provider.provider.on('accountsChanged', async (accounts) => {
     const account = accounts[0]
-    erc20Amount = await setupEthAccount(account, unirisContract, sourceChainExplorer, ucoPrice)
+    erc20Amount = await setupEthAccount(account, unirisContract, sourceChainExplorer, ucoPrice, maxSwapDollar)
   })
 
   // Update the UCO price
@@ -132,7 +134,7 @@ async function startApp() {
     const { UCOPrice } = await getConfig(ethChainId)
     if (UCOPrice != ucoPrice) {
       $("#ucoPrice").text(`1 UCO = ${UCOPrice.toFixed(5)}$`).show();
-      const maxSwap = (20 / UCOPrice).toFixed(5);
+      const maxSwap = (maxSwapDollar / UCOPrice).toFixed(5);
       $("#nbTokensToSwap").attr("max", maxSwap);
 
       const erc20Amount = parseFloat($("#fromBalanceUCO").text())
@@ -214,14 +216,14 @@ async function startApp() {
 
 }
 
-async function setupEthAccount(account, unirisContract, sourceChainExplorer, ucoPrice) {
+async function setupEthAccount(account, unirisContract, sourceChainExplorer, ucoPrice, maxSwapDollar) {
   let accountStr = account
   if (account.length > 4) {
     accountStr = account.substring(0, 5) + "..." + account.substring(account.length - 3);
   }
   $("#accountName").html(`Account<br><a href="${sourceChainExplorer}/address/${account}" target="_blank">${accountStr}</a>`)
 
-  const maxSwap = (20 / ucoPrice).toFixed(5);
+  const maxSwap = (maxSwapDollar / ucoPrice).toFixed(5);
 
   const erc20Amount = await setERC20Amount(account, unirisContract, ucoPrice)
   $("#maxUCOValue").attr("value", Math.min(erc20Amount, maxSwap).toFixed(5));

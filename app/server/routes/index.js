@@ -3,7 +3,7 @@ import express from "express";
 import swapRoutes from "./swap.js";
 import balanceRoutes from "./balance.js";
 
-import { enabledNetworks, bridgeAddress, ethConfig, hasSufficientFunds, getUCOPrice, archethicEndpoint } from "../utils.js"
+import { enabledNetworks, bridgeAddress, ethConfig, hasSufficientFunds, getUCOPrice, archethicEndpoint, maxSwapDollar } from "../utils.js"
 const router = express.Router();
 
 router.post("/status", async (req, res) => {
@@ -32,7 +32,8 @@ router.post("/status", async (req, res) => {
         unirisTokenAddress: unirisTokenAddress,
         sufficientFunds: await hasSufficientFunds(),
         UCOPrice: await getUCOPrice(),
-        sourceChainExplorer: sourceChainExplorer
+        sourceChainExplorer: sourceChainExplorer,
+        maxSwapDollar: maxSwapDollar
     })
 });
 
