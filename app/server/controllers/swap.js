@@ -9,8 +9,10 @@ const __dirname = path.dirname(__filename);
 console.log(__dirname)
 
 const contractJSON = fs.readFileSync(path.join(__dirname, "../../public/HTLC.json"), "utf8")
+const UCOContractJSON = fs.readFileSync(path.join(__dirname, "../../public/uco_abi.json"), "utf8")
 
 const contractABI = JSON.parse(contractJSON).abi
+const UCOContractABI = JSON.parse(UCOContractJSON)
 
 import { Crypto, Utils } from "archethic";
 import { createHmac } from "crypto";
@@ -105,11 +107,6 @@ async function withdraw(req, res, next) {
     const { providerEndpoint } = ethConfig[req.body.ethereumChainId];
     const provider = new ethers.providers.JsonRpcProvider(providerEndpoint);
 
-    const ethContractInstance = await getEthereumContract(
-      req.body.ethereumContractAddress,
-      provider
-    );
-
     if (
       (await checkEthereumWithdraw(
         req.body.ethereumWithdrawTransaction,
@@ -203,10 +200,15 @@ function checkEthereumContract(
       // We check with the amount * 1e10, because the amount on Archethic will be 1e8, we need to reach Ethereum decimals
       const ucoAPI = ethers.utils.formatUnits(ethers.utils.parseUnits(amount.toString(), 10), 18)
 
+      const UCOContractInstance = new ethers.Contract(unirisTokenAddress, UCOContractABI, provider);
+      const balance = await UCOContractInstance.balanceOf(ethereumContractAddress)
+
       if (
         contractToken.toUpperCase() == unirisTokenAddress.toUpperCase() &&
         contractHash == `0x${hash}` &&
         ucoErc == ucoAPI &&
+        // Check the contract have the same balance as expected
+        ethers.utils.formatUnits(balance, 18) == ucoErc &&
         contractRecipient == recipientEthereum
       ) {
         // These functions return a BigNumber object
