@@ -199,11 +199,14 @@ function checkEthereumContract(
       const contractHash = await contractInstance.hash();
       const contractRecipient = await contractInstance.recipient();
 
+      const ucoErc = ethers.utils.formatUnits(contractAmount, 18)
       // We check with the amount * 1e10, because the amount on Archethic will be 1e8, we need to reach Ethereum decimals
+      const ucoAPI = ethers.utils.formatUnits(ethers.utils.parseUnits(amount.toString(), 10), 18)
+
       if (
         contractToken.toUpperCase() == unirisTokenAddress.toUpperCase() &&
         contractHash == `0x${hash}` &&
-        contractAmount.toString() == (amount * 1e10).toString() &&
+        ucoErc == ucoAPI &&
         contractRecipient == recipientEthereum
       ) {
         // These functions return a BigNumber object
@@ -211,6 +214,7 @@ function checkEthereumContract(
         const lockTime = await contractInstance.lockTime();
         return resolve(startTime.toNumber() + lockTime.toNumber());
       }
+
       return reject("invalid contract");
     } catch (e) {
       return reject(e);
