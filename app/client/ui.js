@@ -162,3 +162,111 @@ export function showConfirmationDialog(title, message, callback) {
       }
     });
 }
+
+
+export function showRefundDialog(title, message, callback) {
+  var input = $("<input>").attr({
+    "type": "text",
+    "size": "50"
+  });
+  var dialog = $("<div>").html(message).append("<br/><br/>").append(input)
+    .dialog({
+      title: title,
+      resizable: false,
+      modal: true,
+      buttons: {
+        "Cancel": function () {
+          callback(false);
+          $(this).dialog("close");
+        },
+        "Validate": function () {
+          var contractAddress = input.val();
+          console.log('Refund: contract = ' + contractAddress);
+          if (isValidERC20Address(contractAddress)) {
+            callback(true, contractAddress);
+            $(this).dialog("close");
+          } else {
+            alert("Please enter a valid ERC20 address");
+          }
+        }
+      },
+      open: function (event, ui) {
+        input.css({
+          'border-radius': '10px',
+          'font-family': 'Lato',
+          'font-weight': '700',
+          'font-size': '14px',
+          'line-height': '17px',
+          'color': '#FFFFFF',
+          'border': 'none',
+          'background': '#000000',
+          'padding': '10px',
+          'letter-spacing': '2.56232px'
+        });
+        $(this).css({
+          'color': 'white',
+          'font-family': 'Lato',
+          'font-size': '12px',
+          'border': 'none',
+          'border-radius': '10px',
+          'letter-spacing': '2.56232px'
+        });
+        $('.ui-dialog').css({
+          'width': '450px',
+          'border-radius': '20px',
+        });
+        $('.ui-dialog-titlebar').css({
+          'background': 'transparent',
+          'color': 'white',
+          'font-family': 'Lato',
+          'font-size': '14px',
+          'border': 'none',
+          'border-radius': '10px 10px 0 0',
+          'letter-spacing': '2.56232px'
+        });
+        $('.ui-widget-content').css({
+          'background': '#1a1a1a',
+
+        });
+        $('.ui-dialog .ui-dialog-content').css({
+          'background': 'transparent',
+        });
+        $('.ui-dialog-buttonpane .ui-widget-content .ui-helper-clearfix').css({
+          'background': 'transparent',
+        });
+        $('.ui-dialog-buttonpane').css({
+          'background': 'transparent'
+        });
+        $(this).parent().find('.ui-dialog-buttonset button:first-child').css({
+          'margin-right': '30px'
+        });
+        $(this).parent().find('.ui-dialog-buttonset button').hover(
+          function () {
+            $(this).css({
+              'color': '#b0b0b0'
+            });
+          }, function () {
+            $(this).css({
+              'color': 'white'
+            });
+          }
+        );
+        $('.ui-dialog-buttonpane button').css({
+          'background': 'transparent',
+          'color': 'white',
+          'font-family': 'Lato',
+          'font-weight': '400',
+          'font-size': '14px',
+          'border': 'none',
+          'border-radius': '10px',
+          'letter-spacing': '2.56232px'
+        });
+      }
+    });
+}
+
+function isValidERC20Address(address) {
+  // Check if address matches ERC20 format, return true or false
+  const regex = /^(0x)?[0-9a-fA-F]/;
+  return regex.test(address);
+}
