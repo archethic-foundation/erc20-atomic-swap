@@ -8,7 +8,7 @@ const bridgeSeed = process.env["BRIDGE_SEED"] || "6D0270D3DFFC88C63C5D3DD977C18B
 const bridgeAddress = Utils.uint8ArrayToHex(Crypto.deriveAddress(bridgeSeed, 0));
 const baseSeedContract = "197D7B086613BCB8AB991683D39CC489C343662B3DFF7990B567A2D471D941E";
 
-export const enabledNetworks = [1337, 80001, 97]
+export const enabledNetworks = [1, 137, 56]
 
 const ethConfig = {
   1337: {
