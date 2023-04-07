@@ -181,7 +181,6 @@ export function showRefundDialog(title, message, callback) {
         },
         "Validate": function () {
           var contractAddress = input.val();
-          console.log('Refund: contract = ' + contractAddress);
           if (isValidERC20Address(contractAddress)) {
             callback(true, contractAddress);
             $(this).dialog("close");

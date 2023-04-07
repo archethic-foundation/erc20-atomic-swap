@@ -1,13 +1,13 @@
 import { initPageBridge, initTransfer, changeBtnToTransferInProgress, displayConnectionError, initReConnectionScreen, showConfirmationDialog, showRefundDialog } from "./ui.js";
 import { initChainContext } from "./chain.js";
-import { uint8ArrayToHex, handleError, exportLocalStorage, clearLocalStorage, refundValidation } from "./utils.js";
-import { getERC20Contract, getHTLC_Contract, deployHTLC, transferERC20, deployArchethic, withdrawEthereum, withdrawArchethic } from "./contract";
+import { uint8ArrayToHex, handleError, exportLocalStorage, clearLocalStorage } from "./utils.js";
+import { getERC20Contract, getHTLC_Contract, deployHTLC, transferERC20, deployArchethic, withdrawEthereum, withdrawArchethic, refundERC } from "./contract";
 import { getArchethicBalance, getConfig } from "./service.js";
 
 let provider;
 let interval;
 
-window.onload = async function () {
+window.onload = async function() {
   try {
     if (typeof window.ethereum !== "undefined") {
       console.log("MetaMask is installed!");
@@ -58,19 +58,28 @@ $('#clearLocalStorage').click(function () {
   return false;
 });
 
-$('#exportLocalStorage').click(function () {
+$('#exportLocalStorage').click(function() {
   exportLocalStorage();
 });
 
-$('#exportLocalStorageModal').click(function () {
+$('#exportLocalStorageModal').click(function() {
   exportLocalStorage();
 });
 
 
-$('#refund').click(function () {
-  showRefundDialog("Refund", "Please, fill your contract address to refund", function (isOk, contractAddress) {
+$('#refund').click(function() {
+  showRefundDialog("Refund", "Please, fill your contract address to refund", async function(isOk, contractAddress) {
     if (isOk) {
-      refundValidation(contractAddress);
+      try {
+        console.log("Refund contract", contractAddress)
+        const contract = await getHTLC_Contract(contractAddress, provider)
+        const tx = await refundERC(contract, signer)
+        alert("Refund successful")
+        console.log("Refund tx", tx.transactionHash)
+      }
+      catch (e) {
+        handleError(e)
+      }
     }
   });
   return false;
@@ -89,10 +98,11 @@ function handleNetworkChange() {
 let toChainExplorer;
 let step;
 let ucoPrice;
+let signer;
 
 async function startApp() {
   const { chainId: ethChainId } = await provider.getNetwork();
-  const signer = provider.getSigner();
+  signer = provider.getSigner();
 
   let fromChainName = initChainContext(ethChainId);
 
