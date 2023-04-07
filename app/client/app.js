@@ -1,6 +1,6 @@
 import { initPageBridge, initTransfer, changeBtnToTransferInProgress, displayConnectionError, initReConnectionScreen, showConfirmationDialog, showRefundDialog } from "./ui.js";
 import { initChainContext } from "./chain.js";
-import { uint8ArrayToHex, handleError } from "./utils.js";
+import { uint8ArrayToHex, handleError, exportLocalStorage, clearLocalStorage, refundValidation } from "./utils.js";
 import { getERC20Contract, getHTLC_Contract, deployHTLC, transferERC20, deployArchethic, withdrawEthereum, withdrawArchethic } from "./contract";
 import { getArchethicBalance, getConfig } from "./service.js";
 
@@ -58,6 +58,15 @@ $('#clearLocalStorage').click(function () {
   return false;
 });
 
+$('#exportLocalStorage').click(function () {
+  exportLocalStorage();
+});
+
+$('#exportLocalStorageModal').click(function () {
+  exportLocalStorage();
+});
+
+
 $('#refund').click(function () {
   showRefundDialog("Refund", "Please, fill your contract address to refund", function (isOk, contractAddress) {
     if (isOk) {
@@ -66,14 +75,6 @@ $('#refund').click(function () {
   });
   return false;
 });
-
-function clearLocalStorage() {
-  localStorage.clear();
-}
-
-function refundValidation(contractAddress) {
-  console.log('Refund: contract = ' + contractAddress);
-}
 
 function handleNetworkChange() {
   // Handle chain changement

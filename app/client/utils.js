@@ -113,7 +113,7 @@ export function updateClock(endtime, HTLC_Contract, signer, state, ethChainId) {
 						<span>REFUND</span>
 						<span class="spinner-border spinner-border-sm" style="width: 8px; height: 8px; padding-bottom: 5px;" role="status" aria-hidden="true"></span>
 				</button>
-        <img src="assets/images/icons/help.png" height="20" alt="" style="padding-top: 3px; padding-left: 5px; padding-bottom: 5px; cursor: pointer;" onclick="window.open('https://archethic-foundation.github.io/archethic-docs/FAQ/bridge/#what-happens-if-a-problem-occurs-or-i-refuse-a-transaction-during-the-transfer');" />
+        <img src="assets/images/icons/help.png" height="20" alt="" style="padding-top: 3px; padding-left: 5px; padding-bottom: 5px; cursor: pointer;" onclick="window.open('https://wiki.archethic.net/FAQ/bridge/#what-happens-if-a-problem-occurs-or-i-refuse-a-transaction-during-the-transfer');" />
       `);
 
       $("#refundButton").on("click", async () => {
@@ -161,9 +161,34 @@ export function updateClock(endtime, HTLC_Contract, signer, state, ethChainId) {
       $("#txSummary2Timer").html(`
         <img src="assets/images/icons/timer.png" height="20" alt="" style="padding-right: 5px; padding-bottom: 5px;" />
         As the transfer is not effective, you can retrieve your funds in ${('0' + t.hours).slice(-2) + 'h' + ('0' + t.minutes).slice(-2) + 'm' + ('0' + t.seconds).slice(-2)}.
-        <img src="assets/images/icons/help.png" height="20" alt="" style="padding-left: 5px; padding-bottom: 5px; cursor: pointer;" onclick="window.open('https://archethic-foundation.github.io/archethic-docs/FAQ/bridge/#what-happens-if-a-problem-occurs-or-i-refuse-a-transaction-during-the-transfer')" />
+        <img src="assets/images/icons/help.png" height="20" alt="" style="padding-left: 5px; padding-bottom: 5px; cursor: pointer;" onclick="window.open('https://wiki.archethic.net/FAQ/bridge/#what-happens-if-a-problem-occurs-or-i-refuse-a-transaction-during-the-transfer')" />
       `);
     }
   }, 1000);
 }
 
+export function clearLocalStorage() {
+  localStorage.clear();
+}
+
+export function refundValidation(contractAddress) {
+  console.log('Refund: contract = ' + contractAddress);
+}
+
+export function exportLocalStorage() {
+  var data = {};
+  for (var i = 0; i < localStorage.length; i++) {
+    var key = localStorage.key(i);
+    data[key] = localStorage.getItem(key);
+  }
+  var jsonData = JSON.stringify(data);
+  var blob = new Blob([jsonData], { type: "application/json" });
+  var url = URL.createObjectURL(blob);
+  var link = $("<a />")
+    .attr("href", url)
+    .attr("download", "localStorageData.json")
+    .appendTo("body");
+  link[0].click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
