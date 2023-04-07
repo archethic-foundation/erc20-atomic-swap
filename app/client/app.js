@@ -7,7 +7,7 @@ import { getArchethicBalance, getConfig } from "./service.js";
 let provider;
 let interval;
 
-window.onload = async function() {
+window.onload = async function () {
   try {
     if (typeof window.ethereum !== "undefined") {
       console.log("MetaMask is installed!");
@@ -58,28 +58,50 @@ $('#clearLocalStorage').click(function () {
   return false;
 });
 
-$('#exportLocalStorage').click(function() {
+$('#exportLocalStorage').click(function () {
   exportLocalStorage();
 });
 
-$('#exportLocalStorageModal').click(function() {
+$('#exportLocalStorageModal').click(function () {
   exportLocalStorage();
 });
 
+$('#exportLocalStorageModalRefund').click(function () {
+  exportLocalStorage();
+});
 
-$('#refund').click(function() {
-  showRefundDialog("Refund", "Please, fill your contract address to refund", async function(isOk, contractAddress) {
+$('#refund').click(function () {
+  showRefundDialog("Refund", `Please, fill your ${fromChainName} contract address to refund`, async function (isOk, contractAddress) {
     if (isOk) {
+      var dots = window.setInterval(function () {
+        var wait = $('#loading-dots');
+        if (wait.html().length > 2)
+          wait.html("");
+        else
+          wait.append(".");
+      }, 500);
+
       try {
+        $("#errorRefund").text("")
+        $("#refundFinished").hide();
+        $("#infoRefund").show();
+        $("#refundInProgress").show();
+
         console.log("Refund contract", contractAddress)
         const contract = await getHTLC_Contract(contractAddress, provider)
         const tx = await refundERC(contract, signer)
-        alert("Refund successful")
+        $("#refundInProgress").hide();
+        $("#refundFinished").show();
+
         console.log("Refund tx", tx.transactionHash)
       }
       catch (e) {
-        handleError(e)
+        $("#refundInProgress").hide();
+        $("#errorRefund")
+          .text(`${e.message || e}`)
+          .show();
       }
+      clearInterval(dots);
     }
   });
   return false;
@@ -197,6 +219,10 @@ async function startApp() {
 
   $("#close").on("click", () => {
     $("#workflow").hide();
+  });
+
+  $("#closeInfoRefund").on("click", () => {
+    $("#infoRefund").hide();
   });
 
   let pendingTransferJSON = localStorage.getItem("pendingTransfer");

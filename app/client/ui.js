@@ -16,6 +16,8 @@ export function initPageBridge() {
   $("#btnSwapSpinner").hide();
   $("#btnSwapSpinnerText").hide();
 
+  $("#infoRefund").hide();
+
   initProgressBar();
 }
 

@@ -414,6 +414,49 @@
 				</div>
 			</div>
 		</div>
+		<div id="infoRefund" class="modal">
+			<div class="modal-background">
+				<div class="modal-content">
+					<span id="closeInfoRefund" class="close">&times;</span>
+					<div class="para-text" style="padding-top: 10;">
+						<div class="para-text">
+							<p style="text-overflow: ellipsis;
+				word-wrap: break-word;"><span id="errorRefund"></span></p>
+						</div>
+					</div>
+					<div class="para-text" style="padding-top: 10;">
+
+						<div class="para-text" id="refundInProgress" style="display: none;">
+							<p style="text-overflow: ellipsis;
+				word-wrap: break-word;">Refund in progress. Please wait<span id="loading-dots"></span><br>
+							</p>
+						</div>
+						<div class="para-text" id="refundFinished" style="display: none;">
+							<p style="text-overflow: ellipsis;
+				word-wrap: break-word;">The refund process has successfully completed.<br>
+							</p>
+						</div>
+					</div>
+					<div class="para-text" style="padding-top: 10;">
+						<div class="para-text">
+							<p style="text-overflow: ellipsis;
+				word-wrap: break-word;"><span id="errorRefund"></span></p>
+						</div>
+					</div>
+					<div>
+						<p class="para-text" style="padding-top: 10px; font-weight: 400;">
+							<img src="assets/images/icons/export.png" height="22" alt=""
+								style="padding-top: 3px; padding-left: 10px; padding-bottom: 5px;" />
+							<a href="#" id="exportLocalStorageModalRefund">
+								Export local storage</a>
+							<img src="assets/images/icons/help.png" height="20" alt=""
+								style="padding-top: 3px; padding-left: 5px; padding-bottom: 5px; cursor: pointer;"
+								onclick="window.open(`https://wiki.archethic.net/FAQ/bridge#can-i-help-the-developers-analyze-the-problems`);" />
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
 		</form>
 		<footer class="mastfoot">
 			<div class="inner">
