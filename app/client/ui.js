@@ -267,6 +267,5 @@ export function showRefundDialog(title, message, callback) {
 
 function isValidERC20Address(address) {
   // Check if address matches ERC20 format, return true or false
-  const regex = /^(0x)?[0-9a-fA-F]/;
-  return regex.test(address);
+  return ethers.utils.isAddress(address);
 }
