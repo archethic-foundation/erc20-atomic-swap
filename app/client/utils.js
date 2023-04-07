@@ -125,7 +125,7 @@ export function updateClock(endtime, HTLC_Contract, signer, state, ethChainId) {
         setTimeout(function () {
 
         }, 2000);
-        refundERC(HTLC_Contract, signer, state)
+        refundERC(HTLC_Contract, signer)
           .then(async tx => {
 
             localStorage.removeItem("transferStep")
@@ -169,10 +169,6 @@ export function updateClock(endtime, HTLC_Contract, signer, state, ethChainId) {
 
 export function clearLocalStorage() {
   localStorage.clear();
-}
-
-export function refundValidation(contractAddress) {
-  console.log('Refund: contract = ' + contractAddress);
 }
 
 export function exportLocalStorage() {
