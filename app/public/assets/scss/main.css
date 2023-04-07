@@ -655,6 +655,13 @@ body {
   color: #ff0000;
 }
 
+#errorRefund {
+  font-weight: 300;
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: #ff0000;
+}
+
 #txSummaryFinished {
   color: yellowgreen;
 }
@@ -731,4 +738,26 @@ body {
   color: rgb(71, 71, 71)aaa;
   text-decoration: none;
   cursor: pointer;
+}
+
+#loading-dots {
+  animation: loading-dots 1s infinite;
+}
+
+@keyframes loading-dots {
+  0% {
+    content: ".";
+  }
+
+  33% {
+    content: "..";
+  }
+
+  66% {
+    content: "...";
+  }
+
+  100% {
+    content: ".";
+  }
 }
