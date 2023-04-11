@@ -255,6 +255,11 @@ export async function getHTLCLockTime(HTLC_Contract) {
 
 export async function refundERC(HTLC_Contract, signer) {
   const HTLC_ContractSigner = await HTLC_Contract.connect(signer)
+  const isFinished = await HTLC_ContractSigner.finished()
+  if (isFinished) {
+    throw "Swap is already closed due to a withdraw or a prior refund."
+  }
+
   const tx = await HTLC_ContractSigner.refund()
   return await tx.wait()
 }
