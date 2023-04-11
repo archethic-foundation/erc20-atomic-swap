@@ -97,8 +97,16 @@ $('#refund').click(function () {
       }
       catch (e) {
         $("#refundInProgress").hide();
+
+        let errorMsg = e
+        if (e.data && e.data.message) {
+          errorMsg = e.data.message
+        } else if (e.message) {
+          errorMsg = e.message
+        }
+
         $("#errorRefund")
-          .text(`${e.message || e}`)
+          .text(`${errorMsg}`)
           .show();
       }
       clearInterval(dots);
