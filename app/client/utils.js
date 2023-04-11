@@ -39,9 +39,18 @@ export async function handleError(e, step, state, ethChainId) {
   $("#btnSwap").show();
   $("#btnSwapSpinner").hide();
 
-  console.error(e.message || e);
+  console.log(e)
+  let errorMsg = e
+  if (e.data && e.data.message) {
+    errorMsg = e.data.message
+  }
+  else if (e.message) {
+    errorMsg = e.message
+  }
+
+  console.error(errorMsg);
   $("#error")
-    .text(`${e.message || e}`)
+    .text(`${errorMsg}`)
     .show();
   $("#close").show();
 
