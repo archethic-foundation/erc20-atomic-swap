@@ -1,7 +1,7 @@
 import { initPageBridge, initTransfer, changeBtnToTransferInProgress, displayConnectionError, initReConnectionScreen, showConfirmationDialog, showRefundDialog } from "./ui.js";
 import { initChainContext } from "./chain.js";
-import { uint8ArrayToHex, handleError, exportLocalStorage, clearLocalStorage } from "./utils.js";
-import { getERC20Contract, getHTLC_Contract, deployHTLC, transferERC20, deployArchethic, withdrawEthereum, withdrawArchethic, refundERC } from "./contract";
+import { uint8ArrayToHex, handleError, exportLocalStorage, clearLocalStorage, getTimeRemaining } from "./utils.js";
+import { getERC20Contract, getHTLC_Contract, deployHTLC, transferERC20, deployArchethic, withdrawEthereum, withdrawArchethic, refundERC, getHTLCLockTime } from "./contract";
 import { getArchethicBalance, getConfig } from "./service.js";
 
 let provider;
@@ -81,6 +81,7 @@ $('#refund').click(function () {
           wait.append(".");
       }, 500);
 
+      var endDate = 0;
       try {
         $("#errorRefund").text("")
         $("#refundFinished").hide();
@@ -89,10 +90,12 @@ $('#refund').click(function () {
 
         console.log("Refund contract", contractAddress)
         const contract = await getHTLC_Contract(contractAddress, provider)
+        endDate = await getHTLCLockTime(contract);
+        console.log('endDate' + endDate);
         const tx = await refundERC(contract, signer)
         $("#refundInProgress").hide();
         $("#refundFinished").show();
-
+        clearLocalStorage();
         console.log("Refund tx", tx.transactionHash)
       }
       catch (e) {
@@ -104,10 +107,18 @@ $('#refund').click(function () {
         } else if (e.message) {
           errorMsg = e.message
         }
+        if (endDate == "undefined" || endDate == 0) {
+          $("#errorRefund")
+            .text(`${errorMsg.replace("execution reverted: ", "")}`)
+            .show();
+        }
+        else {
+          var t = getTimeRemaining(endDate);
+          $("#errorRefund")
+            .text(`${errorMsg.replace("execution reverted: ", "")}. You can retrieve your funds in ${('0' + t.hours).slice(-2) + 'h' + ('0' + t.minutes).slice(-2) + 'm' + ('0' + t.seconds).slice(-2)}.`)
+            .show();
+        }
 
-        $("#errorRefund")
-          .text(`${errorMsg}`)
-          .show();
       }
       clearInterval(dots);
     }
