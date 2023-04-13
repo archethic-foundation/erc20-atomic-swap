@@ -94,14 +94,14 @@ export function showConfirmationDialog(title, message, callback) {
       resizable: false,
       modal: true,
       buttons: {
+        "No": function () {
+          callback(false);
+          $(this).dialog("close");
+        },
         "Yes": function () {
           callback(true);
           $(this).dialog("close");
         },
-        "No": function () {
-          callback(false);
-          $(this).dialog("close");
-        }
       },
       open: function (event, ui) {
         $(this).css({
