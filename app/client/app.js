@@ -107,17 +107,25 @@ $('#refund').click(function () {
         } else if (e.message) {
           errorMsg = e.message
         }
-        if (endDate == "undefined" || endDate == 0) {
+        if (errorMsg.includes("Response has no error or result for request")) {
           $("#errorRefund")
-            .text(`${errorMsg.replace("execution reverted: ", "")}`)
+            .text(`Please, connect to the internet.`)
             .show();
         }
         else {
-          var t = getTimeRemaining(endDate);
-          $("#errorRefund")
-            .text(`${errorMsg.replace("execution reverted: ", "")}. You can retrieve your funds in ${('0' + t.hours).slice(-2) + 'h' + ('0' + t.minutes).slice(-2) + 'm' + ('0' + t.seconds).slice(-2)}.`)
-            .show();
+          if (errorMsg.includes("Too early")) {
+            var t = getTimeRemaining(endDate);
+            $("#errorRefund")
+              .text(`You can retrieve your funds in ${('0' + t.hours).slice(-2) + 'h' + ('0' + t.minutes).slice(-2) + 'm' + ('0' + t.seconds).slice(-2)}.`)
+              .show();
+          }
+          else {
+            $("#errorRefund")
+              .text(`${errorMsg}`)
+              .show();
+          }
         }
+
 
       }
       clearInterval(dots);
@@ -462,7 +470,6 @@ async function goto(step, state) {
 }
 
 async function initState(pendingTransferJSON, ethChainId, unirisContract, toChainExplorer, recipientEthereum, signer) {
-  //initProgressBar();
 
   $("#btnSwapSpinnerText").text("Loading previous transfer");
   $("#btnSwapSpinner").show();
