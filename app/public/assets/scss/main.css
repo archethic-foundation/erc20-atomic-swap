@@ -89,7 +89,7 @@ body {
   background: #000 url(../images/bg01.png) no-repeat;
   background-size: auto;
   background-clip: padding-box;
-  border: solid 3px transparent;
+  border: solid 1px transparent;
   border-radius: 25px;
 }
 
@@ -151,7 +151,7 @@ body {
 .main .icon-block {
   position: relative;
   background-clip: padding-box;
-  border: solid 3px transparent;
+  border: solid 1px transparent;
   border-radius: 25px;
   z-index: 1;
 }
