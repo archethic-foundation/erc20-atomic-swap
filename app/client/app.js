@@ -17,8 +17,8 @@ window.onload = async function () {
         // Already connected, start app
         $("#connectMetamaskBtn").hide();
         $("#connectMetamaskBtnSpinner").show();
-        await provider.send("eth_requestAccounts", []);
         handleNetworkChange()
+        await provider.send("eth_requestAccounts", []);
         await startApp()
       }
     } else {
