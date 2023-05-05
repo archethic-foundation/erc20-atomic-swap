@@ -329,7 +329,7 @@ async function handleFormSubmit(
 ) {
 
   await new Promise((resolve, reject) => {
-    showConfirmationDialog("DISCLAIMER", "I understand that the transferred UCOs can only be used on the Archethic Public Blockchain and can't be withdrawn or transferred until a two-way bridge is launched.", function (result) {
+    showConfirmationDialog("DISCLAIMER", "I understand that the transferred UCOs can only be used on the Archethic Public Blockchain and can't be withdrawn or transferred back until a two-way bridge is launched.", function (result) {
       if (result == false) {
         reject("User declined disclaimer");
       } else {
