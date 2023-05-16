@@ -58,6 +58,7 @@ $('#clearLocalStorage').click(function () {
   return false;
 });
 
+
 $('#exportLocalStorage').click(function () {
   exportLocalStorage();
 });
@@ -326,6 +327,16 @@ async function handleFormSubmit(
   fromChainName,
   erc20Amount
 ) {
+
+  await new Promise((resolve, reject) => {
+    showConfirmationDialog("DISCLAIMER", "I understand that the transferred UCOs can only be used on the Archethic Public Blockchain and can't be withdrawn or transferred back until a two-way bridge is launched.", function (result) {
+      if (result == false) {
+        reject("User declined disclaimer");
+      } else {
+        resolve();
+      }
+    });
+  });
 
   initTransfer();
 
