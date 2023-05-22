@@ -1,7 +1,6 @@
 import express from "express";
 
 import swapRoutes from "./swap.js";
-import balanceRoutes from "./balance.js";
 
 import { enabledNetworks, bridgeAddress, ethConfig, hasSufficientFunds, getUCOPrice, archethicEndpoint, maxSwapDollar } from "../utils.js"
 const router = express.Router();
@@ -38,7 +37,6 @@ router.post("/status", async (req, res) => {
 });
 
 router.use("/swap", swapRoutes)
-router.use("/balances", balanceRoutes)
 
 
 export default router;

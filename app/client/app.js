@@ -1,8 +1,11 @@
 import { initPageBridge, initTransfer, changeBtnToTransferInProgress, displayConnectionError, initReConnectionScreen, showConfirmationDialog, showRefundDialog } from "./ui.js";
 import { initChainContext } from "./chain.js";
-import { uint8ArrayToHex, handleError, exportLocalStorage, clearLocalStorage, getTimeRemaining } from "./utils.js";
+import { handleError, exportLocalStorage, clearLocalStorage, getTimeRemaining } from "./utils.js";
 import { getERC20Contract, getHTLC_Contract, deployHTLC, transferERC20, deployArchethic, withdrawEthereum, withdrawArchethic, refundERC, getHTLCLockTime } from "./contract";
-import { getArchethicBalance, getConfig } from "./service.js";
+import { getConfig } from "./service.js";
+
+import Archethic, { Utils } from "archethic"
+const { uint8ArrayToHex, fromBigInt } = Utils
 
 let provider;
 let interval;
@@ -169,6 +172,9 @@ async function startApp() {
 
   ucoPrice = UCOPrice
 
+  const archethic = new Archethic(archethicEndpoint)
+  await archethic.connect()
+
   initPageBridge();
 
   const maxSwap = (maxSwapDollar / UCOPrice).toFixed(5);
@@ -203,28 +209,31 @@ async function startApp() {
     erc20Amount = await setupEthAccount(account, unirisContract, sourceChainExplorer, ucoPrice, maxSwapDollar)
   })
 
-  // Update the UCO price
-  interval = setInterval(async () => {
-    const { UCOPrice } = await getConfig(ethChainId)
-    if (UCOPrice != ucoPrice) {
+  await archethic.network.subscribeToOracleUpdates(res => {
+      const {
+        services: {
+          uco: { usd: usdPrice }
+        }
+      } = res 
+
       $("#ucoPrice").text(`1 UCO = ${UCOPrice.toFixed(5)}$`).show();
-      const maxSwap = (maxSwapDollar / UCOPrice).toFixed(5);
+      const maxSwap = (maxSwapDollar / usdPrice).toFixed(5);
       $("#nbTokensToSwap").attr("max", maxSwap);
 
       const erc20Amount = parseFloat($("#fromBalanceUCO").text())
-      const usd = (erc20Amount * UCOPrice).toFixed(5)
+      const usd = parseFloat((erc20Amount * usdPrice).toFixed(5))
 
-      $("#fromBalanceUSD").text(new Intl.NumberFormat(usd));
+      $("#fromBalanceUSD").text(new Intl.NumberFormat().format(usd));
       $("#maxUCOValue").attr("value", Math.min(erc20Amount, maxSwap).toFixed(5));
 
-      ucoPrice = UCOPrice
-    }
-  }, 5000)
+      ucoPrice = usdPrice
+  })
 
   $("#recipientAddress").on("change", async (e) => {
-    const archethicBalance = await getArchethicBalance($(e.target).val());
+    address = $(e.target).val()
+    const { uco: archethicBalance } = await archethic.network.getBalance(address)
 
-    const ucoAmount = archethicBalance / 1e8
+    const ucoAmount = fromBigInt(archethicBalance)
 
     $("#toBalanceUCO").text(new Intl.NumberFormat().format(parseFloat(ucoAmount).toFixed(8)));
     $("#toBalanceUSD").text(new Intl.NumberFormat().format((ucoPrice * ucoAmount).toFixed(5)));
@@ -358,7 +367,7 @@ async function handleFormSubmit(
     return
   }
 
-  const bridgeBalance = await getArchethicBalance(bridgeAddress)
+  const { uco: bridgeBalance } = await archethic.network.getBalance(bridgeAddress)
   if (bridgeBalance <= amount * 1e8) {
     $("#error").text(
       "Bridge has insuffficient funds. Please retry later..."
@@ -468,9 +477,9 @@ async function goto(step, state) {
       setERC20Amount(await state.signer.getAddress(), state.unirisContract, ucoPrice)
 
       setTimeout(async () => {
-        const archethicBalance = await getArchethicBalance(state.recipientArchethic);
+        const { uco: archethicBalance } = await archethic.network.getBalance(state.recipientArchethic);
 
-        const newUCOBalance = archethicBalance / 1e8
+        const newUCOBalance = fromBigInt(archethicBalance)
 
         $("#toBalanceUCO").text(parseFloat(newUCOBalance).toFixed(2));
         $("#toBalanceUSD").text((ucoPrice * newUCOBalance).toFixed(5));
@@ -511,9 +520,8 @@ async function initState(pendingTransferJSON, ethChainId, unirisContract, toChai
   $("#nbTokensToSwap").val(pendingTransfer.amount);
   $("#nbTokensToSwap").prop('disabled', true)
 
-  const archethicBalance = await getArchethicBalance(pendingTransfer.recipientArchethic);
-
-  const ucoAmount = archethicBalance / 1e8
+  const { uco: archethicBalance } = await archethic.network.getBalance(pendingTransfer.recipientArchethic);
+  const ucoAmount = fromBigInt(archethicBalance)
 
   $("#toBalanceUCO").text(new Intl.NumberFormat().format(parseFloat(ucoAmount).toFixed(8)));
   $("#toBalanceUSD").text(new Intl.NumberFormat().format((ucoPrice * ucoAmount).toFixed(5)));
