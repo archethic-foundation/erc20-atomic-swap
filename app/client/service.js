@@ -30,3 +30,16 @@ export async function getConfig(ethChainId) {
             };
         });
 }
+
+export async function getBalance(archethic, address) {
+    const { lastTransaction: { balance: { uco: uco}} } = await archethic.network.rawGraphQLQuery(`
+        query {
+              lastTransaction(address: "${address}") {
+                 balance {
+                   uco
+                 }
+              }
+            }
+    `)
+    return uco
+}
