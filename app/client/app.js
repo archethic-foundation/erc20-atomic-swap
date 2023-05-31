@@ -278,7 +278,7 @@ async function startApp() {
   let pendingTransferJSON = localStorage.getItem("pendingTransfer");
   let state
   if (pendingTransferJSON) {
-    state = await initState(pendingTransferJSON, ethChainId, unirisContract, toChainExplorer, recipientEthereum, signer)
+    state = await initState(pendingTransferJSON, ethChainId, unirisContract, toChainExplorer, recipientEthereum, signer, archethic)
   }
 
   $("#swapForm").on("submit", async (e) => {
@@ -292,7 +292,7 @@ async function startApp() {
     if (state) {
       changeBtnToTransferInProgress();
       try {
-        await goto(localStorage.getItem("transferStep"), state);
+        await goto(localStorage.getItem("transferStep"), state, archethic);
       }
       catch (e) {
         handleError(e, step, JSON.parse(pendingTransferJSON, ethChainId));
@@ -310,7 +310,8 @@ async function startApp() {
       sourceChainExplorer,
       bridgeAddress,
       fromChainName,
-      erc20Amount
+      erc20Amount,
+      archethic
     );
   });
 
@@ -347,7 +348,8 @@ async function handleFormSubmit(
   sourceChainExplorer,
   bridgeAddress,
   fromChainName,
-  erc20Amount
+  erc20Amount,
+  archethic,
 ) {
 
   await new Promise((resolve, reject) => {
@@ -379,7 +381,6 @@ async function handleFormSubmit(
     $("#close").show();
     return
   }
-
   const bridgeBalance = await getBalance(archethic, bridgeAddress)
   if (bridgeBalance <= amount * 1e8) {
     $("#error").text(
@@ -445,7 +446,7 @@ async function handleFormSubmit(
       HTLC_transaction: HTLC_tx,
       sourceChainName: fromChainName
     }
-    await goto("deployedEthContract", state)
+    await goto("deployedEthContract", state, archethic)
 
   } catch (e) {
     let pendingTransferJSON = localStorage.getItem("pendingTransfer");
@@ -454,22 +455,22 @@ async function handleFormSubmit(
   }
 }
 
-async function goto(step, state) {
+async function goto(step, state, archethic) {
   switch (step) {
     case "deployedEthContract":
       step = 2
       state = await transferERC20(state)
       setERC20Amount(await state.signer.getAddress(), state.unirisContract, ucoPrice)
-      return await goto("transferedERC20", state)
+      return await goto("transferedERC20", state, archethic)
     case "transferedERC20":
       step = 3
       state = await deployArchethic(state)
-      return await goto("deployedArchethicContract", state)
+      return await goto("deployedArchethicContract", state, archethic)
     case "deployedArchethicContract":
       step = 4
       $("#swapStep").addClass("is-active");
       state = await withdrawEthereum(state)
-      return await goto("withdrawEthContract", state)
+      return await goto("withdrawEthContract", state, archethic)
     case "withdrawEthContract":
       await withdrawArchethic(state)
 
@@ -502,7 +503,7 @@ async function goto(step, state) {
   }
 }
 
-async function initState(pendingTransferJSON, ethChainId, unirisContract, toChainExplorer, recipientEthereum, signer) {
+async function initState(pendingTransferJSON, ethChainId, unirisContract, toChainExplorer, recipientEthereum, signer, archethic) {
 
   $("#btnSwapSpinnerText").text("Loading previous transfer");
   $("#btnSwapSpinner").show();
@@ -595,7 +596,7 @@ async function initState(pendingTransferJSON, ethChainId, unirisContract, toChai
   $("#steps").show();
   changeBtnToTransferInProgress()
   try {
-    await goto(localStorage.getItem("transferStep"), state);
+    await goto(localStorage.getItem("transferStep"), state, archethic);
   }
   catch (e) {
     handleError(e, step, JSON.parse(pendingTransferJSON, ethChainId));
