@@ -222,8 +222,12 @@ async function startApp() {
 
     const erc20Amount = parseFloat($("#fromBalanceUCO").text().replace(',', '.'));
     const usd = parseFloat((erc20Amount * usdPrice).toFixed(5))
-
     $("#fromBalanceUSD").text(new Intl.NumberFormat().format(usd));
+
+    const ucoAmount = parseFloat($("#toBalanceUCO").text().replace(',', '.'));
+    const uco = parseFloat((ucoAmount * usdPrice).toFixed(5));
+    $("#toBalanceUSD").text(new Intl.NumberFormat().format(uco));
+
     $("#maxUCOValue").attr("value", Math.min(erc20Amount, maxSwap).toFixed(5));
 
     ucoPrice = usdPrice
