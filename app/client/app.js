@@ -210,23 +210,23 @@ async function startApp() {
   })
 
   await archethic.network.subscribeToOracleUpdates(res => {
-      const {
-        services: {
-          uco: { usd: usdPrice }
-        }
-      } = res 
+    const {
+      services: {
+        uco: { usd: usdPrice }
+      }
+    } = res
 
-      $("#ucoPrice").text(`1 UCO = ${UCOPrice.toFixed(5)}$`).show();
-      const maxSwap = (maxSwapDollar / usdPrice).toFixed(5);
-      $("#nbTokensToSwap").attr("max", maxSwap);
+    $("#ucoPrice").text(`1 UCO = ${UCOPrice.toFixed(5)}$`).show();
+    const maxSwap = (maxSwapDollar / usdPrice).toFixed(5);
+    $("#nbTokensToSwap").attr("max", maxSwap);
 
-      const erc20Amount = parseFloat($("#fromBalanceUCO").text())
-      const usd = parseFloat((erc20Amount * usdPrice).toFixed(5))
+    const erc20Amount = parseFloat($("#fromBalanceUCO").text().replace(',', '.'));
+    const usd = parseFloat((erc20Amount * usdPrice).toFixed(5))
 
-      $("#fromBalanceUSD").text(new Intl.NumberFormat().format(usd));
-      $("#maxUCOValue").attr("value", Math.min(erc20Amount, maxSwap).toFixed(5));
+    $("#fromBalanceUSD").text(new Intl.NumberFormat().format(usd));
+    $("#maxUCOValue").attr("value", Math.min(erc20Amount, maxSwap).toFixed(5));
 
-      ucoPrice = usdPrice
+    ucoPrice = usdPrice
   })
 
   $("#recipientAddress").on("change", async (e) => {
