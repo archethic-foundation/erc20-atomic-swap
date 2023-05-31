@@ -1,6 +1,6 @@
 import { initPageBridge, initTransfer, changeBtnToTransferInProgress, displayConnectionError, initReConnectionScreen, showConfirmationDialog, showRefundDialog } from "./ui.js";
 import { initChainContext } from "./chain.js";
-import { handleError, exportLocalStorage, clearLocalStorage, getTimeRemaining } from "./utils.js";
+import { handleError, exportLocalStorage, clearLocalStorage, getTimeRemaining, NumberParser } from "./utils.js";
 import { getERC20Contract, getHTLC_Contract, deployHTLC, transferERC20, deployArchethic, withdrawEthereum, withdrawArchethic, refundERC, getHTLCLockTime } from "./contract";
 import { getConfig, getBalance } from "./service.js";
 
@@ -220,15 +220,24 @@ async function startApp() {
     const maxSwap = (maxSwapDollar / usdPrice).toFixed(5);
     $("#nbTokensToSwap").attr("max", maxSwap);
 
-    const erc20Amount = parseFloat($("#fromBalanceUCO").text().replace(',', '.'));
-    const usd = parseFloat((erc20Amount * usdPrice).toFixed(5))
+    const erc20Amount = new NumberParser().parse($("#fromBalanceUCO").text());
+    var usd = 0;
+    if (!isNaN(erc20Amount)) {
+      usd = parseFloat((erc20Amount * usdPrice).toFixed(5))
+    }
     $("#fromBalanceUSD").text(new Intl.NumberFormat().format(usd));
 
-    const ucoAmount = parseFloat($("#toBalanceUCO").text().replace(',', '.'));
-    const uco = parseFloat((ucoAmount * usdPrice).toFixed(5));
+    const ucoAmount = new NumberParser().parse($("#toBalanceUCO").text());
+    var uco = 0;
+    if (!isNaN(ucoAmount)) {
+      uco = parseFloat((ucoAmount * usdPrice).toFixed(5))
+    }
     $("#toBalanceUSD").text(new Intl.NumberFormat().format(uco));
 
     $("#maxUCOValue").attr("value", Math.min(erc20Amount, maxSwap).toFixed(5));
+
+    const amount = $("#nbTokensToSwap").val();
+    $("#swapBalanceUSD").text((amount * usdPrice).toFixed(5));
 
     ucoPrice = usdPrice
   })
