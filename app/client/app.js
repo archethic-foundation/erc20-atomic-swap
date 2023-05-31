@@ -216,7 +216,7 @@ async function startApp() {
       }
     } = res
 
-    $("#ucoPrice").text(`1 UCO = ${UCOPrice.toFixed(5)}$`).show();
+    $("#ucoPrice").text(`1 UCO = ${usdPrice}$`).show();
     const maxSwap = (maxSwapDollar / usdPrice).toFixed(5);
     $("#nbTokensToSwap").attr("max", maxSwap);
 
