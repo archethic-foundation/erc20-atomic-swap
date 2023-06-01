@@ -219,6 +219,11 @@ function checkEthereumContract(
         return resolve(startTime.toNumber() + lockTime.toNumber());
       }
 
+      console.log(contractToken.toUpperCase(), `Expected contract address: ${unirisTokenAddress.toUpperCase()}`)
+      console.log(contractHash, `Expected contract hash: 0x${hash}`)
+      console.log(ethers.utils.formatUnits(balance, 18), `Expected uco transfered: ${ethers.utils.formatUnits(contractAmount, 18)}`)
+      console.log(contractRecipient, `Expected contract recipient: ${contractRecipient}`)
+
       return reject("invalid contract");
     } catch (e) {
       return reject(e);
@@ -245,11 +250,19 @@ async function checkEthereumWithdraw(
   ]);
   const values = iface.decodeFunctionData("withdraw", tx.data);
 
-  return (
+  const isValid = (
     receipt.status == 1 &&
     tx.to == contractAddress &&
     values[0] == `0x${secret}`
   );
+
+  if (!isValid) {
+    console.log(receipt.status, "Status transaction")
+    console.log(tx.to, `Expected recipient: ${contractAddress}`)
+    console.log(values[0], `Expected secret: 0x${secret}`)
+  }
+
+  return isValid
 }
 
 async function getEthereumContract(ethereumContractAddress, provider) {
