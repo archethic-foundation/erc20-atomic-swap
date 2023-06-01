@@ -19,6 +19,7 @@ import { createHmac } from "crypto";
 const { originPrivateKey } = Utils;
 
 import { archethicConnection, ethConfig, baseSeedContract, bridgeAddress, bridgeSeed, getUCOPrice, getLastTransaction, getStandardDeviation, getTransactionChain, maxSwapDollar } from "../utils.js";
+import { toBigInt } from "archethic/lib/utils.js";
 
 export default { deployContract, withdraw }
 
@@ -61,7 +62,8 @@ async function deployContract(req, res, next) {
         const fundingTx = await fundContract(
           archethic,
           contractSeed,
-          req.body.amount
+          req.body.amount,
+          ucoPrice
         );
         console.log(`Funding tx ${Utils.uint8ArrayToHex(fundingTx.address)}`);
         await sendTransaction(fundingTx);
@@ -263,14 +265,17 @@ async function getEthereumContract(ethereumContractAddress, provider) {
   }
 }
 
-async function fundContract(archethic, contractSeed, amount) {
+async function fundContract(archethic, contractSeed, amount, ucoPrice) {
   const index = await archethic.transaction.getTransactionIndex(bridgeAddress);
+
+  // additional fund = 0.03$ to support 0.015$ fee per transaction
+  const additional_fund = toBigInt(ucoPrice / 0.03)
 
   const contractAddress = Crypto.deriveAddress(contractSeed, 0);
   return archethic.transaction
     .new()
     .setType("transfer")
-    .addUCOTransfer(contractAddress, amount + 30_000_000) // Send 0.3 UCO to the contract to pay the fees
+    .addUCOTransfer(contractAddress, amount + additional_fund)
     .build(bridgeSeed, index)
     .originSign(originPrivateKey)
 }
