@@ -14,24 +14,6 @@ export async function handleResponse(response) {
   });
 }
 
-const byteToHex = [];
-for (let n = 0; n <= 0xff; ++n) {
-  const hexOctet = n.toString(16).padStart(2, "0");
-  byteToHex.push(hexOctet);
-}
-
-export function uint8ArrayToHex(bytes) {
-  const buff = new Uint8Array(bytes);
-  const hexOctets = new Array(buff.length);
-
-  for (let i = 0; i < buff.length; ++i) {
-    hexOctets[i] = byteToHex[buff[i]];
-  }
-
-  return hexOctets.join("");
-}
-
-
 export async function handleError(e, step, state, ethChainId) {
   $('#btnSwap').prop('disabled', false);
   $('#nbTokensToSwap').prop('disabled', false);
@@ -196,4 +178,22 @@ export function exportLocalStorage() {
   link[0].click();
   link.remove();
   URL.revokeObjectURL(url);
+}
+
+export class NumberParser {
+  constructor(locale) {
+    const parts = new Intl.NumberFormat(locale).formatToParts(12345.6);
+    const numerals = [...new Intl.NumberFormat(locale, { useGrouping: false }).format(9876543210)].reverse();
+    const index = new Map(numerals.map((d, i) => [d, i]));
+    this._group = new RegExp(`[${parts.find(d => d.type === "group").value}]`, "g");
+    this._decimal = new RegExp(`[${parts.find(d => d.type === "decimal").value}]`);
+    this._numeral = new RegExp(`[${numerals.join("")}]`, "g");
+    this._index = d => index.get(d);
+  }
+  parse(string) {
+    return (string = string.trim()
+      .replace(this._group, "")
+      .replace(this._decimal, ".")
+      .replace(this._numeral, this._index)) ? +string : NaN;
+  }
 }

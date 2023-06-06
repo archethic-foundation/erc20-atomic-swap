@@ -1,13 +1,5 @@
 import { handleResponse } from "./utils.js";
 
-export async function getArchethicBalance(address) {
-    return fetch(`/balances/archethic/${address}`)
-        .then(handleResponse)
-        .then((r) => {
-            return r.balance
-        });
-}
-
 export async function getConfig(ethChainId) {
 
     return fetch("/status", {
@@ -37,4 +29,23 @@ export async function getConfig(ethChainId) {
                 maxSwapDollar: r.maxSwapDollar
             };
         });
+}
+
+export async function getBalance(archethic, address) {
+    const response = await archethic.network.rawGraphQLQuery(`
+        query {
+              lastTransaction(address: "${address}") {
+                 balance {
+                   uco
+                 }
+              }
+        }
+    `);
+
+    if (!response || !response.lastTransaction) {
+        return 0;
+    }
+
+    const { lastTransaction: { balance: { uco: uco } } } = response;
+    return uco;
 }

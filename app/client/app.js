@@ -1,8 +1,11 @@
 import { initPageBridge, initTransfer, changeBtnToTransferInProgress, displayConnectionError, initReConnectionScreen, showConfirmationDialog, showRefundDialog } from "./ui.js";
 import { initChainContext } from "./chain.js";
-import { uint8ArrayToHex, handleError, exportLocalStorage, clearLocalStorage, getTimeRemaining } from "./utils.js";
+import { handleError, exportLocalStorage, clearLocalStorage, getTimeRemaining, NumberParser } from "./utils.js";
 import { getERC20Contract, getHTLC_Contract, deployHTLC, transferERC20, deployArchethic, withdrawEthereum, withdrawArchethic, refundERC, getHTLCLockTime } from "./contract";
-import { getArchethicBalance, getConfig } from "./service.js";
+import { getConfig, getBalance } from "./service.js";
+
+import Archethic, { Utils } from "archethic"
+const { uint8ArrayToHex, fromBigInt } = Utils
 
 let provider;
 let interval;
@@ -169,6 +172,9 @@ async function startApp() {
 
   ucoPrice = UCOPrice
 
+  const archethic = new Archethic(archethicEndpoint)
+  await archethic.connect()
+
   initPageBridge();
 
   const maxSwap = (maxSwapDollar / UCOPrice).toFixed(5);
@@ -203,28 +209,44 @@ async function startApp() {
     erc20Amount = await setupEthAccount(account, unirisContract, sourceChainExplorer, ucoPrice, maxSwapDollar)
   })
 
-  // Update the UCO price
-  interval = setInterval(async () => {
-    const { UCOPrice } = await getConfig(ethChainId)
-    if (UCOPrice != ucoPrice) {
-      $("#ucoPrice").text(`1 UCO = ${UCOPrice.toFixed(5)}$`).show();
-      const maxSwap = (maxSwapDollar / UCOPrice).toFixed(5);
-      $("#nbTokensToSwap").attr("max", maxSwap);
+  await archethic.network.subscribeToOracleUpdates(res => {
+    const {
+      services: {
+        uco: { usd: usdPrice }
+      }
+    } = res
 
-      const erc20Amount = parseFloat($("#fromBalanceUCO").text())
-      const usd = (erc20Amount * UCOPrice).toFixed(5)
+    $("#ucoPrice").text(`1 UCO = ${usdPrice}$`).show();
+    const maxSwap = (maxSwapDollar / usdPrice).toFixed(5);
+    $("#nbTokensToSwap").attr("max", maxSwap);
 
-      $("#fromBalanceUSD").text(new Intl.NumberFormat(usd));
-      $("#maxUCOValue").attr("value", Math.min(erc20Amount, maxSwap).toFixed(5));
-
-      ucoPrice = UCOPrice
+    const erc20Amount = new NumberParser().parse($("#fromBalanceUCO").text());
+    var usd = 0;
+    if (!isNaN(erc20Amount)) {
+      usd = parseFloat((erc20Amount * usdPrice).toFixed(5))
     }
-  }, 5000)
+    $("#fromBalanceUSD").text(new Intl.NumberFormat().format(usd));
+
+    const ucoAmount = new NumberParser().parse($("#toBalanceUCO").text());
+    var uco = 0;
+    if (!isNaN(ucoAmount)) {
+      uco = parseFloat((ucoAmount * usdPrice).toFixed(5))
+    }
+    $("#toBalanceUSD").text(new Intl.NumberFormat().format(uco));
+
+    $("#maxUCOValue").attr("value", Math.min(erc20Amount, maxSwap).toFixed(5));
+
+    const amount = $("#nbTokensToSwap").val();
+    $("#swapBalanceUSD").text((amount * usdPrice).toFixed(5));
+
+    ucoPrice = usdPrice
+  })
 
   $("#recipientAddress").on("change", async (e) => {
-    const archethicBalance = await getArchethicBalance($(e.target).val());
+    address = $(e.target).val()
+    const archethicBalance = await getBalance(archethic, address)
 
-    const ucoAmount = archethicBalance / 1e8
+    const ucoAmount = fromBigInt(archethicBalance)
 
     $("#toBalanceUCO").text(new Intl.NumberFormat().format(parseFloat(ucoAmount).toFixed(8)));
     $("#toBalanceUSD").text(new Intl.NumberFormat().format((ucoPrice * ucoAmount).toFixed(5)));
@@ -256,7 +278,7 @@ async function startApp() {
   let pendingTransferJSON = localStorage.getItem("pendingTransfer");
   let state
   if (pendingTransferJSON) {
-    state = await initState(pendingTransferJSON, ethChainId, unirisContract, toChainExplorer, recipientEthereum, signer)
+    state = await initState(pendingTransferJSON, ethChainId, unirisContract, toChainExplorer, recipientEthereum, signer, archethic)
   }
 
   $("#swapForm").on("submit", async (e) => {
@@ -270,7 +292,7 @@ async function startApp() {
     if (state) {
       changeBtnToTransferInProgress();
       try {
-        await goto(localStorage.getItem("transferStep"), state);
+        await goto(localStorage.getItem("transferStep"), state, archethic);
       }
       catch (e) {
         handleError(e, step, JSON.parse(pendingTransferJSON, ethChainId));
@@ -288,7 +310,8 @@ async function startApp() {
       sourceChainExplorer,
       bridgeAddress,
       fromChainName,
-      erc20Amount
+      erc20Amount,
+      archethic
     );
   });
 
@@ -325,7 +348,8 @@ async function handleFormSubmit(
   sourceChainExplorer,
   bridgeAddress,
   fromChainName,
-  erc20Amount
+  erc20Amount,
+  archethic,
 ) {
 
   await new Promise((resolve, reject) => {
@@ -357,8 +381,7 @@ async function handleFormSubmit(
     $("#close").show();
     return
   }
-
-  const bridgeBalance = await getArchethicBalance(bridgeAddress)
+  const bridgeBalance = await getBalance(archethic, bridgeAddress)
   if (bridgeBalance <= amount * 1e8) {
     $("#error").text(
       "Bridge has insuffficient funds. Please retry later..."
@@ -423,7 +446,7 @@ async function handleFormSubmit(
       HTLC_transaction: HTLC_tx,
       sourceChainName: fromChainName
     }
-    await goto("deployedEthContract", state)
+    await goto("deployedEthContract", state, archethic)
 
   } catch (e) {
     let pendingTransferJSON = localStorage.getItem("pendingTransfer");
@@ -432,22 +455,22 @@ async function handleFormSubmit(
   }
 }
 
-async function goto(step, state) {
+async function goto(step, state, archethic) {
   switch (step) {
     case "deployedEthContract":
       step = 2
       state = await transferERC20(state)
       setERC20Amount(await state.signer.getAddress(), state.unirisContract, ucoPrice)
-      return await goto("transferedERC20", state)
+      return await goto("transferedERC20", state, archethic)
     case "transferedERC20":
       step = 3
       state = await deployArchethic(state)
-      return await goto("deployedArchethicContract", state)
+      return await goto("deployedArchethicContract", state, archethic)
     case "deployedArchethicContract":
       step = 4
       $("#swapStep").addClass("is-active");
       state = await withdrawEthereum(state)
-      return await goto("withdrawEthContract", state)
+      return await goto("withdrawEthContract", state, archethic)
     case "withdrawEthContract":
       await withdrawArchethic(state)
 
@@ -468,9 +491,9 @@ async function goto(step, state) {
       setERC20Amount(await state.signer.getAddress(), state.unirisContract, ucoPrice)
 
       setTimeout(async () => {
-        const archethicBalance = await getArchethicBalance(state.recipientArchethic);
+        const archethicBalance = await getBalance(archethic, state.recipientArchethic);
 
-        const newUCOBalance = archethicBalance / 1e8
+        const newUCOBalance = fromBigInt(archethicBalance)
 
         $("#toBalanceUCO").text(parseFloat(newUCOBalance).toFixed(2));
         $("#toBalanceUSD").text((ucoPrice * newUCOBalance).toFixed(5));
@@ -480,7 +503,7 @@ async function goto(step, state) {
   }
 }
 
-async function initState(pendingTransferJSON, ethChainId, unirisContract, toChainExplorer, recipientEthereum, signer) {
+async function initState(pendingTransferJSON, ethChainId, unirisContract, toChainExplorer, recipientEthereum, signer, archethic) {
 
   $("#btnSwapSpinnerText").text("Loading previous transfer");
   $("#btnSwapSpinner").show();
@@ -511,9 +534,8 @@ async function initState(pendingTransferJSON, ethChainId, unirisContract, toChai
   $("#nbTokensToSwap").val(pendingTransfer.amount);
   $("#nbTokensToSwap").prop('disabled', true)
 
-  const archethicBalance = await getArchethicBalance(pendingTransfer.recipientArchethic);
-
-  const ucoAmount = archethicBalance / 1e8
+  const archethicBalance = await getBalance(archethic, pendingTransfer.recipientArchethic);
+  const ucoAmount = fromBigInt(archethicBalance)
 
   $("#toBalanceUCO").text(new Intl.NumberFormat().format(parseFloat(ucoAmount).toFixed(8)));
   $("#toBalanceUSD").text(new Intl.NumberFormat().format((ucoPrice * ucoAmount).toFixed(5)));
@@ -574,7 +596,7 @@ async function initState(pendingTransferJSON, ethChainId, unirisContract, toChai
   $("#steps").show();
   changeBtnToTransferInProgress()
   try {
-    await goto(localStorage.getItem("transferStep"), state);
+    await goto(localStorage.getItem("transferStep"), state, archethic);
   }
   catch (e) {
     handleError(e, step, JSON.parse(pendingTransferJSON, ethChainId));
