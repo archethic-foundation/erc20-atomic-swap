@@ -18,7 +18,7 @@ import { Crypto, Utils } from "archethic";
 import { createHmac } from "crypto";
 const { originPrivateKey } = Utils;
 
-import { archethicConnection, ethConfig, baseSeedContract, bridgeAddress, bridgeSeed, getUCOPrice, getLastTransaction, getStandardDeviation, getTransactionChain, maxSwapDollar } from "../utils.js";
+import { archethicConnection, etherConnection, ethConfig, baseSeedContract, bridgeAddress, bridgeSeed, getUCOPrice, getLastTransaction, getStandardDeviation, getTransactionChain, maxSwapDollar } from "../utils.js";
 import { toBigInt } from "archethic/lib/utils.js";
 
 export default { deployContract, withdraw }
@@ -26,8 +26,8 @@ export default { deployContract, withdraw }
 async function deployContract(req, res, next) {
   try {
 
-    const { providerEndpoint, unirisTokenAddress, recipientEthereum, sourceChainExplorer } = ethConfig[req.body.ethereumChainId]
-    const provider = new ethers.providers.JsonRpcProvider(providerEndpoint)
+    const provider = etherConnection(req.body.ethereumChainId)
+    const { unirisTokenAddress, recipientEthereum, sourceChainExplorer } = ethConfig[req.body.ethereumChainId]
 
     const ercContractEndTime = await checkEthereumContract(req.body.ethereumContractAddress, req.body.amount, req.body.secretHash, recipientEthereum, unirisTokenAddress, provider)
     console.log("Ethereum contract checked");
@@ -106,8 +106,7 @@ async function deployContract(req, res, next) {
 
 async function withdraw(req, res, next) {
   try {
-    const { providerEndpoint } = ethConfig[req.body.ethereumChainId];
-    const provider = new ethers.providers.JsonRpcProvider(providerEndpoint);
+    const provider = etherConnection(req.body.ethereumChainId)
 
     if (
       (await checkEthereumWithdraw(

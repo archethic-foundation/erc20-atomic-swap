@@ -1,5 +1,6 @@
 import Archethic, { Crypto, Utils } from "archethic";
 import fetch from "node-fetch"
+import { ethers } from "ethers";
 
 const archethicEndpoint =
   process.env["ARCHETHIC_ENDPOINT"] || "https://mainnet.archethic.net";
@@ -8,7 +9,8 @@ const bridgeSeed = process.env["BRIDGE_SEED"] || "6D0270D3DFFC88C63C5D3DD977C18B
 const bridgeAddress = Utils.uint8ArrayToHex(Crypto.deriveAddress(bridgeSeed, 0));
 const baseSeedContract = "197D7B086613BCB8AB991683D39CC489C343662B3DFF7990B567A2D471D941E";
 
-export const enabledNetworks = [1, 137, 56]
+//export const enabledNetworks = [1, 137, 56]
+export const enabledNetworks = [5, 1337, 80001, 97]
 
 const ethConfig = {
   1337: {
@@ -78,10 +80,24 @@ export {
   archethicEndpoint,
   getLastTransaction,
   getTransactionChain,
-  maxSwapDollar
+  maxSwapDollar,
+  etherConnection
 };
 
 let archethic
+let etherConnections = {}
+
+function etherConnection(ethChainId){
+    let connection = etherConnections[ethChainId]
+    if (connection) {
+      return connection
+    }
+    const { providerEndpoint } = ethConfig[ethChainId];
+    connection = new ethers.providers.JsonRpcProvider(providerEndpoint);
+    etherConnections[ethChainId] = connection
+    return connection
+}
+
 
 async function archethicConnection() {
   if (!archethic) {
