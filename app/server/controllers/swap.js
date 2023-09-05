@@ -117,6 +117,7 @@ async function withdraw(req, res, next) {
         provider
       )) == false
     ) {
+      console.log(`Cannot withdraw with invalid ETH withdraw transaction - ${req.body.ethereumWithdrawTransaction} at contract: ${req.body.ethereumContractAddress}`)
       throw "Invalid withdraw transaction";
     }
 
@@ -125,6 +126,9 @@ async function withdraw(req, res, next) {
       req.body.archethicContractAddress
     );
     if (chainSize == 0) {
+
+      console.log(`Cannot withdraw with a contract not deployed - ${req.body.archethicContractAddress}`)
+      
       return res
         .status(400)
         .json({ message: "Archethic's contract not deployed" });
@@ -137,6 +141,7 @@ async function withdraw(req, res, next) {
       );
       const chain = await getTransactionChain(archethic, req.body.archethicContractAddress);
       const archethicWithdrawTransaction = chain[1].address;
+      
       return res
         .status(200)
         .json({
@@ -147,25 +152,26 @@ async function withdraw(req, res, next) {
     }
 
 
+    console.log(`Creating revel secret transaction for ${req.body.archethicContractAddress}`)
     const revealTx = await createRevealSecretTransaction(
       archethic,
       req.body.archethicContractAddress,
       req.body.secret
     );
 
-    console.log("Sending withdraw transaction")
+    console.log(`Sending withdraw transaction for ${req.body.archethicContractAddress}`)
     await sendTransaction(revealTx);
     console.log(
-      `Reveal transaction created - ${Utils.uint8ArrayToHex(revealTx.address)}`
+      `Reveal transaction created - ${Utils.uint8ArrayToHex(revealTx.address)} for contract: ${req.body.archethicContractAddress}`
     );
 
-    console.log("Getting transfer address")
+    console.log(`Getting transfer address for ${req.body.archethicContractAddress}`)
     const transferTxAddress = await getLastAddressContract(
       archethic,
       req.body.archethicContractAddress
     );
 
-    console.log(`Transfer transaction - ${transferTxAddress}`);
+    console.log(`Transfer transaction - ${transferTxAddress} for contract ${req.body.archethicContractAddress}`);
 
     res.json({
       status: "ok",
